@@ -1,0 +1,6 @@
+{"chunk":"script.NiagaraShader","types":[
+{"name":"NiagaraDataInterfaceGPUParamInfo","kind":"struct","from":"/Script/NiagaraShader.NiagaraDataInterfaceGPUParamInfo","props":[["DIClassName","string","print(value.DIClassName)"],["DataInterfaceHLSLSymbol","string","print(value.DataInterfaceHLSLSymbol)"],["GeneratedFunctions","NiagaraDataInterfaceGeneratedFunction[]","print(value.GeneratedFunctions)"]]},
+{"name":"NiagaraDataInterfaceGeneratedFunction","kind":"struct","from":"/Script/NiagaraShader.NiagaraDataInterfaceGeneratedFunction","props":[]},
+{"name":"NiagaraScriptBase","kind":"class","from":"/Script/NiagaraShader.NiagaraScriptBase","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"SimulationStageMetaData","kind":"struct","from":"/Script/NiagaraShader.SimulationStageMetaData","props":[["IterationSource","string","print(value.IterationSource)"],["MaxStage","integer","print(value.MaxStage)"],["MinStage","integer","print(value.MinStage)"],["OutputDestinations","string[]","print(value.OutputDestinations)"],["SimulationStageName","string","print(value.SimulationStageName)"],["bPartialParticleUpdate","boolean","print(value.bPartialParticleUpdate)"],["bSpawnOnly","boolean","print(value.bSpawnOnly)"],["bWritesParticles","boolean","print(value.bWritesParticles)"]]}
+]}

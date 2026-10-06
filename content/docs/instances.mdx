@@ -31,6 +31,9 @@ end
 ## The object's own members
 
 Every other name is one of the object's own properties or functions. These are the ones the game gave it.
+Which ones it has depends on its class. Your character is an `IcarusPlayerCharacter`. That class is built on
+`IcarusCharacter`, which is built on `Character`, then `Pawn`, then `Actor`. The character has what all of
+those have, and so does everything else built on `Actor`.
 
 ```lua title="init.lua"
 local character = game.Character
@@ -53,7 +56,15 @@ If the name does not exist, you get an error. The error suggests the closest nam
 
 ### Find out what an object has
 
-`GetMembers()` lists every property and function name of an object.
+There are three ways.
+
+- The [Explorer](/explorer) on this site lists every class of the game, what it is built on, and each property
+  and function with its types.
+- The **Explorer** page of the [Wax panel](/docs/debug-panel#explorer) shows the objects in your running game
+  with their values.
+- In VS Code, the [extension](/docs/editor) completes the members of a class as you type.
+
+In a mod, `GetMembers()` lists every property and function name of an object.
 
 ```lua title="init.lua"
 local character = game.Character

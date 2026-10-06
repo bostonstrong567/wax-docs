@@ -1,6 +1,7 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import type { MDXComponents } from 'mdx/types';
+import { InExplorer } from '@/components/in-explorer';
 import { Shot, ShotRow } from '@/components/shot';
 
 export function getMDXComponents(components?: MDXComponents) {
@@ -10,6 +11,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Steps,
     Shot,
     ShotRow,
+    InExplorer,
     ...components,
   } satisfies MDXComponents;
 }

@@ -1,0 +1,3 @@
+{"chunk":"content.Game.UI.World","types":[
+{"name":"UMG_DeployableRotationIndicator_C","kind":"class","from":"/Game/UI/World/UMG_DeployableRotationIndicator.UMG_DeployableRotationIndicator_C","parent":"UserWidget","origin":"blueprint","props":[["DrawSize","number","print(obj.DrawSize)"],["Grow","WidgetAnimation","print(obj.Grow)"],["Image_AngleSnap","Image","print(obj.Image_AngleSnap)"],["Image_Rotator","Image","print(obj.Image_Rotator)"],["Rotate","WidgetAnimation","print(obj.Rotate)"]],"funcs":[["Construct",[],"","obj:Construct()"],["Hide",[],"","obj:Hide()"],["Show",[["DesiredSize","number"],["ShowAngleSnap","boolean"]],"","obj:Show(1.0, true)"]]}
+]}

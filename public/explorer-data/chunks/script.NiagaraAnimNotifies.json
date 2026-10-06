@@ -1,0 +1,3 @@
+{"chunk":"script.NiagaraAnimNotifies","types":[
+{"name":"AnimNotify_PlayNiagaraEffect","kind":"class","from":"/Script/NiagaraAnimNotifies.AnimNotify_PlayNiagaraEffect","parent":"AnimNotify","origin":"native","props":[["Attached","boolean","print(obj.Attached)"],["LocationOffset","Vector","print(obj.LocationOffset)"],["RotationOffset","Rotator","print(obj.RotationOffset)"],["Scale","Vector","print(obj.Scale)"],["SocketName","string","print(obj.SocketName)"],["Template","NiagaraSystem","print(obj.Template)"],["bAbsoluteScale","boolean","print(obj.bAbsoluteScale)"]],"funcs":[["GetSpawnedEffect",[],"FXSystemComponent","local result = obj:GetSpawnedEffect()"]]}
+]}

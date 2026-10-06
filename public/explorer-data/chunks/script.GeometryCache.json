@@ -1,0 +1,4 @@
+{"chunk":"script.GeometryCache","types":[
+{"name":"GeometryCache","kind":"class","from":"/Script/GeometryCache.GeometryCache","parent":"Object","origin":"native","props":[["EndFrame","integer","print(obj.EndFrame)"],["Hash","integer","print(obj.Hash)"],["Materials","MaterialInterface[]","print(obj.Materials)"],["StartFrame","integer","print(obj.StartFrame)"],["Tracks","GeometryCacheTrack[]","print(obj.Tracks)"]],"funcs":[]},
+{"name":"GeometryCacheTrack","kind":"class","from":"/Script/GeometryCache.GeometryCacheTrack","parent":"Object","origin":"native","props":[["Duration","number","print(obj.Duration)"]],"funcs":[]}
+]}

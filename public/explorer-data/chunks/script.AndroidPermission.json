@@ -1,0 +1,4 @@
+{"chunk":"script.AndroidPermission","types":[
+{"name":"AndroidPermissionCallbackProxy","kind":"class","from":"/Script/AndroidPermission.AndroidPermissionCallbackProxy","parent":"Object","origin":"native","props":[["OnPermissionsGrantedDynamicDelegate","delegate(Permissions: string[], GrantResults: boolean[])","print(obj.OnPermissionsGrantedDynamicDelegate)"]],"funcs":[]},
+{"name":"AndroidPermissionFunctionLibrary","kind":"class","from":"/Script/AndroidPermission.AndroidPermissionFunctionLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["AcquirePermissions",[["Permissions","string[]"]],"AndroidPermissionCallbackProxy","local result = obj:AcquirePermissions({})",["static"]],["CheckPermission",[["permission","string"]],"boolean","local result = obj:CheckPermission(\"text\")",["static"]]]}
+]}

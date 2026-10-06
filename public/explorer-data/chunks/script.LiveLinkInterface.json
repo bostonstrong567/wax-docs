@@ -1,0 +1,18 @@
+{"chunk":"script.LiveLinkInterface","types":[
+{"name":"LiveLinkAnimationFrameData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkAnimationFrameData","parent":"LiveLinkBaseFrameData","props":[["Transforms","Transform[]","print(value.Transforms)"]]},
+{"name":"LiveLinkBaseBlueprintData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkBaseBlueprintData","props":[]},
+{"name":"LiveLinkBaseFrameData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkBaseFrameData","props":[["MetaData","LiveLinkMetaData","print(value.MetaData)"],["PropertyValues","number[]","print(value.PropertyValues)"],["WorldTime","LiveLinkWorldTime","print(value.WorldTime)"]]},
+{"name":"LiveLinkBaseStaticData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkBaseStaticData","props":[["PropertyNames","string[]","print(value.PropertyNames)"]]},
+{"name":"LiveLinkBasicBlueprintData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkBasicBlueprintData","parent":"LiveLinkBaseBlueprintData","props":[["FrameData","LiveLinkBaseFrameData","print(value.FrameData)"],["StaticData","LiveLinkBaseStaticData","print(value.StaticData)"]]},
+{"name":"LiveLinkMetaData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkMetaData","props":[["SceneTime","QualifiedFrameTime","print(value.SceneTime)"],["StringMetadata","table<string, string>","print(value.StringMetadata)"]]},
+{"name":"LiveLinkRole","kind":"class","from":"/Script/LiveLinkInterface.LiveLinkRole","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"LiveLinkSkeletonStaticData","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkSkeletonStaticData","parent":"LiveLinkBaseStaticData","props":[["BoneNames","string[]","print(value.BoneNames)"],["BoneParents","integer[]","print(value.BoneParents)"]]},
+{"name":"LiveLinkSourceHandle","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkSourceHandle","props":[]},
+{"name":"LiveLinkSubjectKey","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkSubjectKey","props":[["Source","Guid","print(value.Source)"],["SubjectName","LiveLinkSubjectName","print(value.SubjectName)"]]},
+{"name":"LiveLinkSubjectName","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkSubjectName","props":[["Name","string","print(value.Name)"]]},
+{"name":"LiveLinkSubjectRepresentation","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkSubjectRepresentation","props":[["Role","Class","print(value.Role)"],["Subject","LiveLinkSubjectName","print(value.Subject)"]]},
+{"name":"LiveLinkTransform","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkTransform","props":[]},
+{"name":"LiveLinkWorldTime","kind":"struct","from":"/Script/LiveLinkInterface.LiveLinkWorldTime","props":[["Offset","number","print(value.Offset)"],["Time","number","print(value.Time)"]]},
+{"name":"SubjectFrameHandle","kind":"struct","from":"/Script/LiveLinkInterface.SubjectFrameHandle","parent":"LiveLinkBaseBlueprintData","props":[]},
+{"name":"SubjectMetadata","kind":"struct","from":"/Script/LiveLinkInterface.SubjectMetadata","props":[["SceneFramerate","FrameRate","print(value.SceneFramerate)"],["SceneTimecode","Timecode","print(value.SceneTimecode)"],["StringMetadata","table<string, string>","print(value.StringMetadata)"]]}
+]}

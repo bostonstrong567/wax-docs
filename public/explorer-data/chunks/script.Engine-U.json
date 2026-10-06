@@ -1,0 +1,6 @@
+{"chunk":"script.Engine-U","types":[
+{"name":"UniqueNetIdRepl","kind":"struct","from":"/Script/Engine.UniqueNetIdRepl","parent":"UniqueNetIdWrapper","props":[["ReplicationBytes","integer[]","print(value.ReplicationBytes)"]]},
+{"name":"UpdateLevelStreamingLevelStatus","kind":"struct","from":"/Script/Engine.UpdateLevelStreamingLevelStatus","props":[["LODIndex","integer","print(value.LODIndex)"],["PackageName","string","print(value.PackageName)"],["bNewShouldBeLoaded","boolean","print(value.bNewShouldBeLoaded)"],["bNewShouldBeVisible","boolean","print(value.bNewShouldBeVisible)"],["bNewShouldBlockOnLoad","boolean","print(value.bNewShouldBlockOnLoad)"]]},
+{"name":"UpdateLevelVisibilityLevelInfo","kind":"struct","from":"/Script/Engine.UpdateLevelVisibilityLevelInfo","props":[["Filename","string","print(value.Filename)"],["PackageName","string","print(value.PackageName)"],["bIsVisible","boolean","print(value.bIsVisible)"]]},
+{"name":"UserActivity","kind":"struct","from":"/Script/Engine.UserActivity","props":[["ActionName","string","print(value.ActionName)"]]}
+]}

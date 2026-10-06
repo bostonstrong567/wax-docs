@@ -31,7 +31,7 @@ without a trailing slash redirects, and a missing page gets `404.html`. To chang
 
 `npm run build` does three things in a row:
 
-1. It regenerates the reference and the icon list (see below).
+1. It regenerates the Explorer's data, the reference and the icon list (see below).
 2. It runs `next build`.
 3. It runs `scripts\fix-export.mjs`.
 
@@ -86,7 +86,7 @@ Text, then a complete example the reader can paste.
 
 ### Pages that name the download
 
-`content\docs\install.mdx` names the download `Wax-0.1.0.zip` and links to
+`content\docs\install.mdx` names the download `Wax-0.1.1.zip` and links to
 https://github.com/bostonstrong567/icarus-wax/releases/latest. The version comes from `wax\VERSION` in the Wax
 workspace. Change the file name on that page when the version changes.
 
@@ -143,13 +143,73 @@ The script runs by itself before `npm run dev` and `npm run build`. To run it wi
 npm run generate
 ```
 
-That runs both generators, this one and the icon list below. It prints what it could not use, and which
-classes and functions have no description.
+That runs all three generators: the Explorer's data, this one and the icon list below. This one prints what it
+could not use, and which classes and functions have no description.
+
+Three things in the type files are read in a special way:
+
+- A parameter typed in backticks, as in ``---@param class_name `T` ``, is a class name given as text. The page
+  shows it as a `string`.
+- With `---@generic T : WaxInstance` above it, the result typed `T?` is shown as `WaxInstance?`, with the words
+  "An Instance of that class".
+- A class that extends `table` is shown without a parent.
+
+Only the `.lua` files directly in `wax\types` are read. The `icarus` folder there holds the game's classes for
+the editor. The site shows those from the game index (see the Explorer page below).
+
+Every section and every function on a reference page ends with an "Open in the Explorer" link
+(`components\in-explorer.tsx`). A game class named on a reference page, such as `IcarusPlayerController`, links
+to that class in the Explorer. That goes for a type in a table and for a class named in a description. In a
+description only names that look like class names are linked (two words run together, or words joined by
+underscores, plus `Actor`, `Pawn` and `Object`), and never a name that Wax uses itself, such as `GameState`.
 
 The generated pages are committed. The published repository does not contain `wax\types`. There the script
 finds nothing to read, says so, and leaves the committed pages as they are. To update the reference, run the
 build in the Wax workspace (where this folder is `docs\` next to `wax\`) and commit the result. Set
 `WAX_TYPES_DIR` to read the type files from somewhere else.
+
+## The Explorer page
+
+`/explorer` searches and browses two things in one place: what Wax gives a mod, and the classes of the game.
+It runs in the browser. Nothing on it needs a server.
+
+| What | Made by | From | Kept in |
+| --- | --- | --- | --- |
+| Wax's own API | `scripts\generate-api.mjs` | `wax\types\*.lua` | `lib\explorer-wax.json` (part of the page's script) |
+| The game's types | `scripts\generate-explorer.mjs` | `build\game-index\site\` in the Wax workspace | `public\explorer-data\` |
+
+`build\game-index\site\` is written by `python scripts\gameindex.py site` in the Wax workspace. It is not in
+git, so `generate-explorer.mjs` copies what the page needs and the copy is committed. Without the folder the
+script says so and keeps the copy. Set `GAME_INDEX_DIR` to read the index from somewhere else. After a game
+update, run `gameindex.py site`, then `npm run generate`, and commit `public\explorer-data\`.
+
+| File in `public\explorer-data\` | What it holds | When the page fetches it |
+| --- | --- | --- |
+| `search.json` | Every type's name, kind and chunk. A copy of the index's own file. | On every visit |
+| `tree.json` | Each type's parent, the date of the index, and the other names a type goes by. Worked out from the chunks. | On every visit |
+| `members.json` | Member names, apart as properties, functions and delegates, each with the types that have it. Worked out from the chunks. | When a search first needs it |
+| `chunks\*.json` | Each type's properties and functions. Copies of the index's own files. | One file, when a type in it is opened |
+
+The index's own `members.json` does not say whether a member is a property or a function, so the script makes
+its own. The script stops with an error when the index and its chunks do not agree, or when the index has a
+format number it does not know. It also prints the type names that are mentioned and are not in the index.
+
+How the page works:
+
+- `lib\explorer.ts` holds the logic and no React: the search and its ranking, the links inside a type, and the
+  "In a script" examples for the game's members. `components\explorer.tsx` draws it.
+- The address bar follows the page: `?q=` is the search, `?kind=` and `?from=` are the filters, `?wax=ui.Notify`
+  opens an entry of Wax and `?game=Actor.K2_GetActorLocation` one of the game. A link shows the same view.
+- A search puts exact names first, then names that start with what was typed, then names with a word that
+  starts with it. Among equal matches Wax comes before the game.
+- The example for a game member goes through the member of `game` that is of that class (`game.Character`,
+  `game.World` and so on, as `wax\types\game.lua` types them). Other classes use `game:Find`.
+- A function the index marks `oversized` is shown as one that cannot be called from Lua, without an example.
+- The index was read at the game's title screen. Blueprint classes that only load inside a prospect are not in
+  it, and the page says so.
+
+Which guide page a Wax entry links to is set at the top of `scripts\generate-api.mjs` (`GUIDES`,
+`MEMBER_GUIDES`). The groups the page lists are `GROUPS` in the same file.
 
 ## The Icons page
 
@@ -211,10 +271,12 @@ In the repository settings, set **Pages > Build and deployment > Source** to **G
 | `content\docs\reference\` | Generated reference pages (committed) |
 | `public\img\` | Screenshots |
 | `public\lucide\` | The icon sheet and its licence (generated, committed) |
-| `app\` | The Next.js routes: the home page, the Mods and Icons pages, the docs layout, the search index |
-| `components\` | The wordmark, the search dialog, `Shot`, the mod browser, the icon browser and the MDX component list |
-| `lib\` | The content source, shared settings and `icon-names.json` (generated, committed) |
-| `scripts\generate-api.mjs` | Writes the reference pages |
+| `public\explorer-data\` | The game's types for the Explorer (generated, committed) |
+| `app\` | The Next.js routes: the home page, the Explorer, Mods and Icons pages, the docs layout, the search index |
+| `components\` | The wordmark, the search dialog, `Shot`, the Explorer, the mod browser, the icon browser and the MDX component list |
+| `lib\` | The content source, shared settings, the Explorer's logic, and `icon-names.json` and `explorer-wax.json` (generated, committed) |
+| `scripts\generate-api.mjs` | Writes the reference pages and `lib\explorer-wax.json` |
+| `scripts\generate-explorer.mjs` | Copies the game index into `public\explorer-data\` |
 | `scripts\generate-icons.mjs` | Writes the icon list and copies the icon sheet |
 | `scripts\fix-export.mjs` | Runs after the build: puts prefetch files where the browser asks for them (needed on Windows only) |
 | `scripts\check-links.mjs` | Checks the built site |

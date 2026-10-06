@@ -1,0 +1,5 @@
+{"chunk":"script.Engine-O","types":[
+{"name":"OnlineBlueprintCallProxyBase","kind":"class","from":"/Script/Engine.OnlineBlueprintCallProxyBase","parent":"BlueprintAsyncActionBase","origin":"native","props":[],"funcs":[]},
+{"name":"OnlineSession","kind":"class","from":"/Script/Engine.OnlineSession","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"OrbitOptions","kind":"struct","from":"/Script/Engine.OrbitOptions","props":[["bProcessDuringSpawn","boolean","print(value.bProcessDuringSpawn)"],["bProcessDuringUpdate","boolean","print(value.bProcessDuringUpdate)"],["bUseEmitterTime","boolean","print(value.bUseEmitterTime)"]]}
+]}

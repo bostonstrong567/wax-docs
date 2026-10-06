@@ -1,5 +1,5 @@
 import { ServerCodeBlock } from 'fumadocs-ui/components/codeblock.rsc';
-import { Activity, Boxes, Keyboard, LayoutPanelLeft, Package, RefreshCw, Shapes, Timer } from 'lucide-react';
+import { Activity, Boxes, Keyboard, LayoutPanelLeft, Package, RefreshCw, Search, Shapes, Timer } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Shot } from '@/components/shot';
@@ -80,6 +80,12 @@ const features: Card[] = [
 
 const places: Card[] = [
   {
+    icon: <Search className="size-4" />,
+    title: 'Explorer',
+    text: 'Search every function, event and type of Wax and of the game, and see how to write each one.',
+    href: '/explorer',
+  },
+  {
     icon: <Package className="size-4" />,
     title: 'Mods',
     text: 'The catalogue of Wax mods. Read about a mod and add it to your game.',
@@ -151,7 +157,7 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section className="-mt-12 grid gap-4 sm:grid-cols-2">
+      <section className="-mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {places.map((place) => (
           <CardLink key={place.title} card={place} />
         ))}

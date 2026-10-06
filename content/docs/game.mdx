@@ -22,23 +22,28 @@ Open the **Log** page of the [Wax panel](/docs/debug-panel) to see what it print
 
 ## What game has
 
-| Name | What it is |
-| --- | --- |
-| `game.World` | The current world. Its children are the actors in it. |
-| `game.LocalPlayer` | Your player controller. |
-| `game.Character` | The character you control. `nil` at the main menu. |
-| `game.Players` | The players in the session. See below. |
-| `game.GameState` | The state of the session, shared with every player. |
-| `game.GameMode` | The rules of the session. `nil` when you are a client in someone else's game. |
-| `game.GameInstance` | The object the game keeps from when it starts until it closes. |
-| `game.Engine` | The Unreal Engine object. |
-| `game.Viewport` | The game's view on the screen. |
-| `game.MapName` | The name of the current world, as text. |
-| `game.InProspect` | `true` while you are in a prospect. |
-| `game.MapChanged` | A [signal](/docs/signals) that fires when the world changes. |
+| Name | What it is | Its class |
+| --- | --- | --- |
+| `game.World` | The current world. Its children are the actors in it. | [`World`](/explorer?game=World) |
+| `game.LocalPlayer` | Your player controller. | [`IcarusPlayerController`](/explorer?game=IcarusPlayerController) |
+| `game.Character` | The character you control. `nil` at the main menu. | [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) |
+| `game.Players` | The players in the session. See below. | |
+| `game.GameState` | The state of the session, shared with every player. | [`IcarusGameStateBase`](/explorer?game=IcarusGameStateBase) |
+| `game.GameMode` | The rules of the session. `nil` when you are a client in someone else's game. | [`IcarusGameModeBase`](/explorer?game=IcarusGameModeBase) |
+| `game.GameInstance` | The object the game keeps from when it starts until it closes. | [`BP_IcarusGameInstance_C`](/explorer?game=BP_IcarusGameInstance_C) |
+| `game.Engine` | The Unreal Engine object. | [`IcarusGameEngine`](/explorer?game=IcarusGameEngine) |
+| `game.Viewport` | The game's view on the screen. | [`IcarusGameViewportClient`](/explorer?game=IcarusGameViewportClient) |
+| `game.MapName` | The name of the current world, as text. | |
+| `game.InProspect` | `true` while you are in a prospect. | |
+| `game.MapChanged` | A [signal](/docs/signals) that fires when the world changes. | |
 
 Most of these are **Instances**: objects of the game that you can read, change and call. The next page,
 [Instances](/docs/instances), shows how.
+
+Each one is of a different class, so each has different properties and functions. A player controller has
+`PlayerCameraManager`, and a game state has `PlayerArray`. Click a class in the table to see everything it
+has in the [Explorer](/explorer). The object you get in the game can be of a class built on the one named here.
+It then has everything listed, and more.
 
 `game` is read-only. If you misspell a name, you get an error that suggests the right one.
 
@@ -102,6 +107,7 @@ print("Controllers:", #everyone)
 | --- | --- |
 | `game:Find(class_name)` | The first live object of a class, or `nil`. |
 | `game:FindAll(class_name)` | A list of every live object of a class. |
+| `game:Library(name)` | One of the game's function libraries. See below. |
 | `game:GetTagged(tag)` | Every Instance you marked with that [tag](/docs/tags-and-attributes). |
 | `game:GetChildren()` | The top of the tree: world, game instance, game state and so on. |
 | `game:GetService(name)` | The same as `game[name]`. |
@@ -110,6 +116,25 @@ print("Controllers:", #everyone)
   `game:FindAll` looks at every object in the game. Call it once and keep the answer for a while. Never call
   it many times a second.
 </Callout>
+
+## Function libraries
+
+Some functions belong to no object in the world. The game keeps them in libraries, such as
+`KismetMathLibrary`, `KismetSystemLibrary` and `GameplayStatics`. `game:Library` gives you one, and you call
+its functions with a colon.
+
+```lua title="init.lua"
+local maths = game:Library("KismetMathLibrary")
+print(maths:Abs(-3.5))                              -- 3.5
+
+local system = game:Library("KismetSystemLibrary")
+print(system:GetGameTimeInSeconds(game.World))      -- seconds since the world started
+```
+
+Many of these functions ask for a `WorldContextObject` first. Pass `game.World`.
+
+The [Explorer](/explorer) lists every library and what its functions take. A wrong name raises an error that
+suggests the right one.
 
 ## The actors in the world
 

@@ -82,30 +82,66 @@ without clashing.
 
 ## More than one file
 
-Put shared code in its own file. Load it with `require`.
+A mod is a folder, and you can lay it out as you like. `init.lua` stays at the top. Other files go beside it or
+in folders of their own.
 
-```lua title="MyMod\helpers.lua"
-local helpers = {}
+```text
+MyMod\
+    mod.lua
+    init.lua
+    Utils.lua
+    extras\
+        Maths.lua
+    assets\
+        logo.png
+```
 
-function helpers.shout(text)
+Put shared code in its own file and return it:
+
+```lua title="MyMod\Utils.lua"
+local Utils = {}
+
+function Utils.shout(text)
     return text:upper() .. "!"
 end
 
-return helpers
+return Utils
 ```
+
+Load it with `require`. `mod` knows the files of your mod, so you name a file the way you see it in the folder:
 
 ```lua title="MyMod\init.lua"
-local helpers = require("helpers")
+local Utils = require(mod.Utils)
+local Maths = require(mod.extras.Maths)
 
-print(helpers.shout("hello"))   -- HELLO!
+print(Utils.shout("hello"))   -- HELLO!
 ```
 
-- `require("helpers")` loads `helpers.lua`.
-- `require("tools.math")` loads `tools\math.lua`. If that file is not there, it loads `tools\math\init.lua`.
-- A file runs once. A second `require` of the same name gives back the same value.
+- `mod.Utils` is `Utils.lua`. `mod.extras.Maths` is `extras\Maths.lua`.
+- A folder with an `init.lua` in it is loaded by the folder's name: `require(mod.extras)` loads `extras\init.lua`.
+- A file runs once. A second `require` of the same file gives back the same value.
 - What the file returns is what `require` gives you.
+- In VS Code, `mod.` lists your files and folders, and what a file returns completes too.
+
+The name in quotes works as well, with dots for folders: `require("Utils")`, `require("extras.Maths")`. You need
+that form for a file whose name has a dash in it, or is called `id`, `name`, `version` or `dir`.
 
 Saving any `.lua` file of the mod reloads the whole mod.
+
+## Pictures and other files
+
+Keep them in the mod's folder, for example in `assets`. `mod.dir` is the path of your mod's folder, so a file in
+it is `mod.dir .. "/assets/logo.png"`.
+
+```lua
+ui.Icons.Register("mymod-logo", mod.dir .. "/assets/logo.png")
+
+local window = ui.Window({ title = "My mod", icon = "mymod-logo" })
+window:Icon("mymod-logo", { size = 64 })
+```
+
+A registered picture is used by its name anywhere an icon name is taken. Use a PNG. Give the name a prefix of
+your own so it does not clash with another mod's.
 
 ## Using another mod
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Writes content/docs/reference/*.mdx from the LuaLS annotations in wax/types/*.lua.
+// Writes content/docs/reference/*.mdx from the LuaLS annotations in wax/types/*.lua, and the same
+// model as lib/explorer-wax.json for the Explorer page.
 // Runs before `dev` and `build`. When the type files are not there (the published repository
-// holds only this folder) it does nothing, and the committed pages are used as they are.
+// holds only this folder) it does nothing, and the committed files are used as they are.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,6 +60,69 @@ const PAGES = {
 const SKIP = new Set(['lua_basic.lua']);
 const IGNORED_TAGS = new Set(['meta']);
 
+const EXPLORER_OUT = path.join(DOCS, 'lib', 'explorer-wax.json');
+// The game's own types, so that a mention of one links to its entry in the Explorer.
+const GAME_TYPES = path.join(DOCS, 'public', 'explorer-data', 'search.json');
+const gameTypes = new Set(fs.existsSync(GAME_TYPES) ? JSON.parse(fs.readFileSync(GAME_TYPES, 'utf8')).types.map(([name]) => name) : []);
+// What a class name looks like in a sentence: two words run together, or words joined by underscores. Not inside quotes.
+const GAME_WORD = /(?<![\w."'/#=-])(Actor|Pawn|Object|[A-Z][a-z0-9]+(?:[A-Z]+[a-z0-9]*)+|[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+)(?![\w("'])/g;
+// The Explorer lists the API in this order. `names` takes single types or global functions out of their file's group.
+const GROUPS = [
+  { id: 'game', title: 'game', file: 'game.lua', text: 'The game tree, Instances, players, creatures and outlines.' },
+  { id: 'ui', title: 'ui', file: 'ui.lua', text: 'The menu, windows, overlays, notifications, tags, hotkeys and themes.' },
+  { id: 'controls', title: 'Controls', file: 'controls.lua', text: 'What goes in a window: text, buttons, switches, sliders, lists and grids.' },
+  { id: 'task', title: 'task', file: 'task.lua', text: 'Run code alongside the game: wait, delay and repeat.' },
+  { id: 'signal', title: 'Signal', names: ['WaxSignalLibrary', 'WaxSignal', 'WaxConnection'], text: 'Events, and the functions connected to them.' },
+  { id: 'storage', title: 'storage', names: ['WaxStorage', 'persist'], text: 'Keep values when the mod reloads and when the game restarts.' },
+  { id: 'mod', title: 'mod', file: 'mod.lua', text: 'What a mod knows about itself, require, and the functions that are blocked.' },
+  { id: 'log', title: 'log', names: ['WaxLogger', 'WaxLogEntry', 'print'], text: 'Write to the Wax log.' },
+];
+// The guide page that explains a type, by type name. The first match wins.
+const GUIDES = [
+  [/^Wax(Game|Players)$/, '/docs/game'],
+  [/^WaxInstance$/, '/docs/instances'],
+  [/^WaxCreature/, '/docs/creatures'],
+  [/^WaxHighlight/, '/docs/outlines'],
+  [/^WaxUI$/, '/docs/menu'],
+  [/^Wax(Window|Page|Status)/, '/docs/gui/windows'],
+  [/^WaxOverlay/, '/docs/gui/overlays'],
+  [/^WaxNotif/, '/docs/gui/notifications'],
+  [/^WaxIcons$/, '/docs/gui/icons'],
+  [/^WaxDebugPanel$/, '/docs/debug-panel'],
+  [/^WaxTag/, '/docs/gui/tags'],
+  [/^WaxHotkey/, '/docs/gui/hotkeys'],
+  [/^Wax(Theme|Color$|Shape$)/, '/docs/gui/themes'],
+  [/^WaxGrid/, '/docs/gui/grid'],
+  [/^WaxTask$/, '/docs/tasks'],
+  [/^Wax(Signal|Connection)/, '/docs/signals'],
+  [/^WaxStorage$/, '/docs/storage'],
+  [/^WaxLog/, '/docs/logging'],
+  [/^Wax(ModInfo|Manifest|File)$/, '/docs/mods'],
+];
+const FILE_GUIDES = { 'controls.lua': '/docs/gui/controls' };
+// Functions explained on another page than their type, by Explorer id.
+const MEMBER_GUIDES = [
+  [/^ui\.Windows?$/, '/docs/gui/windows'],
+  [/^ui\.Overlay$/, '/docs/gui/overlays'],
+  [/^ui\.Notify$/, '/docs/gui/notifications'],
+  [/^ui\.Tag$/, '/docs/gui/tags'],
+  [/^ui\.Hotkey$/, '/docs/gui/hotkeys'],
+  [/^ui\.(\w*Theme\w*|Color|\w+Scale|AddSettings)$/, '/docs/gui/themes'],
+  [/^WaxContainer\.Grid$/, '/docs/gui/grid'],
+  [/^WaxInstance\.(\w*Attribute\w*|\w+Tags?)$|^game\.GetTagged$/, '/docs/tags-and-attributes'],
+  [/^print$/, '/docs/logging'],
+  [/^persist$/, '/docs/storage'],
+  [/^(require|raw)$/, '/docs/mods'],
+];
+// How an example gets the thing a method is called on, where the first function that returns one is a poor choice.
+const SETUP = {
+  WaxInstance: { subject: 'instance', lines: ['local instance = game.World'] },
+  WaxContainer: { subject: 'window', lines: ['local window = ui.Window({ title = "Example" })'] },
+  WaxWindow: { subject: 'window', lines: ['local window = ui.Window({ title = "Example" })'] },
+  WaxConnection: { subject: 'connection', lines: ['local connection = game.MapChanged:Connect(function(name) end)'] },
+  WaxControl: { subject: 'control', lines: ['local window = ui.Window({ title = "Example" })', 'local control = window:Toggle("Example")'] },
+};
+
 if (!fs.existsSync(TYPES)) {
   console.log(`[generate-api] ${path.relative(DOCS, TYPES)} not found: keeping the reference pages that are already here.`);
   process.exit(0);
@@ -109,6 +173,7 @@ function readMember(text, at) {
   }
   const c = text[i];
   if (c === '"' || c === "'") i = closeQuote(text, i);
+  else if (c === '`') i = text.indexOf('`', i + 1) === -1 ? text.length : text.indexOf('`', i + 1) + 1;
   else if (c === '{' || c === '(' || c === '[') i = closeBracket(text, i);
   else if (text.startsWith('fun(', i)) {
     i = closeBracket(text, i + 3);
@@ -181,6 +246,7 @@ function parseFile(file, source) {
     params: [],
     returns: [],
     generics: [],
+    captured: [],
     overloads: [],
     type: null,
     deprecated: false,
@@ -200,7 +266,7 @@ function parseFile(file, source) {
         const entry = {
           name: match[1],
           generics: match[2] ? match[2].slice(1, -1).split(',').map((part) => part.trim()) : [],
-          parents: match[3] ? splitTopLevel(match[3], ',') : [],
+          parents: match[3] ? splitTopLevel(match[3], ',').filter((parent) => parent !== 'table') : [],
           description: takeText(),
           fields: [],
           methods: [],
@@ -246,18 +312,33 @@ function parseFile(file, source) {
         const start = match[0].length;
         const end = readType(rest, start);
         if (end === start) return note(file, line, `@param ${match[1]} has no type`);
+        // A type in backticks is a class name given as text, which the editor reads as the generic of that name.
+        const captured = /^`(\w+)`$/.exec(rest.slice(start, end));
+        if (captured) block.captured.push(captured[1]);
         block.params.push({
           name: match[1],
           optional: Boolean(match[2]),
-          type: rest.slice(start, end),
-          description: rest.slice(end).trim(),
+          type: captured ? 'string' : rest.slice(start, end),
+          description: rest.slice(end).trim() || (captured ? 'The name of a class, given as text.' : ''),
         });
         block.hasFunctionTags = true;
         return;
       }
       case 'return': {
-        const end = readType(rest, 0);
+        let end = readType(rest, 0);
         if (end === 0) return note(file, line, `could not read @return "${rest}"`);
+        // One line may name several values: `---@return WaxInstance?, number?`.
+        const first = rest.slice(0, end);
+        const more = [];
+        for (;;) {
+          const comma = skipSpaces(rest, end);
+          if (rest[comma] !== ',') break;
+          const start = skipSpaces(rest, comma + 1);
+          const next = readType(rest, start);
+          if (next === start) break;
+          more.push(rest.slice(start, next));
+          end = next;
+        }
         let tail = rest.slice(end).trim();
         let returnName = '';
         // LuaLS reads the first word as the value's name; a capitalised word is taken as prose instead.
@@ -267,7 +348,8 @@ function parseFile(file, source) {
           returnName = word[1];
           tail = tail.slice(word[0].length).replace(/^#\s*/, '').trim();
         }
-        block.returns.push({ type: rest.slice(0, end), name: returnName, description: tail });
+        block.returns.push({ type: first, name: returnName, description: tail });
+        for (const type of more) block.returns.push({ type, name: '', description: '' });
         block.hasFunctionTags = true;
         return;
       }
@@ -324,6 +406,19 @@ function parseFile(file, source) {
         if (!args.includes(param.name)) note(file, line, `${full}: @param "${param.name}" is not in the function's argument list`);
       }
       if (!text && !current.deprecated) bare.push(full);
+      // The page shows the widest type such a generic can be: `T : WaxInstance` reads as WaxInstance.
+      current.generics = current.generics.filter((generic) => {
+        const [name, base] = generic.split(':').map((part) => part.trim());
+        if (!base || !current.captured.includes(name)) return true;
+        const word = new RegExp(`\\b${name}\\b`, 'g');
+        for (const value of current.returns) {
+          if (!word.test(value.type)) continue;
+          value.type = value.type.replace(word, base);
+          const said = value.type.endsWith('[]') ? 'Instances of that class.' : value.type.endsWith('?') ? 'An Instance of that class, or nil.' : 'An Instance of that class.';
+          value.description ||= said;
+        }
+        return false;
+      });
       model.functions.push({
         table: cut === -1 ? null : full.slice(0, cut),
         separator: cut === -1 ? '' : full[cut],
@@ -408,6 +503,10 @@ const lowerFirst = (text) => text.charAt(0).toLowerCase() + text.slice(1);
 const anchorOf = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const isSignal = (type) => /^WaxSignal\b/.test(type);
 const selfMethod = (field) => /^fun\(\s*self\b/.test(field.type);
+// What the Explorer calls a type and a member: "ui", "ui.Notify", "WaxWindow.SetTitle", "print".
+const typeId = (entry) => entry.path ?? entry.name;
+const memberId = (fn) => (fn.deprecated || !fn.owner ? fn.name : `${typeId(fn.owner)}.${fn.name}`);
+const inExplorer = (id) => `<InExplorer id=${JSON.stringify(id)} />`;
 
 function resolve(models) {
   const classes = new Map();
@@ -517,6 +616,7 @@ function build(models) {
   const targetOf = (name) => {
     if (classes.has(name)) return `${ROUTE}/${pageOf.get(name)}#${classes.get(name).anchor}`;
     if (aliases.has(name)) return `${ROUTE}/${pageOf.get(name)}#${anchorOf(name)}`;
+    if (gameTypes.has(name)) return `/explorer?game=${encodeURIComponent(name)}`;
     return null;
   };
 
@@ -548,13 +648,22 @@ function build(models) {
       )
     : null;
 
+  // Names Wax itself uses. `game.GameState` is a member of game, not the engine class of the same name.
+  const ownNames = new Set([...classes.keys(), ...aliases.keys()]);
+  for (const entry of classes.values()) for (const item of [...entry.fields, ...entry.methods]) ownNames.add(item.name);
+
   const prose = (text, inTable, selfHref) => {
     if (!text) return '';
     const linked = text
       .split(/(`[^`]*`)/)
       .map((part, index) => {
-        if (index % 2 === 1 || !spokenPattern) return part;
-        return part.replace(spokenPattern, (whole, name) => {
+        if (index % 2 === 1) return part;
+        // A class of the game named in a sentence links to its entry in the Explorer.
+        const named = part.replace(GAME_WORD, (word) =>
+          gameTypes.has(word) && !ownNames.has(word) ? `[\`${word}\`](/explorer?game=${encodeURIComponent(word)})` : word,
+        );
+        if (!spokenPattern) return named;
+        return named.replace(spokenPattern, (whole, name) => {
           const href = spoken.get(name);
           return href === selfHref ? `\`${whole}\`` : `[\`${whole}\`](${href})`;
         });
@@ -634,6 +743,7 @@ function build(models) {
     } else {
       out.push('**Returns** nothing.', '');
     }
+    out.push(inExplorer(memberId(fn)), '');
   }
 
   function writeFields(out, fields, heading) {
@@ -672,6 +782,7 @@ function build(models) {
       if (users.length) facts.push(`Used by ${listed(users)}.`);
     }
     if (facts.length) out.push(facts.join(' '), '');
+    out.push(inExplorer(typeId(entry)), '');
 
     const signals = entry.fields.filter((field) => isSignal(field.type));
     const others = entry.fields.filter((field) => !isSignal(field.type));
@@ -686,7 +797,11 @@ function build(models) {
       ['Signal', 'Handler receives', 'Description'],
       signals.map((field) => {
         const shape = /^WaxSignal<fun\((.*)\)>$/.exec(field.type);
-        const receives = !shape ? 'depends on the control' : shape[1].trim() === '' ? 'nothing' : code(shape[1].trim(), true);
+        const part = (text) => {
+          const match = /^(\.\.\.|\w+)\??\s*:\s*(.+)$/.exec(text);
+          return match ? `${code(match[1], true)}: ${typeLinks(match[2], true)}` : code(text, true);
+        };
+        const receives = !shape ? 'depends on the control' : shape[1].trim() === '' ? 'nothing' : splitTopLevel(shape[1], ',').map(part).join(', ');
         return [code(field.name, true), receives, prose(field.description, true)];
       }),
     );
@@ -713,6 +828,7 @@ function build(models) {
       const rest = open.map((member) => typeLinks(member.value)).join(' or ');
       out.push(literal.length ? `One of ${list}${rest ? `, or any other ${rest}` : ''}.` : `One of ${rest}.`, '');
     }
+    out.push(inExplorer(entry.name), '');
   }
 
   const files = new Map();
@@ -726,6 +842,8 @@ function build(models) {
       '---',
       '',
       `{/* ${MARKER} from wax/types/${model.file}. Do not edit: change the type file and run "npm run generate". */}`,
+      '',
+      'The [Explorer](/explorer) searches everything on this page, and the classes of the game too.',
       '',
     ];
     const used = new Set();
@@ -749,7 +867,7 @@ function build(models) {
         used.add(anchorOf(value.name));
         out.push(`### \`${value.name}\` [#${anchorOf(value.name)}]`, '');
         if (value.description) out.push(prose(value.description), '');
-        out.push(`**Type** ${typeLinks(value.type)}`, '');
+        out.push(`**Type** ${typeLinks(value.type)}`, '', inExplorer(value.name), '');
       }
     }
 
@@ -766,18 +884,338 @@ function build(models) {
       out.push(`## ${config.deprecatedTitle ?? 'Deprecated'} [#${anchorOf(config.deprecatedTitle ?? 'Deprecated')}]`, '');
       if (config.deprecatedIntro) out.push(config.deprecatedIntro, '');
       table(out, ['Function', 'Note'], blocked.map((fn) => [code(fn.display, true), prose(fn.description, true)]));
+      out.push(inExplorer(BLOCKED), '');
     }
 
     files.set(`${config.slug}.mdx`, out.join('\n'));
   }
-  return files;
+  return { files, explorer: explorerData(models, classes, aliases, allFunctions, pageOf) };
+}
+
+// ---------------------------------------------------------------------------------------------
+// The same model as JSON, for the Explorer page.
+
+const GLOBALS = 'globals';
+const BLOCKED = 'blocked';
+const SAMPLES = new Map([
+  ['string', '"text"'],
+  ['number', '1'],
+  ['integer', '1'],
+  ['boolean', 'true'],
+]);
+
+function explorerData(models, classes, aliases, allFunctions, pageOf) {
+  const live = allFunctions.filter((fn) => !fn.deprecated);
+  const mentions = (type, name) => new RegExp(`(?<![\\w.])${name}(?![\\w.])`).test(type);
+  const refOf = (entry) => `${ROUTE}/${pageOf.get(entry.name)}#${entry.anchor ?? anchorOf(entry.name)}`;
+  const first = (rules, text) => rules.find(([pattern]) => pattern.test(text))?.[1];
+
+  // A guide is only linked when its page is there. The link shows the page's own title.
+  const guides = new Map();
+  function guide(href) {
+    if (!href) return undefined;
+    if (!guides.has(href)) {
+      const file = path.join(DOCS, 'content', `${href.replace(/^\//, '')}.mdx`);
+      const title = fs.existsSync(file) ? /^title:\s*(.+)$/m.exec(fs.readFileSync(file, 'utf8'))?.[1] : null;
+      if (!title) notes.push(`explorer: the guide ${href} has no page, so it is not linked`);
+      guides.set(href, title ? { href, title: title.trim().replace(/^"(.*)"$/, '$1') } : undefined);
+    }
+    return guides.get(href);
+  }
+  const typeGuide = (entry) => guide(first(GUIDES, entry.name) ?? FILE_GUIDES[entry.file]);
+
+  const groups = GROUPS.map((group) => ({ id: group.id, title: group.title, text: group.text, types: [], members: [] }));
+  function groupOf(name, file) {
+    const config = GROUPS.find((group) => group.names?.includes(name)) ?? GROUPS.find((group) => group.file === file);
+    const id = config?.id ?? anchorOf(path.basename(file, '.lua'));
+    let group = groups.find((entry) => entry.id === id);
+    if (!group) groups.push((group = { id, title: path.basename(file, '.lua'), text: '', types: [], members: [] }));
+    return group;
+  }
+
+  // What an example writes for one argument: a function is written out, anything else goes by its name.
+  function argument(param, name) {
+    const type = param?.type ?? '';
+    if (!type.startsWith('fun(')) return name;
+    const close = closeBracket(type, 3);
+    const inner = splitTopLevel(type.slice(4, close - 1), ',').map((part) => /^(\.\.\.|\w+)/.exec(part)?.[1] ?? '_');
+    return `function(${inner.join(', ')}) end`;
+  }
+  function callText(fn, subject, replace = {}) {
+    const args = fn.args.map((arg) => replace[arg] ?? argument(fn.params.get(arg), arg));
+    return `${fn.owner ? `${subject}${fn.separator}` : ''}${fn.name}(${args.join(', ')})`;
+  }
+  const exactly = (fn, name) => fn.returns.length > 0 && fn.returns[0].type.replace(/\?$/, '') === name;
+  // The lines that make the thing a method is called on, and the name it then goes by.
+  function setupFor(name, depth = 0) {
+    if (SETUP[name]) return SETUP[name];
+    const entry = classes.get(name);
+    if (entry.path) return { subject: entry.path, lines: [] };
+    if (depth < 2) {
+      for (const fn of live) {
+        if (!fn.owner || fn.owner === entry || !exactly(fn, name)) continue;
+        const owner = setupFor(fn.owner.name, depth + 1);
+        if (owner.subject === entry.subject) continue;
+        return { subject: entry.subject, lines: [...owner.lines, `local ${entry.subject} = ${callText(fn, owner.subject)}`] };
+      }
+    }
+    return { subject: entry.subject, lines: [] };
+  }
+  const declared = (lines) => lines.flatMap((line) => /^local ([\w, ]+) =/.exec(line)?.[1].split(/,\s*/) ?? []);
+  function resultName(value) {
+    if (value.name) return value.name;
+    const type = value.type.replace(/\?$/, '');
+    const base = type.replace(/\[\]$/, '').replace(/<.*$/, '');
+    const entry = classes.get(base);
+    if (!entry && !aliases.has(base)) return type.endsWith('[]') ? 'list' : 'result';
+    const word = entry?.kind === 'object' ? entry.subject : lowerFirst(base.replace(/^Wax/, ''));
+    return type.endsWith('[]') ? `${word}s` : word;
+  }
+  function callLines(fn, replace) {
+    const setup = fn.owner ? setupFor(fn.owner.name) : { subject: '', lines: [] };
+    const taken = new Set([setup.subject, ...declared(setup.lines), ...fn.args]);
+    const names = fn.returns.map((value) => {
+      let name = resultName(value);
+      for (let n = 1; taken.has(name); n++) name = n === 1 ? 'result' : `result${n}`;
+      taken.add(name);
+      return name;
+    });
+    return { lines: [...setup.lines, `${names.length ? `local ${names.join(', ')} = ` : ''}${callText(fn, setup.subject, replace)}`], names };
+  }
+  const useOfFunction = (fn) => (fn.deprecated ? '' : callLines(fn).lines.join('\n'));
+
+  const signalArgs = (type) => {
+    const shape = /^WaxSignal<fun\((.*)\)>$/.exec(type);
+    return shape ? splitTopLevel(shape[1], ',').map((part) => /^(\.\.\.|\w+)/.exec(part)?.[1] ?? '_') : ['...'];
+  };
+  function useOfSignal(entry, field, body) {
+    const setup = setupFor(entry.name);
+    const args = signalArgs(field.type);
+    const inside = body ?? (args.length ? `print(${args.join(', ')})` : `print("${field.name}")`);
+    return [...setup.lines, `${setup.subject}.${field.name}:Connect(function(${args.join(', ')})`, `    ${inside}`, 'end)'].join('\n');
+  }
+
+  // A value to write for an option, where its type leaves no doubt.
+  function sample(type) {
+    const plain = type.replace(/\?$/, '');
+    if (plain.startsWith('fun(')) return argument({ type: plain }, 'value');
+    const members = aliases.has(plain)
+      ? aliases.get(plain).members.length
+        ? aliases.get(plain).members.map((member) => member.value)
+        : splitTopLevel(aliases.get(plain).type, '|')
+      : splitTopLevel(plain, '|');
+    if (members.length > 0 && members.every((member) => /^["']/.test(member) || member === 'string') && /^["']/.test(members[0])) return members[0];
+    return SAMPLES.get(plain) ?? 'value';
+  }
+  const key = (name) => (/^[A-Za-z_]\w*$/.test(name) ? name : `[${JSON.stringify(name)}]`);
+  function useOfField(entry, field) {
+    if (field.name.startsWith('[')) return '';
+    if (entry.kind !== 'data') {
+      const setup = setupFor(entry.name);
+      return [...setup.lines, `print(${setup.subject}.${field.name})`].join('\n');
+    }
+    const takes = (fn) => fn.args.find((arg) => mentions(fn.params.get(arg)?.type ?? '', entry.name));
+    const user = live.find(takes);
+    const maker = live.find((fn) => fn.owner !== entry && fn.returns.some((value) => mentions(value.type, entry.name)));
+    const options = /(Options|Settings|Query)$/.test(entry.name) || entry.parents.includes('WaxOptions');
+    if (user && (options || !maker)) return callLines(user, { [takes(user)]: `{ ${key(field.name)} = ${sample(field.type)} }` }).lines.join('\n');
+    if (maker) {
+      const at = maker.returns.findIndex((value) => mentions(value.type, entry.name));
+      const made = callLines(maker);
+      const one = maker.returns[at].type.replace(/\?$/, '').endsWith('[]') ? `${made.names[at]}[1]` : made.names[at];
+      return [...made.lines, `print(${one}.${field.name})`].join('\n');
+    }
+    for (const owner of classes.values()) {
+      const signal = owner.fields.find((item) => isSignal(item.type) && mentions(item.type, entry.name));
+      if (!signal) continue;
+      const shape = /^WaxSignal<fun\((.*)\)>$/.exec(signal.type);
+      const part = splitTopLevel(shape?.[1] ?? '', ',').find((item) => mentions(item, entry.name));
+      const name = /^\w+/.exec(part ?? '')?.[0];
+      if (name) return useOfSignal(owner, signal, `print(${name}.${field.name})`);
+    }
+    return '';
+  }
+
+  // A type the definitions do not describe is described by the function it belongs to.
+  function about(entry, makers, users) {
+    const options = /(Options|Settings|Query)$/.test(entry.name) || entry.parents.includes('WaxOptions');
+    if (entry.kind === 'data' && options && users.length) return `The options that ${users[0].display} takes.`;
+    if (entry.kind !== 'namespace' && makers.length) return `What ${makers[0].display} gives back.`;
+    return '';
+  }
+
+  const spoken = {};
+  const drop = (object) => Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined && value !== '' && value !== false && !(Array.isArray(value) && value.length === 0)));
+  const paramOf = (fn) => (arg) => {
+    const param = fn.params.get(arg);
+    return drop({ name: arg, type: param?.type ?? 'any', optional: Boolean(param?.optional), text: param?.description ?? '' });
+  };
+  function functionRow(fn, ownerGuide) {
+    const id = memberId(fn);
+    const own = guide(first(MEMBER_GUIDES, id));
+    const shape = (overload) => {
+      const text = overload.replace(/^fun/, '');
+      return `${fn.display}${fn.separator === ':' ? text.replace(/^\(\s*self\s*:\s*[\w.<>]+\s*,?\s*/, '(') : text}`;
+    };
+    return drop({
+      id,
+      name: fn.name,
+      call: fn.display,
+      params: fn.args.map(paramOf(fn)),
+      returns: fn.returns.map((value) => drop({ type: value.type, name: value.name, text: value.description })),
+      generics: fn.generics,
+      overloads: fn.overloads.map(shape),
+      text: fn.description,
+      ref: fn.deprecated ? undefined : `${ROUTE}/${fn.page}#${fn.anchor}`,
+      guide: own && own.href !== ownerGuide?.href ? own : undefined,
+      use: useOfFunction(fn),
+    });
+  }
+
+  const types = [];
+  for (const model of models) {
+    for (const entry of model.classes) {
+      const id = typeId(entry);
+      const entryGuide = typeGuide(entry);
+      const setup = entry.kind === 'object' ? setupFor(entry.name) : null;
+      const makers = entry.kind === 'namespace' ? [] : live.filter((fn) => fn.owner !== entry && fn.returns.some((value) => mentions(value.type, entry.name)));
+      const users = entry.kind === 'data' ? live.filter((fn) => [...fn.params.values()].some((param) => mentions(param.type, entry.name))) : [];
+      const fieldRow = (field) =>
+        drop({
+          id: `${id}.${field.name}`,
+          name: field.name,
+          type: field.type,
+          optional: field.optional,
+          text: field.description || classes.get(field.type)?.description || '',
+          use: useOfField(entry, field),
+        });
+      const methods = entry.methods.filter((fn) => !fn.deprecated);
+      for (const fn of methods) {
+        if (entry.path) spoken[fn.display] = memberId(fn);
+        if (entry.bound && !entry.path) spoken[`${entry.bound.name}${fn.separator}${fn.name}`] = memberId(fn);
+      }
+      types.push(
+        drop({
+          id,
+          name: entry.name,
+          title: entry.heading,
+          kind: entry.kind,
+          group: groupOf(entry.name, entry.file).id,
+          text: entry.description || about(entry, makers, users),
+          parents: entry.parents,
+          generics: entry.generics,
+          ref: refOf(entry),
+          guide: entryGuide,
+          makers: makers.map(memberId),
+          users: users.map(memberId),
+          use: setup && setup.lines.length ? setup.lines.join('\n') : '',
+          props: entry.fields.filter((field) => !isSignal(field.type)).map(fieldRow),
+          signals: entry.fields
+            .filter((field) => isSignal(field.type))
+            .map((field) => {
+              const shape = /^WaxSignal<fun\((.*)\)>$/.exec(field.type);
+              return drop({
+                id: `${id}.${field.name}`,
+                name: field.name,
+                type: field.type,
+                receives: shape ? shape[1].trim() : undefined,
+                open: !shape,
+                text: field.description,
+                use: useOfSignal(entry, field),
+              });
+            }),
+          funcs: methods.map((fn) => functionRow(fn, entryGuide)),
+        }),
+      );
+      groupOf(entry.name, entry.file).types.push(id);
+    }
+    for (const entry of model.aliases) {
+      const split = splitTopLevel(entry.type, '|');
+      const values = entry.members.length ? entry.members : split.length > 1 ? split.map((value) => ({ value, description: '' })) : [];
+      types.push(
+        drop({
+          id: entry.name,
+          name: entry.name,
+          title: entry.name,
+          kind: 'alias',
+          group: groupOf(entry.name, entry.file).id,
+          text: entry.description,
+          ref: `${ROUTE}/${pageOf.get(entry.name)}#${anchorOf(entry.name)}`,
+          guide: guide(first(GUIDES, entry.name) ?? FILE_GUIDES[entry.file]),
+          type: entry.type,
+          values: values.map((member) => drop({ value: member.value, text: member.description })),
+        }),
+      );
+      groupOf(entry.name, entry.file).types.push(entry.name);
+    }
+  }
+
+  const globals = models.flatMap((model) => model.functions.filter((fn) => !fn.deprecated));
+  const values = models.flatMap((model) => model.values.map((value) => ({ ...value, page: model.config.slug })));
+  const blocked = models.flatMap((model) =>
+    [...model.functions, ...model.classes.flatMap((entry) => entry.methods)]
+      .filter((fn) => fn.deprecated)
+      .map((fn) => ({ fn, ref: `${ROUTE}/${model.config.slug}#${anchorOf(model.config.deprecatedTitle ?? 'Deprecated')}` })),
+  );
+  if (globals.length || values.length) {
+    types.push(
+      drop({
+        id: GLOBALS,
+        name: GLOBALS,
+        title: 'Global functions',
+        kind: 'globals',
+        group: groupOf(GLOBALS, [...globals, ...values][0].file).id,
+        text: 'Functions and values every mod has. Use them by name, with nothing in front.',
+        props: values.map((value) =>
+          drop({
+            id: value.name,
+            name: value.name,
+            type: value.type,
+            text: value.description,
+            ref: `${ROUTE}/${value.page}#${anchorOf(value.name)}`,
+            guide: guide(first(MEMBER_GUIDES, value.name)),
+            use: `print(${value.name})`,
+          }),
+        ),
+        funcs: globals.map((fn) => functionRow(fn)),
+      }),
+    );
+    for (const item of [...globals, ...values]) groupOf(item.name, item.file).members.push(item.name);
+  }
+  if (blocked.length) {
+    const config = models.find((model) => model.config.deprecatedIntro)?.config;
+    types.push({
+      id: BLOCKED,
+      name: BLOCKED,
+      title: config?.deprecatedTitle ?? 'Deprecated',
+      kind: 'blocked',
+      group: groupOf(BLOCKED, blocked[0].fn.file).id,
+      text: config?.deprecatedIntro ?? '',
+      ref: blocked[0].ref,
+      funcs: blocked.map(({ fn, ref }) => ({ ...functionRow(fn), ref, blocked: true })),
+    });
+    groupOf(BLOCKED, blocked[0].fn.file).types.push(BLOCKED);
+  }
+
+  // In a group: the types its page leads with, then tables of functions, objects, plain tables and named values.
+  const order = { namespace: 0, object: 1, data: 2, alias: 3, blocked: 4 };
+  const lead = new Set(models.flatMap((model) => model.config.lead ?? []).filter((name) => classes.has(name)).map((name) => typeId(classes.get(name))));
+  const kindOf = new Map(types.map((type) => [type.id, type.kind]));
+  for (const group of groups) {
+    const at = new Map(group.types.map((id, index) => [id, index]));
+    group.types.sort((a, b) => Number(lead.has(b)) - Number(lead.has(a)) || order[kindOf.get(a)] - order[kindOf.get(b)] || at.get(a) - at.get(b));
+  }
+
+  return { groups: groups.filter((group) => group.types.length || group.members.length), spoken, types };
 }
 
 // ---------------------------------------------------------------------------------------------
 
+// Only the files directly in the folder are Wax's own. Its `icarus` folder holds the game's classes, which the Explorer shows from the game index.
 const sources = fs
-  .readdirSync(TYPES)
-  .filter((name) => name.endsWith('.lua') && !SKIP.has(name))
+  .readdirSync(TYPES, { withFileTypes: true })
+  .filter((entry) => entry.isFile() && entry.name.endsWith('.lua') && !SKIP.has(entry.name))
+  .map((entry) => entry.name)
   .sort((a, b) => {
     const order = Object.keys(PAGES);
     const [ia, ib] = [order.indexOf(a), order.indexOf(b)];
@@ -785,12 +1223,13 @@ const sources = fs
   });
 
 const models = sources.map((name) => parseFile(name, fs.readFileSync(path.join(TYPES, name), 'utf8')));
-const files = build(models);
+const { files, explorer } = build(models);
 
 fs.mkdirSync(OUT, { recursive: true });
 let written = 0;
-for (const [name, content] of files) {
-  const target = path.join(OUT, name);
+const outputs = [...files].map(([name, content]) => [path.join(OUT, name), content]);
+outputs.push([EXPLORER_OUT, `${JSON.stringify(explorer, null, 1)}\n`]);
+for (const [target, content] of outputs) {
   if (fs.existsSync(target) && fs.readFileSync(target, 'utf8') === content) continue;
   fs.writeFileSync(target, content);
   written++;

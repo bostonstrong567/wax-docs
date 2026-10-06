@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
-    "predev": "node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
+    "generate": "node scripts/generate-explorer.mjs && node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
+    "predev": "node scripts/generate-explorer.mjs && node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
+    "prebuild": "node scripts/generate-explorer.mjs && node scripts/generate-api.mjs && node scripts/generate-icons.mjs",
     "build": "next build",
     "postbuild": "node scripts/fix-export.mjs",
     "serve": "node scripts/serve.mjs",

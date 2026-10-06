@@ -1,0 +1,5 @@
+{"chunk":"script.AudioCapture","types":[
+{"name":"AudioCapture","kind":"class","from":"/Script/AudioCapture.AudioCapture","parent":"AudioGenerator","origin":"native","props":[],"funcs":[["GetAudioCaptureDeviceInfo",[["OutInfo","AudioCaptureDeviceInfo"]],"boolean","local result = obj:GetAudioCaptureDeviceInfo({})"],["IsCapturingAudio",[],"boolean","local result = obj:IsCapturingAudio()"],["StartCapturingAudio",[],"","obj:StartCapturingAudio()"],["StopCapturingAudio",[],"","obj:StopCapturingAudio()"]]},
+{"name":"AudioCaptureDeviceInfo","kind":"struct","from":"/Script/AudioCapture.AudioCaptureDeviceInfo","props":[["DeviceName","string","print(value.DeviceName)"],["NumInputChannels","integer","print(value.NumInputChannels)"],["SampleRate","integer","print(value.SampleRate)"]]},
+{"name":"AudioCaptureFunctionLibrary","kind":"class","from":"/Script/AudioCapture.AudioCaptureFunctionLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["CreateAudioCapture",[],"AudioCapture","local result = obj:CreateAudioCapture()",["static"]]]}
+]}

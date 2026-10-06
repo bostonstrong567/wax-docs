@@ -1,10 +1,10 @@
 ---
 title: The Wax panel
-description: "The window that comes with Wax: your mods, the log, a Lua command bar, performance, icons and settings."
+description: "The window that comes with Wax: your mods, the log, a Lua command bar, performance, icons, an explorer of the running game and settings."
 icon: Bug
 ---
 
-Wax comes with one window of its own, called **Wax**. Press **F8** and it is there. It has five pages.
+Wax comes with one window of its own, called **Wax**. Press **F8** and it is there. It has six pages.
 
 The line along the bottom is always visible. It says how many mods loaded and whether there are errors. On
 the right it shows the frame rate and the time Wax uses per frame.
@@ -123,6 +123,44 @@ The numbers are measured again every half second.
 
 This page shows every icon you can use. Type in the box to search. Click an icon and a notification shows its
 name. Use that name anywhere an icon is accepted. See [Icons](/docs/gui/icons).
+
+## Explorer
+
+This page shows what is in the game while it runs, and lets you change it.
+
+The left side is a tree. Its first rows are the parts of `game`: your character, your controller, the game
+state and the others. Under **World** are the actors of the current world. A row with an arrow has things
+attached to it. Click a row to pick it.
+
+- Type in the search box to find something by its name or its class. With several words, all of them must match.
+- The first dropdown picks what is listed: actors, creatures, players, items, buildings, components or everything.
+- The second dropdown sorts the list: by name, by class, nearest first or newest first.
+- The line under the tree keeps only what is within a distance of you.
+
+The right side shows what you picked. The small line under its name is the Lua that reaches it, and the copy
+button beside the name copies that line. The button with the turned arrow goes back to what you had picked before.
+
+Each row is one member: its name, its value and its type. The values are read again while you look, and a
+value that changed is marked for a moment. That is how you find the property that goes with something you do
+in the game. Choose **Changed** in the first dropdown to see only those, or **Changed first** in the second.
+
+- A value that is an object is a link. Click it to go to that object.
+- A true-or-false member has a switch.
+- For a number or a text, click the row, type the new value in the box at the bottom and press Enter.
+- A vector, a rotator or a colour opens with its arrow, and each part is typed on its own.
+- The `<>` button copies the Lua that reads the picked member and the Lua that sets it.
+
+Choose **Functions** to see the object's functions with their parameters. They are not called from this page.
+The `<>` button copies the call.
+
+**Changes as Lua**, along the bottom, lists everything you changed here as lines of Lua that do the same.
+Copy them into a mod.
+
+In a narrow window one side shows at a time, and an arrow at the top takes you back to the tree.
+
+<Callout type="warn" title="A change here is a change in your game">
+  Not every value is meant to be changed. Try things on a character you can afford to lose.
+</Callout>
 
 ## Settings
 

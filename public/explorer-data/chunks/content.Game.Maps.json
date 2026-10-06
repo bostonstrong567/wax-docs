@@ -1,0 +1,3 @@
+{"chunk":"content.Game.Maps","types":[
+{"name":"TitleScreen_C","kind":"class","from":"/Game/Maps/TitleScreen/TitleScreen.TitleScreen_C","parent":"LevelScriptActor","origin":"blueprint","props":[],"funcs":[]}
+]}

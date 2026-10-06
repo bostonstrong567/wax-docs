@@ -39,12 +39,19 @@ the first time. Change what is inside the table. Don't replace the table.
 
 ## When a reload fails
 
-If the new code has an error, the mod does not load.
+There are two ways a save can go wrong.
+
+**The file does not compile.** This happens when you save in the middle of a line, or when your editor saves
+by itself while you type. Wax leaves the mod as it is: the version from before that save keeps running. The
+mod's card on the Mods page says which line is wrong. It is not counted as an error.
+
+**The file compiles but fails when it runs.** The mod does not load.
 
 - A red notification shows the error.
 - The Mods page marks the mod as failed and shows the error under its name.
 
-Fix the file and save. Wax tries again by itself.
+Either way, fix the file and save. Wax tries again by itself. Once the mod loads, its old errors are cleared
+from the panel.
 
 ## New mods start switched off
 

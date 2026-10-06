@@ -12,6 +12,9 @@ export const searchIndexUrl = `${basePath}/search-index.json`;
 // The mod catalogue. Absolute, because the GitHub Pages copy of the site is on another host.
 export const marketApi = 'https://wax-icarus.duckdns.org/api';
 
+// The index of the game's classes, put there by scripts/generate-explorer.mjs.
+export const explorerDataUrl = `${basePath}/explorer-data`;
+
 // Every bundled icon on one image, put there by scripts/generate-icons.mjs.
 export const iconSheetUrl = `${basePath}/lucide/sheet32.png`;
 export const iconLicenseUrl = `${basePath}/lucide/LICENSE.txt`;

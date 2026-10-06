@@ -1,0 +1,4 @@
+{"chunk":"script.MediaAssets","types":[
+{"name":"MediaBlueprintFunctionLibrary","kind":"class","from":"/Script/MediaAssets.MediaBlueprintFunctionLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["EnumerateAudioCaptureDevices",[["OutDevices","MediaCaptureDevice[]"],["Filter","integer"]],"","obj:EnumerateAudioCaptureDevices({}, 1)",["static"]],["EnumerateVideoCaptureDevices",[["OutDevices","MediaCaptureDevice[]"],["Filter","integer"]],"","obj:EnumerateVideoCaptureDevices({}, 1)",["static"]],["EnumerateWebcamCaptureDevices",[["OutDevices","MediaCaptureDevice[]"],["Filter","integer"]],"","obj:EnumerateWebcamCaptureDevices({}, 1)",["static"]]]},
+{"name":"MediaCaptureDevice","kind":"struct","from":"/Script/MediaAssets.MediaCaptureDevice","props":[["DisplayName","string","print(value.DisplayName)"],["URL","string","print(value.URL)"]]}
+]}
