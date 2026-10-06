@@ -9,6 +9,7 @@
     "game.Players",
     "game.Creatures",
     "game.Highlight",
+    "game.Crafting",
     "WaxInstance",
     "WaxHighlightLook",
     "WaxHighlightMark",
@@ -17,6 +18,7 @@
     "WaxCreatureFacts",
     "WaxCreatureEnd",
     "WaxHighlightOptions",
+    "WaxListedRecipe",
     "WaxCreature",
     "WaxGameMember"
    ],
@@ -28,6 +30,7 @@
    "text": "The menu, windows, overlays, notifications, tags, hotkeys and themes.",
    "types": [
     "ui",
+    "ui.Pictures",
     "ui.Notifications",
     "ui.Icons",
     "ui.Debug",
@@ -35,6 +38,7 @@
     "WaxWindow",
     "WaxStatusBar",
     "WaxOverlay",
+    "WaxFit",
     "WaxNotification",
     "WaxTag",
     "WaxHotkey",
@@ -47,6 +51,8 @@
     "WaxPageOptions",
     "WaxStatusOptions",
     "WaxOverlayOptions",
+    "WaxPanelOptions",
+    "WaxFitOptions",
     "WaxNotifyOptions",
     "WaxTagOptions",
     "WaxHotkeyOptions",
@@ -86,6 +92,7 @@
     "WaxGrid",
     "WaxItem",
     "WaxSplit",
+    "WaxSlots",
     "WaxLabelOptions",
     "WaxButtonOptions",
     "WaxIconOptions",
@@ -100,6 +107,8 @@
     "WaxItemLook",
     "WaxItemOptions",
     "WaxSplitOptions",
+    "WaxSlotLook",
+    "WaxSlotsOptions",
     "WaxConsoleLine"
    ],
    "members": []
@@ -161,6 +170,20 @@
    "members": [
     "print"
    ]
+  },
+  {
+   "id": "data",
+   "title": "data",
+   "text": "",
+   "types": [
+    "game.Data",
+    "WaxDataTable",
+    "WaxRowHandle",
+    "WaxDataField",
+    "WaxDataLoadOptions",
+    "WaxDataRow"
+   ],
+   "members": []
   }
  ],
  "spoken": {
@@ -188,6 +211,13 @@
   "Overlay:IsVisible": "WaxOverlay.IsVisible",
   "Overlay:SetAnchor": "WaxOverlay.SetAnchor",
   "Overlay:Destroy": "WaxOverlay.Destroy",
+  "Overlay:SetOffset": "WaxOverlay.SetOffset",
+  "Overlay:IsShowing": "WaxOverlay.IsShowing",
+  "Fit:Set": "WaxFit.Set",
+  "Fit:SetEnabled": "WaxFit.SetEnabled",
+  "Fit:Remove": "WaxFit.Remove",
+  "ui.Pictures.Check": "ui.Pictures.Check",
+  "ui.Pictures.Stats": "ui.Pictures.Stats",
   "Notification:SetText": "WaxNotification.SetText",
   "Notification:SetTitle": "WaxNotification.SetTitle",
   "Notification:SetProgress": "WaxNotification.SetProgress",
@@ -214,6 +244,12 @@
   "ui.GetToggleKey": "ui.GetToggleKey",
   "ui.Window": "ui.Window",
   "ui.Overlay": "ui.Overlay",
+  "ui.Panel": "ui.Panel",
+  "ui.Hovered": "ui.Hovered",
+  "ui.IsTyping": "ui.IsTyping",
+  "ui.ScreenSize": "ui.ScreenSize",
+  "ui.FitGame": "ui.FitGame",
+  "ui.GameScreen": "ui.GameScreen",
   "ui.Tag": "ui.Tag",
   "ui.Notify": "ui.Notify",
   "ui.Windows": "ui.Windows",
@@ -243,6 +279,8 @@
   "Heading:Set": "WaxHeading.Set",
   "Button:SetIcon": "WaxButton.SetIcon",
   "Button:Spin": "WaxButton.Spin",
+  "Button:SetCaption": "WaxButton.SetCaption",
+  "Button:SetActive": "WaxButton.SetActive",
   "Icon:Set": "WaxIcon.Set",
   "Toggle:Get": "WaxToggle.Get",
   "Toggle:Set": "WaxToggle.Set",
@@ -290,6 +328,7 @@
   "Container:Flow": "WaxContainer.Flow",
   "Container:Item": "WaxContainer.Item",
   "Container:Split": "WaxContainer.Split",
+  "Container:Slots": "WaxContainer.Slots",
   "Container:Progress": "WaxContainer.Progress",
   "Container:Field": "WaxContainer.Field",
   "Container:Keybind": "WaxContainer.Keybind",
@@ -305,6 +344,11 @@
   "Split:Shown": "WaxSplit.Shown",
   "Split:SetShare": "WaxSplit.SetShare",
   "Split:GetShare": "WaxSplit.GetShare",
+  "Slots:Set": "WaxSlots.Set",
+  "Slots:SetLook": "WaxSlots.SetLook",
+  "Slots:GetLook": "WaxSlots.GetLook",
+  "Slots:Capacity": "WaxSlots.Capacity",
+  "Slots:Ready": "WaxSlots.Ready",
   "Instance:Get": "WaxInstance.Get",
   "Instance:Set": "WaxInstance.Set",
   "Instance:Call": "WaxInstance.Call",
@@ -357,6 +401,12 @@
   "game:GetTagged": "game.GetTagged",
   "game:GetChildren": "game.GetChildren",
   "game:GetService": "game.GetService",
+  "game.Crafting:GetRecipes": "game.Crafting.GetRecipes",
+  "game.Crafting:GetScreen": "game.Crafting.GetScreen",
+  "game.Crafting:GetHovered": "game.Crafting.GetHovered",
+  "game.Crafting:OpenTab": "game.Crafting.OpenTab",
+  "game.Crafting:Select": "game.Crafting.Select",
+  "game.Crafting:SetListHidden": "game.Crafting.SetListHidden",
   "Connection:Disconnect": "WaxConnection.Disconnect",
   "Signal.new": "Signal.new",
   "task.spawn": "task.spawn",
@@ -371,7 +421,21 @@
   "log:warn": "log.warn",
   "log:error": "log.error",
   "storage.Load": "storage.Load",
-  "storage.Save": "storage.Save"
+  "storage.Save": "storage.Save",
+  "DataTable:Count": "WaxDataTable.Count",
+  "DataTable:GetNames": "WaxDataTable.GetNames",
+  "DataTable:Has": "WaxDataTable.Has",
+  "DataTable:Row": "WaxDataTable.Row",
+  "DataTable:Load": "WaxDataTable.Load",
+  "DataTable:Loaded": "WaxDataTable.Loaded",
+  "DataTable:Fields": "WaxDataTable.Fields",
+  "DataTable:Meta": "WaxDataTable.Meta",
+  "DataTable:Stamp": "WaxDataTable.Stamp",
+  "game.Data:Table": "game.Data.Table",
+  "game.Data:GetTables": "game.Data.GetTables",
+  "game.Data:Has": "game.Data.Has",
+  "game.Data:Resolve": "game.Data.Resolve",
+  "game.Data:Flush": "game.Data.Flush"
  },
  "types": [
   {
@@ -1554,9 +1618,20 @@
     "title": "Overlays"
    },
    "makers": [
-    "ui.Overlay"
+    "ui.Overlay",
+    "ui.Panel"
    ],
    "use": "local overlay = ui.Overlay(options)",
+   "signals": [
+    {
+     "id": "WaxOverlay.Scrolled",
+     "name": "Scrolled",
+     "type": "WaxSignal<fun(steps: integer)>",
+     "receives": "steps: integer",
+     "text": "On a panel made with ui.Panel: the wheel was turned over it, 1 for down and -1 for up. The game does not see the wheel while the mouse is over a panel.",
+     "use": "local overlay = ui.Overlay(options)\noverlay.Scrolled:Connect(function(steps)\n    print(steps)\nend)"
+    }
+   ],
    "funcs": [
     {
      "id": "WaxOverlay.SetVisible",
@@ -1616,6 +1691,272 @@
      "text": "Removes the overlay and everything on it.",
      "ref": "/docs/reference/ui#overlay-destroy",
      "use": "local overlay = ui.Overlay(options)\noverlay:Destroy()"
+    },
+    {
+     "id": "WaxOverlay.SetOffset",
+     "name": "SetOffset",
+     "call": "overlay:SetOffset",
+     "params": [
+      {
+       "name": "x",
+       "type": "number",
+       "optional": true
+      },
+      {
+       "name": "y",
+       "type": "number",
+       "optional": true
+      }
+     ],
+     "text": "Moves it without changing its anchor. x and y keep their values when omitted.",
+     "ref": "/docs/reference/ui#overlay-setoffset",
+     "use": "local overlay = ui.Overlay(options)\noverlay:SetOffset(x, y)"
+    },
+    {
+     "id": "WaxOverlay.IsShowing",
+     "name": "IsShowing",
+     "call": "overlay:IsShowing",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True while it is really on screen: switched on, and what it waits for (the menu, the mouse) is there.",
+     "ref": "/docs/reference/ui#overlay-isshowing",
+     "use": "local overlay = ui.Overlay(options)\nlocal result = overlay:IsShowing()"
+    }
+   ]
+  },
+  {
+   "id": "WaxPanelOptions",
+   "name": "WaxPanelOptions",
+   "title": "WaxPanelOptions",
+   "kind": "data",
+   "group": "ui",
+   "text": "The options that ui.Panel takes.",
+   "parents": [
+    "WaxOverlayOptions"
+   ],
+   "ref": "/docs/reference/ui#waxpaneloptions",
+   "users": [
+    "ui.Panel"
+   ],
+   "props": [
+    {
+     "id": "WaxPanelOptions.when",
+     "name": "when",
+     "type": "\"cursor\"|\"menu\"|\"always\"",
+     "optional": true,
+     "text": "When it shows: \"cursor\" (the default) while the Wax menu is open or one of the game's own screens has the mouse, \"menu\" only with the Wax menu, \"always\" whenever it is switched on.",
+     "use": "local overlay = ui.Panel({ when = \"cursor\" })"
+    },
+    {
+     "id": "WaxPanelOptions.padding",
+     "name": "padding",
+     "type": "number",
+     "optional": true,
+     "text": "Space between its edge and its controls.",
+     "use": "local overlay = ui.Panel({ padding = 1 })"
+    },
+    {
+     "id": "WaxPanelOptions.height",
+     "name": "height",
+     "type": "number",
+     "optional": true,
+     "text": "A fixed height. As tall as its controls when omitted.",
+     "use": "local overlay = ui.Panel({ height = 1 })"
+    },
+    {
+     "id": "WaxPanelOptions.zoom",
+     "name": "zoom",
+     "type": "number",
+     "optional": true,
+     "text": "Draws everything in it this much larger (1.25 is a quarter larger). Text stays sharp.",
+     "use": "local overlay = ui.Panel({ zoom = 1 })"
+    },
+    {
+     "id": "WaxPanelOptions.opacity",
+     "name": "opacity",
+     "type": "number",
+     "optional": true,
+     "text": "How solid its background is, 0 to 1. 0.96 when omitted.",
+     "use": "local overlay = ui.Panel({ opacity = 1 })"
+    },
+    {
+     "id": "WaxPanelOptions.visible",
+     "name": "visible",
+     "type": "boolean",
+     "optional": true,
+     "text": "False makes it hidden until SetVisible(true).",
+     "use": "local overlay = ui.Panel({ visible = true })"
+    },
+    {
+     "id": "WaxPanelOptions.on_press",
+     "name": "on_press",
+     "type": "fun()",
+     "optional": true,
+     "text": "Runs when the panel is pressed where it has no control.",
+     "use": "local overlay = ui.Panel({ on_press = function() end })"
+    }
+   ]
+  },
+  {
+   "id": "WaxFitOptions",
+   "name": "WaxFitOptions",
+   "title": "WaxFitOptions",
+   "kind": "data",
+   "group": "ui",
+   "text": "The options that ui.FitGame takes.",
+   "parents": [
+    "WaxOptions"
+   ],
+   "ref": "/docs/reference/ui#waxfitoptions",
+   "users": [
+    "ui.FitGame"
+   ],
+   "props": [
+    {
+     "id": "WaxFitOptions.scale",
+     "name": "scale",
+     "type": "number",
+     "optional": true,
+     "text": "How large the game's menus are drawn, 0.5 to 1. 0.85 when omitted.",
+     "use": "local fit = ui.FitGame({ scale = 1 })"
+    },
+    {
+     "id": "WaxFitOptions.corner",
+     "name": "corner",
+     "type": "WaxAnchor",
+     "optional": true,
+     "text": "The corner they shrink towards. \"bottom-left\" when omitted, which frees the right and the top.",
+     "use": "local fit = ui.FitGame({ corner = \"top-left\" })"
+    },
+    {
+     "id": "WaxFitOptions.x",
+     "name": "x",
+     "type": "number",
+     "optional": true,
+     "text": "Moves them sideways after they are made smaller, as a share of the screen. Right is positive.",
+     "use": "local fit = ui.FitGame({ x = 1 })"
+    },
+    {
+     "id": "WaxFitOptions.y",
+     "name": "y",
+     "type": "number",
+     "optional": true,
+     "text": "Moves them up or down after they are made smaller, as a share of the screen. Down is positive.",
+     "use": "local fit = ui.FitGame({ y = 1 })"
+    },
+    {
+     "id": "WaxFitOptions.enabled",
+     "name": "enabled",
+     "type": "boolean",
+     "optional": true,
+     "text": "False makes the request wait for SetEnabled(true).",
+     "use": "local fit = ui.FitGame({ enabled = true })"
+    }
+   ]
+  },
+  {
+   "id": "WaxFit",
+   "name": "WaxFit",
+   "title": "WaxFit",
+   "kind": "object",
+   "group": "ui",
+   "text": "A request to draw the game's own menus smaller.",
+   "ref": "/docs/reference/ui#waxfit",
+   "makers": [
+    "ui.FitGame"
+   ],
+   "use": "local fit = ui.FitGame(options)",
+   "funcs": [
+    {
+     "id": "WaxFit.Set",
+     "name": "Set",
+     "call": "fit:Set",
+     "params": [
+      {
+       "name": "scale",
+       "type": "number"
+      },
+      {
+       "name": "x",
+       "type": "number",
+       "optional": true,
+       "text": "Keeps its value when omitted."
+      },
+      {
+       "name": "y",
+       "type": "number",
+       "optional": true,
+       "text": "Keeps its value when omitted."
+      }
+     ],
+     "ref": "/docs/reference/ui#fit-set",
+     "use": "local fit = ui.FitGame(options)\nfit:Set(scale, x, y)"
+    },
+    {
+     "id": "WaxFit.SetEnabled",
+     "name": "SetEnabled",
+     "call": "fit:SetEnabled",
+     "params": [
+      {
+       "name": "on",
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/ui#fit-setenabled",
+     "use": "local fit = ui.FitGame(options)\nfit:SetEnabled(on)"
+    },
+    {
+     "id": "WaxFit.Remove",
+     "name": "Remove",
+     "call": "fit:Remove",
+     "text": "Gives the game's menus their own size back.",
+     "ref": "/docs/reference/ui#fit-remove",
+     "use": "local fit = ui.FitGame(options)\nfit:Remove()"
+    }
+   ]
+  },
+  {
+   "id": "ui.Pictures",
+   "name": "WaxPictures",
+   "title": "ui.Pictures",
+   "kind": "namespace",
+   "group": "ui",
+   "ref": "/docs/reference/ui#ui-pictures",
+   "funcs": [
+    {
+     "id": "ui.Pictures.Check",
+     "name": "Check",
+     "call": "ui.Pictures.Check",
+     "params": [
+      {
+       "name": "path",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "string?"
+      }
+     ],
+     "text": "The game path of a picture as it can be shown (\"/Game/.../ITEM_Wood.ITEM_Wood\"), or nil when the text is not one.",
+     "ref": "/docs/reference/ui#ui-pictures-check",
+     "use": "local result = ui.Pictures.Check(path)"
+    },
+    {
+     "id": "ui.Pictures.Stats",
+     "name": "Stats",
+     "call": "ui.Pictures.Stats",
+     "returns": [
+      {
+       "type": "{ loaded: integer, failed: integer, waiting: integer, pinned: integer, worst_ms: number }"
+      }
+     ],
+     "text": "How many game pictures were loaded, failed, are waiting and are kept in memory.",
+     "ref": "/docs/reference/ui#ui-pictures-stats",
+     "use": "local result = ui.Pictures.Stats()"
     }
    ]
   },
@@ -1994,6 +2335,12 @@
      "type": "WaxDebugPanel",
      "text": "The in-game debug panel.",
      "use": "print(ui.Debug)"
+    },
+    {
+     "id": "ui.Pictures",
+     "name": "Pictures",
+     "type": "WaxPictures",
+     "use": "print(ui.Pictures)"
     }
    ],
    "signals": [
@@ -2033,9 +2380,17 @@
      "id": "ui.Open",
      "name": "Open",
      "call": "ui.Open",
+     "params": [
+      {
+       "name": "options",
+       "type": "{ windows: boolean? }",
+       "optional": true,
+       "text": "`windows = false` frees the mouse for panels only and leaves the windows hidden."
+      }
+     ],
      "text": "Opens the menu: windows appear and the mouse is freed to use them.",
      "ref": "/docs/reference/ui#ui-open",
-     "use": "ui.Open()"
+     "use": "ui.Open(options)"
     },
     {
      "id": "ui.Close",
@@ -2181,6 +2536,117 @@
       "title": "Overlays"
      },
      "use": "local overlay = ui.Overlay(options)"
+    },
+    {
+     "id": "ui.Panel",
+     "name": "Panel",
+     "call": "ui.Panel",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxPanelOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxOverlay"
+      }
+     ],
+     "text": "Creates a panel whose controls take the mouse. It has no title bar and shows beside the game's own screens.",
+     "ref": "/docs/reference/ui#ui-panel",
+     "use": "local overlay = ui.Panel(options)"
+    },
+    {
+     "id": "ui.Hovered",
+     "name": "Hovered",
+     "call": "ui.Hovered",
+     "returns": [
+      {
+       "type": "any",
+       "name": "value"
+      },
+      {
+       "type": "WaxSlotLook?",
+       "name": "look"
+      },
+      {
+       "type": "WaxSlots?",
+       "name": "control"
+      }
+     ],
+     "text": "The value of the slot under the mouse, then its look and its Slots control. Nothing when no slot is under it.",
+     "ref": "/docs/reference/ui#ui-hovered",
+     "use": "local value, look, control = ui.Hovered()"
+    },
+    {
+     "id": "ui.IsTyping",
+     "name": "IsTyping",
+     "call": "ui.IsTyping",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True while a text box of Wax has the keyboard.",
+     "ref": "/docs/reference/ui#ui-istyping",
+     "use": "local result = ui.IsTyping()"
+    },
+    {
+     "id": "ui.ScreenSize",
+     "name": "ScreenSize",
+     "call": "ui.ScreenSize",
+     "returns": [
+      {
+       "type": "number",
+       "name": "width"
+      },
+      {
+       "type": "number",
+       "name": "height"
+      }
+     ],
+     "text": "The size of the screen in the units windows and panels are laid out in.",
+     "ref": "/docs/reference/ui#ui-screensize",
+     "use": "local width, height = ui.ScreenSize()"
+    },
+    {
+     "id": "ui.FitGame",
+     "name": "FitGame",
+     "call": "ui.FitGame",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxFitOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxFit"
+      }
+     ],
+     "text": "Draws the game's own menus (inventory, crafting, benches) smaller, which leaves room beside them for panels. They keep working as before. The request ends when the mod reloads.",
+     "ref": "/docs/reference/ui#ui-fitgame",
+     "use": "local fit = ui.FitGame(options)"
+    },
+    {
+     "id": "ui.GameScreen",
+     "name": "GameScreen",
+     "call": "ui.GameScreen",
+     "returns": [
+      {
+       "type": "string?",
+       "name": "name"
+      },
+      {
+       "type": "integer?",
+       "name": "tab"
+      }
+     ],
+     "text": "The game's own menu screen that is showing now: \"UMG_MainMenu\", \"UMG_EscapeMenu\", or a bench or container such as \"UMG_Processor_C\". For the main menu the second value is its tab: 0 inventory, 1 crafting, 2 tech tree, 3 talents, 4 map. Nothing when none shows.",
+     "ref": "/docs/reference/ui#ui-gamescreen",
+     "use": "local name, tab = ui.GameScreen()"
     },
     {
      "id": "ui.Tag",
@@ -2656,6 +3122,22 @@
      "optional": true,
      "text": "Also reacts while the menu is open (off by default, so that typing in a box does not trigger it).",
      "use": "local hotkey = ui.Hotkey(key, function() end, { in_menu = true })"
+    },
+    {
+     "id": "WaxHotkeyOptions.typing",
+     "name": "typing",
+     "type": "boolean",
+     "optional": true,
+     "text": "Also reacts while a text box has the keyboard (for a key meant for the box, such as Tab).",
+     "use": "local hotkey = ui.Hotkey(key, function() end, { typing = true })"
+    },
+    {
+     "id": "WaxHotkeyOptions.hover",
+     "name": "hover",
+     "type": "boolean",
+     "optional": true,
+     "text": "Makes it a key for the slot under the mouse: it only reacts while a slot is under it.",
+     "use": "local hotkey = ui.Hotkey(key, function() end, { hover = true })"
     }
    ]
   },
@@ -2832,7 +3314,7 @@
     "href": "/docs/gui/themes",
     "title": "Themes"
    },
-   "type": "\"Midnight\"|\"Graphite\"|\"Abyss\"|\"Dune\"|\"Daylight\"|string",
+   "type": "\"Midnight\"|\"Graphite\"|\"Abyss\"|\"Dune\"|\"Prospector\"|\"Ember\"|\"Aurora\"|\"Nebula\"|\"Rosewood\"|\"Terminal\"|\"Daylight\"|\"Glacier\"|\"Sandstone\"|string",
    "values": [
     {
      "value": "\"Midnight\""
@@ -2847,7 +3329,31 @@
      "value": "\"Dune\""
     },
     {
+     "value": "\"Prospector\""
+    },
+    {
+     "value": "\"Ember\""
+    },
+    {
+     "value": "\"Aurora\""
+    },
+    {
+     "value": "\"Nebula\""
+    },
+    {
+     "value": "\"Rosewood\""
+    },
+    {
+     "value": "\"Terminal\""
+    },
+    {
      "value": "\"Daylight\""
+    },
+    {
+     "value": "\"Glacier\""
+    },
+    {
+     "value": "\"Sandstone\""
     },
     {
      "value": "string"
@@ -3039,6 +3545,22 @@
      "optional": true,
      "text": "\"ui\" (the game's own interface font) when omitted.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal label = window:Label(content, { family = \"ui\" })"
+    },
+    {
+     "id": "WaxLabelOptions.align",
+     "name": "align",
+     "type": "\"center\"|\"right\"",
+     "optional": true,
+     "text": "Where the text sits in its line. Left when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal label = window:Label(content, { align = \"center\" })"
+    },
+    {
+     "id": "WaxLabelOptions.weight",
+     "name": "weight",
+     "type": "number",
+     "optional": true,
+     "text": "In a row: its share of the width beside the other controls. 1 when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal label = window:Label(content, { weight = 1 })"
     }
    ]
   },
@@ -3178,6 +3700,14 @@
      "optional": true,
      "text": "The icon turns round once on every click, to show that something has started.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { spin = true })"
+    },
+    {
+     "id": "WaxButtonOptions.tab",
+     "name": "tab",
+     "type": "boolean",
+     "optional": true,
+     "text": "Makes it one of a row of tabs: SetActive marks the chosen one.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { tab = true })"
     }
    ]
   },
@@ -3238,6 +3768,34 @@
      "text": "Turns the icon round once.",
      "ref": "/docs/reference/controls#button-spin",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:Spin()"
+    },
+    {
+     "id": "WaxButton.SetCaption",
+     "name": "SetCaption",
+     "call": "button:SetCaption",
+     "params": [
+      {
+       "name": "text",
+       "type": "any"
+      }
+     ],
+     "text": "Replaces the caption of a button that was made with one.",
+     "ref": "/docs/reference/controls#button-setcaption",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:SetCaption(text)"
+    },
+    {
+     "id": "WaxButton.SetActive",
+     "name": "SetActive",
+     "call": "button:SetActive",
+     "params": [
+      {
+       "name": "on",
+       "type": "boolean"
+      }
+     ],
+     "text": "Marks a button made with `tab = true` as the chosen tab, or as one of the others.",
+     "ref": "/docs/reference/controls#button-setactive",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:SetActive(on)"
     }
    ]
   },
@@ -4789,6 +5347,26 @@
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal split = window:Split(options)"
     },
     {
+     "id": "WaxContainer.Slots",
+     "name": "Slots",
+     "call": "container:Slots",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxSlotsOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxSlots"
+      }
+     ],
+     "text": "Adds a block of square cells for pictures, such as items. Give it looks with Set.",
+     "ref": "/docs/reference/controls#container-slots",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)"
+    },
+    {
      "id": "WaxContainer.Progress",
      "name": "Progress",
      "call": "container:Progress",
@@ -4977,6 +5555,30 @@
      "optional": true,
      "text": "Default 300. On a page made with scroll = false the grid takes the space left when omitted.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal grid = window:Grid({ height = 1 })"
+    },
+    {
+     "id": "WaxGridOptions.spare",
+     "name": "spare",
+     "type": "integer",
+     "optional": true,
+     "text": "Rows kept ready above and below the ones that show, so a fast scroll does not show empty space. Default: half of what shows, between 2 and 6.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal grid = window:Grid({ spare = 1 })"
+    },
+    {
+     "id": "WaxGridOptions.warm",
+     "name": "warm",
+     "type": "boolean",
+     "optional": true,
+     "text": "Makes the cells one a frame from the moment the grid exists, also while the menu is closed, so the list is there the first time it is shown.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal grid = window:Grid({ warm = true })"
+    },
+    {
+     "id": "WaxGridOptions.view",
+     "name": "view",
+     "type": "number",
+     "optional": true,
+     "text": "With `warm`: the height in pixels the list is expected to show. Default: the window's height.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal grid = window:Grid({ view = 1 })"
     }
    ]
   },
@@ -5449,6 +6051,325 @@
      ],
      "ref": "/docs/reference/controls#split-getshare",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal split = window:Split(options)\nlocal result = split:GetShare()"
+    }
+   ]
+  },
+  {
+   "id": "WaxSlotLook",
+   "name": "WaxSlotLook",
+   "title": "WaxSlotLook",
+   "kind": "data",
+   "group": "controls",
+   "text": "What one cell of a Slots control shows. A cell with no look is empty and takes no clicks.",
+   "ref": "/docs/reference/controls#waxslotlook",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "ui.Hovered",
+    "WaxSlots.GetLook"
+   ],
+   "users": [
+    "WaxSlots.Set",
+    "WaxSlots.SetLook"
+   ],
+   "props": [
+    {
+     "id": "WaxSlotLook.image",
+     "name": "image",
+     "type": "string",
+     "optional": true,
+     "text": "A picture of the game by its path, such as an item's icon.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.image)"
+    },
+    {
+     "id": "WaxSlotLook.icon",
+     "name": "icon",
+     "type": "string",
+     "optional": true,
+     "text": "An icon by name, for a cell with no picture.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.icon)"
+    },
+    {
+     "id": "WaxSlotLook.count",
+     "name": "count",
+     "type": "string|number",
+     "optional": true,
+     "text": "Small text in the lower right corner.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.count)"
+    },
+    {
+     "id": "WaxSlotLook.mark",
+     "name": "mark",
+     "type": "string",
+     "optional": true,
+     "text": "A small icon in the upper left corner.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.mark)"
+    },
+    {
+     "id": "WaxSlotLook.value",
+     "name": "value",
+     "type": "any",
+     "optional": true,
+     "text": "What the signals and ui.Hovered give for this cell.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.value)"
+    },
+    {
+     "id": "WaxSlotLook.tip",
+     "name": "tip",
+     "type": "string|table|fun(): any",
+     "optional": true,
+     "text": "The tooltip: a text, `{ title = \"...\", lines = { \"text\" or { \"text\", \"warn\" } } }`, or a function that returns one.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.tip)"
+    },
+    {
+     "id": "WaxSlotLook.dim",
+     "name": "dim",
+     "type": "boolean",
+     "optional": true,
+     "text": "Draws the picture faint.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.dim)"
+    },
+    {
+     "id": "WaxSlotLook.selected",
+     "name": "selected",
+     "type": "boolean",
+     "optional": true,
+     "text": "Marks the cell as the chosen one.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.selected)"
+    },
+    {
+     "id": "WaxSlotLook.tone",
+     "name": "tone",
+     "type": "\"good\"|\"warn\"|\"bad\"|\"accent\"",
+     "optional": true,
+     "text": "A short line of that colour under the picture.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.tone)"
+    },
+    {
+     "id": "WaxSlotLook.plain",
+     "name": "plain",
+     "type": "boolean",
+     "optional": true,
+     "text": "A picture only: no box, and the mouse passes over it.",
+     "use": "local value, look, control = ui.Hovered()\nprint(look.plain)"
+    }
+   ]
+  },
+  {
+   "id": "WaxSlotsOptions",
+   "name": "WaxSlotsOptions",
+   "title": "WaxSlotsOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "The options that container:Slots takes.",
+   "parents": [
+    "WaxOptions"
+   ],
+   "ref": "/docs/reference/controls#waxslotsoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Slots"
+   ],
+   "props": [
+    {
+     "id": "WaxSlotsOptions.columns",
+     "name": "columns",
+     "type": "integer",
+     "optional": true,
+     "text": "Default 9.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ columns = 1 })"
+    },
+    {
+     "id": "WaxSlotsOptions.rows",
+     "name": "rows",
+     "type": "integer",
+     "optional": true,
+     "text": "Default 1.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ rows = 1 })"
+    },
+    {
+     "id": "WaxSlotsOptions.size",
+     "name": "size",
+     "type": "number",
+     "optional": true,
+     "text": "The side of a cell. Default 36.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ size = 1 })"
+    },
+    {
+     "id": "WaxSlotsOptions.gap",
+     "name": "gap",
+     "type": "number",
+     "optional": true,
+     "text": "Space between cells. Default 2.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ gap = 1 })"
+    },
+    {
+     "id": "WaxSlotsOptions.backing",
+     "name": "backing",
+     "type": "boolean",
+     "optional": true,
+     "text": "False leaves out the box behind each cell.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ backing = true })"
+    },
+    {
+     "id": "WaxSlotsOptions.align",
+     "name": "align",
+     "type": "\"left\"|\"center\"|\"right\"",
+     "optional": true,
+     "text": "Where the block sits in its line.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ align = \"left\" })"
+    },
+    {
+     "id": "WaxSlotsOptions.below",
+     "name": "below",
+     "type": "number",
+     "optional": true,
+     "text": "Space under the block. The theme's spacing when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ below = 1 })"
+    },
+    {
+     "id": "WaxSlotsOptions.looks",
+     "name": "looks",
+     "type": "WaxSlotLook[]",
+     "optional": true,
+     "text": "What to show at the start.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots({ looks = value })"
+    }
+   ]
+  },
+  {
+   "id": "WaxSlots",
+   "name": "WaxSlots",
+   "title": "WaxSlots",
+   "kind": "object",
+   "group": "controls",
+   "text": "A block of square cells that each show a picture, a count and a mark.",
+   "parents": [
+    "WaxControl"
+   ],
+   "ref": "/docs/reference/controls#waxslots",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "ui.Hovered",
+    "WaxContainer.Slots"
+   ],
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)",
+   "signals": [
+    {
+     "id": "WaxSlots.Activated",
+     "name": "Activated",
+     "type": "WaxSignal<fun(value: any, index: integer, look: WaxSlotLook)>",
+     "receives": "value: any, index: integer, look: WaxSlotLook",
+     "text": "A cell was clicked.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots.Activated:Connect(function(value, index, look)\n    print(value, index, look)\nend)"
+    },
+    {
+     "id": "WaxSlots.RightClicked",
+     "name": "RightClicked",
+     "type": "WaxSignal<fun(value: any, index: integer, look: WaxSlotLook)>",
+     "receives": "value: any, index: integer, look: WaxSlotLook",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots.RightClicked:Connect(function(value, index, look)\n    print(value, index, look)\nend)"
+    },
+    {
+     "id": "WaxSlots.MiddleClicked",
+     "name": "MiddleClicked",
+     "type": "WaxSignal<fun(value: any, index: integer, look: WaxSlotLook)>",
+     "receives": "value: any, index: integer, look: WaxSlotLook",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots.MiddleClicked:Connect(function(value, index, look)\n    print(value, index, look)\nend)"
+    },
+    {
+     "id": "WaxSlots.Hovered",
+     "name": "Hovered",
+     "type": "WaxSignal<fun(value: any, index: integer, look: WaxSlotLook?)>",
+     "receives": "value: any, index: integer, look: WaxSlotLook?",
+     "text": "The mouse came over a cell.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots.Hovered:Connect(function(value, index, look)\n    print(value, index, look)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxSlots.Set",
+     "name": "Set",
+     "call": "slots:Set",
+     "params": [
+      {
+       "name": "looks",
+       "type": "WaxSlotLook[]"
+      }
+     ],
+     "text": "Shows these looks, the first in the first cell. Cells past the end of the list are empty.",
+     "ref": "/docs/reference/controls#slots-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots:Set(looks)"
+    },
+    {
+     "id": "WaxSlots.SetLook",
+     "name": "SetLook",
+     "call": "slots:SetLook",
+     "params": [
+      {
+       "name": "index",
+       "type": "integer"
+      },
+      {
+       "name": "look",
+       "type": "WaxSlotLook?"
+      }
+     ],
+     "text": "Changes one cell.",
+     "ref": "/docs/reference/controls#slots-setlook",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nslots:SetLook(index, look)"
+    },
+    {
+     "id": "WaxSlots.GetLook",
+     "name": "GetLook",
+     "call": "slots:GetLook",
+     "params": [
+      {
+       "name": "index",
+       "type": "integer"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxSlotLook?"
+      }
+     ],
+     "ref": "/docs/reference/controls#slots-getlook",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nlocal slotLook = slots:GetLook(index)"
+    },
+    {
+     "id": "WaxSlots.Capacity",
+     "name": "Capacity",
+     "call": "slots:Capacity",
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "How many cells it has.",
+     "ref": "/docs/reference/controls#slots-capacity",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nlocal result = slots:Capacity()"
+    },
+    {
+     "id": "WaxSlots.Ready",
+     "name": "Ready",
+     "call": "slots:Ready",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True once every cell exists. Cells are made a few a frame.",
+     "ref": "/docs/reference/controls#slots-ready",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slots = window:Slots(options)\nlocal result = slots:Ready()"
     }
    ]
   },
@@ -6900,6 +7821,20 @@
      "type": "WaxHighlight",
      "text": "Outlines actors so they show through walls, using the outline the game itself draws. The game has room for four filled colours and three outline-only colours at a time. A colour counts once, however many actors use it.",
      "use": "print(game.Highlight)"
+    },
+    {
+     "id": "game.Data",
+     "name": "Data",
+     "type": "WaxData",
+     "text": "The game's data tables as plain Lua values.",
+     "use": "print(game.Data)"
+    },
+    {
+     "id": "game.Crafting",
+     "name": "Crafting",
+     "type": "WaxCrafting",
+     "text": "The bench or crafting screen that is open.",
+     "use": "print(game.Crafting)"
     }
    ],
    "signals": [
@@ -7053,6 +7988,156 @@
    ]
   },
   {
+   "id": "WaxListedRecipe",
+   "name": "WaxListedRecipe",
+   "title": "WaxListedRecipe",
+   "kind": "data",
+   "group": "game",
+   "text": "One recipe a bench or the crafting screen lists.",
+   "ref": "/docs/reference/game#waxlistedrecipe",
+   "makers": [
+    "game.Crafting.GetRecipes"
+   ],
+   "props": [
+    {
+     "id": "WaxListedRecipe.row",
+     "name": "row",
+     "type": "string",
+     "text": "The recipe's row name in D_ProcessorRecipes.",
+     "use": "local recipes, screen, kind = game.Crafting:GetRecipes()\nprint(recipes[1].row)"
+    },
+    {
+     "id": "WaxListedRecipe.valid",
+     "name": "valid",
+     "type": "boolean",
+     "text": "The game's own answer to \"can this be made right now\".",
+     "use": "local recipes, screen, kind = game.Crafting:GetRecipes()\nprint(recipes[1].valid)"
+    }
+   ]
+  },
+  {
+   "id": "game.Crafting",
+   "name": "WaxCrafting",
+   "title": "game.Crafting",
+   "kind": "namespace",
+   "group": "game",
+   "text": "The bench or crafting screen that is open: the recipes it lists, and choosing one of them.",
+   "ref": "/docs/reference/game#game-crafting",
+   "funcs": [
+    {
+     "id": "game.Crafting.GetRecipes",
+     "name": "GetRecipes",
+     "call": "game.Crafting:GetRecipes",
+     "returns": [
+      {
+       "type": "WaxListedRecipe[]?",
+       "name": "recipes"
+      },
+      {
+       "type": "integer?",
+       "name": "screen",
+       "text": "A number that stays the same while that screen stays open."
+      },
+      {
+       "type": "\"bench\"|\"crafting\"|\"menu\"?",
+       "name": "kind",
+       "text": "\"menu\" is another tab of the game's menu: the list is then what can be made by hand."
+      }
+     ],
+     "text": "The recipes the open screen lists, in the game's order. Nothing when no bench and no crafting tab is open.",
+     "ref": "/docs/reference/game#game-crafting-getrecipes",
+     "use": "local recipes, screen, kind = game.Crafting:GetRecipes()"
+    },
+    {
+     "id": "game.Crafting.GetScreen",
+     "name": "GetScreen",
+     "call": "game.Crafting:GetScreen",
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "screen"
+      },
+      {
+       "type": "\"bench\"|\"crafting\"|\"menu\"?",
+       "name": "kind"
+      }
+     ],
+     "text": "The number of the screen that is open, without reading its recipes. Nothing when none is.",
+     "ref": "/docs/reference/game#game-crafting-getscreen",
+     "use": "local screen, kind = game.Crafting:GetScreen()"
+    },
+    {
+     "id": "game.Crafting.GetHovered",
+     "name": "GetHovered",
+     "call": "game.Crafting:GetHovered",
+     "returns": [
+      {
+       "type": "\"item\"|\"recipe\"?",
+       "name": "kind"
+      },
+      {
+       "type": "string?",
+       "name": "row"
+      }
+     ],
+     "text": "What the mouse is over in the game's own screens: \"item\" and its row name in D_ItemsStatic for a slot of the inventory or of a bench, \"recipe\" and its row name in D_ProcessorRecipes for a recipe tile. Nothing otherwise. It walks the open screen's slots, so ask when a key is pressed, not every frame.",
+     "ref": "/docs/reference/game#game-crafting-gethovered",
+     "use": "local kind, row = game.Crafting:GetHovered()"
+    },
+    {
+     "id": "game.Crafting.OpenTab",
+     "name": "OpenTab",
+     "call": "game.Crafting:OpenTab",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Goes from another tab of the game's menu to its crafting tab, the way the game's own key for crafting does. True when the crafting tab was asked for or is showing already, false on any other screen.",
+     "ref": "/docs/reference/game#game-crafting-opentab",
+     "use": "local result = game.Crafting:OpenTab()"
+    },
+    {
+     "id": "game.Crafting.Select",
+     "name": "Select",
+     "call": "game.Crafting:Select",
+     "params": [
+      {
+       "name": "row",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Chooses a recipe on the open screen, as a click on its tile does. False when the screen does not list it.",
+     "ref": "/docs/reference/game#game-crafting-select",
+     "use": "local result = game.Crafting:Select(row)"
+    },
+    {
+     "id": "game.Crafting.SetListHidden",
+     "name": "SetListHidden",
+     "call": "game.Crafting:SetListHidden",
+     "params": [
+      {
+       "name": "on",
+       "type": "boolean"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Hides the game's own recipe list on the open screen, or shows it again. Hidden, it keeps its place and takes no clicks. A screen opened later has its list again. It is shown again when the mod reloads.",
+     "ref": "/docs/reference/game#game-crafting-setlisthidden",
+     "use": "local result = game.Crafting:SetListHidden(on)"
+    }
+   ]
+  },
+  {
    "id": "WaxCreature",
    "name": "WaxCreature",
    "title": "WaxCreature",
@@ -7120,6 +8205,9 @@
     },
     {
      "value": "\"Highlight\""
+    },
+    {
+     "value": "\"Data\""
     },
     {
      "value": "\"MapChanged\""
@@ -7817,6 +8905,442 @@
      "use": "storage.Save(name, value)"
     }
    ]
+  },
+  {
+   "id": "WaxRowHandle",
+   "name": "WaxRowHandle",
+   "title": "WaxRowHandle",
+   "kind": "data",
+   "group": "data",
+   "text": "A row handle: the two names many fields hold to point at a row of another table.",
+   "ref": "/docs/reference/data#waxrowhandle",
+   "users": [
+    "game.Data.Resolve"
+   ],
+   "props": [
+    {
+     "id": "WaxRowHandle.RowName",
+     "name": "RowName",
+     "type": "string",
+     "text": "The row's name. \"None\" when the handle points at nothing.",
+     "use": "local row, table = game.Data:Resolve({ RowName = \"text\" }, fields)"
+    },
+    {
+     "id": "WaxRowHandle.DataTableName",
+     "name": "DataTableName",
+     "type": "string",
+     "text": "The table's name with \"D_\" in front, such as \"D_ItemsStatic\".",
+     "use": "local row, table = game.Data:Resolve({ DataTableName = \"text\" }, fields)"
+    }
+   ]
+  },
+  {
+   "id": "WaxDataField",
+   "name": "WaxDataField",
+   "title": "WaxDataField",
+   "kind": "data",
+   "group": "data",
+   "text": "One field of a row, as the game declares it.",
+   "ref": "/docs/reference/data#waxdatafield",
+   "makers": [
+    "WaxDataTable.Fields"
+   ],
+   "props": [
+    {
+     "id": "WaxDataField.Name",
+     "name": "Name",
+     "type": "string",
+     "text": "The field's name.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataFields = dataTable:Fields(path)\nprint(dataFields[1].Name)"
+    },
+    {
+     "id": "WaxDataField.Kind",
+     "name": "Kind",
+     "type": "string",
+     "text": "What the field holds: \"Bool\", \"Int\", \"Float\", \"Byte\", \"Name\", \"Str\", \"Text\", \"SoftObject\", \"Struct\", \"Array\", \"Enum\", \"Map\" and so on.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataFields = dataTable:Fields(path)\nprint(dataFields[1].Kind)"
+    },
+    {
+     "id": "WaxDataField.Struct",
+     "name": "Struct",
+     "type": "string?",
+     "text": "The struct's name, for a struct and for an array of structs.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataFields = dataTable:Fields(path)\nprint(dataFields[1].Struct)"
+    },
+    {
+     "id": "WaxDataField.Inner",
+     "name": "Inner",
+     "type": "string?",
+     "text": "What an array holds, named the way Kind is.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataFields = dataTable:Fields(path)\nprint(dataFields[1].Inner)"
+    }
+   ]
+  },
+  {
+   "id": "WaxDataLoadOptions",
+   "name": "WaxDataLoadOptions",
+   "title": "WaxDataLoadOptions",
+   "kind": "data",
+   "group": "data",
+   "text": "The options that dataTable:Load takes.",
+   "ref": "/docs/reference/data#waxdataloadoptions",
+   "users": [
+    "WaxDataTable.Load"
+   ],
+   "props": [
+    {
+     "id": "WaxDataLoadOptions.fields",
+     "name": "fields",
+     "type": "string[]",
+     "optional": true,
+     "text": "The field paths to read. Every readable field when omitted.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal rows = dataTable:Load({ fields = value })"
+    },
+    {
+     "id": "WaxDataLoadOptions.names",
+     "name": "names",
+     "type": "string[]",
+     "optional": true,
+     "text": "The rows to read. Every row when omitted. A name the table lacks is skipped.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal rows = dataTable:Load({ names = value })"
+    },
+    {
+     "id": "WaxDataLoadOptions.budget",
+     "name": "budget",
+     "type": "number",
+     "optional": true,
+     "text": "How many milliseconds of a frame the read may use before the task pauses. 1 when omitted.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal rows = dataTable:Load({ budget = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxDataTable",
+   "name": "WaxDataTable",
+   "title": "WaxDataTable",
+   "kind": "object",
+   "group": "data",
+   "text": "One of the game's data tables, such as ProcessorRecipes (every recipe) or Itemable (every item's name, icon and weight). A field path is a field's name, with a dot for each step into a struct or an array: \"RequiredMillijoules\", \"Requirement.RowName\", \"Inputs.Element.RowName\". Naming a struct or an array of structs asks for everything inside it. A wrong path raises an error that suggests the right one. Rows are read once and kept. A row is one table for as long as it is kept, and asking for more fields later adds them to that same table. Row names are matched without regard to letter case. Enum fields are read only when their own path is named, and they read as numbers. Maps, sets, delegates, doubles and references to live objects are never read. Naming one raises an error that says what it is.",
+   "ref": "/docs/reference/data#waxdatatable",
+   "makers": [
+    "game.Data.Table",
+    "game.Data.Resolve"
+   ],
+   "use": "local dataTable = game.Data:Table(name)",
+   "props": [
+    {
+     "id": "WaxDataTable.Name",
+     "name": "Name",
+     "type": "string",
+     "text": "The table's name without the \"D_\" in front, such as \"ProcessorRecipes\".",
+     "use": "local dataTable = game.Data:Table(name)\nprint(dataTable.Name)"
+    },
+    {
+     "id": "WaxDataTable.RowStruct",
+     "name": "RowStruct",
+     "type": "string",
+     "text": "The name of the struct every row of the table is, such as \"ProcessorRecipe\".",
+     "use": "local dataTable = game.Data:Table(name)\nprint(dataTable.RowStruct)"
+    },
+    {
+     "id": "WaxDataTable.Raw",
+     "name": "Raw",
+     "type": "any",
+     "text": "The UE4SS table itself, found again each time this is read. Nil while the game does not have it. Do not keep it past the frame.",
+     "use": "local dataTable = game.Data:Table(name)\nprint(dataTable.Raw)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxDataTable.Count",
+     "name": "Count",
+     "call": "dataTable:Count",
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "How many rows the table has.",
+     "ref": "/docs/reference/data#datatable-count",
+     "use": "local dataTable = game.Data:Table(name)\nlocal result = dataTable:Count()"
+    },
+    {
+     "id": "WaxDataTable.GetNames",
+     "name": "GetNames",
+     "call": "dataTable:GetNames",
+     "returns": [
+      {
+       "type": "string[]"
+      }
+     ],
+     "text": "The name of every row, spelled and ordered as the game has them.",
+     "ref": "/docs/reference/data#datatable-getnames",
+     "use": "local dataTable = game.Data:Table(name)\nlocal list = dataTable:GetNames()"
+    },
+    {
+     "id": "WaxDataTable.Has",
+     "name": "Has",
+     "call": "dataTable:Has",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True when the table has a row of this name.",
+     "ref": "/docs/reference/data#datatable-has",
+     "use": "local dataTable = game.Data:Table(name)\nlocal result = dataTable:Has(name)"
+    },
+    {
+     "id": "WaxDataTable.Row",
+     "name": "Row",
+     "call": "dataTable:Row",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      },
+      {
+       "name": "fields",
+       "type": "string[]",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxDataRow?"
+      }
+     ],
+     "text": "One row, or nil when the table has no row of this name or the row could not be read. With `fields` only those are read. Without it the row holds every readable field.",
+     "ref": "/docs/reference/data#datatable-row",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataRow = dataTable:Row(name, fields)"
+    },
+    {
+     "id": "WaxDataTable.Load",
+     "name": "Load",
+     "call": "dataTable:Load",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxDataLoadOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "table<string, WaxDataRow>",
+       "name": "rows"
+      }
+     ],
+     "text": "Reads many rows without holding the game up, and returns them by name. It only works inside a task. The task pauses whenever it has used its budget for the frame, and goes on in the next one. Rows that already hold the fields are not read again, so a second Load costs nothing and a Load that was stopped goes on where it left off.",
+     "ref": "/docs/reference/data#datatable-load",
+     "use": "local dataTable = game.Data:Table(name)\nlocal rows = dataTable:Load(options)"
+    },
+    {
+     "id": "WaxDataTable.Loaded",
+     "name": "Loaded",
+     "call": "dataTable:Loaded",
+     "params": [
+      {
+       "name": "fields",
+       "type": "string[]",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer",
+       "name": "done",
+       "text": "The rows that already hold these fields."
+      },
+      {
+       "type": "integer",
+       "name": "total",
+       "text": "The rows the table has."
+      },
+      {
+       "type": "integer",
+       "name": "failed",
+       "text": "The rows that could not be read."
+      }
+     ],
+     "text": "How far a Load of these fields has come.",
+     "ref": "/docs/reference/data#datatable-loaded",
+     "use": "local dataTable = game.Data:Table(name)\nlocal done, total, failed = dataTable:Loaded(fields)"
+    },
+    {
+     "id": "WaxDataTable.Fields",
+     "name": "Fields",
+     "call": "dataTable:Fields",
+     "params": [
+      {
+       "name": "path",
+       "type": "string",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxDataField[]"
+      }
+     ],
+     "text": "The fields of a row as the game declares them. With `path`, the fields of the struct at that field path.",
+     "ref": "/docs/reference/data#datatable-fields",
+     "use": "local dataTable = game.Data:Table(name)\nlocal dataFields = dataTable:Fields(path)"
+    },
+    {
+     "id": "WaxDataTable.Meta",
+     "name": "Meta",
+     "call": "dataTable:Meta",
+     "returns": [
+      {
+       "type": "WaxDataTable?"
+      }
+     ],
+     "text": "The table's meta table, or nil when it has none. Its rows have the same names and say which expansion a row belongs to (RequiredFeatureLevel) and whether the game has retired it (bIsDeprecated).",
+     "ref": "/docs/reference/data#datatable-meta",
+     "use": "local dataTable = game.Data:Table(name)\nlocal result = dataTable:Meta()"
+    },
+    {
+     "id": "WaxDataTable.Stamp",
+     "name": "Stamp",
+     "call": "dataTable:Stamp",
+     "returns": [
+      {
+       "type": "string"
+      }
+     ],
+     "text": "The table's row count and address as text, such as \"2215:0x1F3A2B40\". It is checked against the game each time. Keep it beside anything you worked out from the table: a different stamp means the table is not the one you read.",
+     "ref": "/docs/reference/data#datatable-stamp",
+     "use": "local dataTable = game.Data:Table(name)\nlocal result = dataTable:Stamp()"
+    }
+   ]
+  },
+  {
+   "id": "game.Data",
+   "name": "WaxData",
+   "title": "game.Data",
+   "kind": "namespace",
+   "group": "data",
+   "text": "The game's data tables as plain Lua values: recipes, items, creatures, talents and the rest. Nothing is read until you ask, and what was read is kept, so asking twice costs nothing. Text is kept in the language the game was showing when it was read. After the player changes the language it shows in the new one only after Flush, or when the game starts again.",
+   "ref": "/docs/reference/data#game-data",
+   "signals": [
+    {
+     "id": "game.Data.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun(name: string?)>",
+     "receives": "name: string?",
+     "text": "Fires when the game has made a table again and what was read from it was dropped. `name` is the table's name, or nil when everything was dropped. Flush fires it too, with no name.",
+     "use": "game.Data.Changed:Connect(function(name)\n    print(name)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "game.Data.Table",
+     "name": "Table",
+     "call": "game.Data:Table",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxDataTable"
+      }
+     ],
+     "text": "A table by name, with or without the \"D_\" in front. Letter case does not matter. A wrong name raises an error that suggests the right one.",
+     "ref": "/docs/reference/data#game-data-table",
+     "use": "local dataTable = game.Data:Table(name)"
+    },
+    {
+     "id": "game.Data.GetTables",
+     "name": "GetTables",
+     "call": "game.Data:GetTables",
+     "returns": [
+      {
+       "type": "string[]"
+      }
+     ],
+     "text": "The name of every table the game has, sorted.",
+     "ref": "/docs/reference/data#game-data-gettables",
+     "use": "local list = game.Data:GetTables()"
+    },
+    {
+     "id": "game.Data.Has",
+     "name": "Has",
+     "call": "game.Data:Has",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True when the game has a table of this name.",
+     "ref": "/docs/reference/data#game-data-has",
+     "use": "local result = game.Data:Has(name)"
+    },
+    {
+     "id": "game.Data.Resolve",
+     "name": "Resolve",
+     "call": "game.Data:Resolve",
+     "params": [
+      {
+       "name": "handle",
+       "type": "WaxRowHandle"
+      },
+      {
+       "name": "fields",
+       "type": "string[]",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxDataRow?",
+       "name": "row",
+       "text": "The row, or nil."
+      },
+      {
+       "type": "WaxDataTable?",
+       "name": "table",
+       "text": "The table the row is in."
+      }
+     ],
+     "text": "The row a row handle points at, and the table it is in. Nil when the handle points at nothing or at a row the game does not have. A handle whose DataTableName was not read as a name raises an error. Read such a row with Table and Row.",
+     "ref": "/docs/reference/data#game-data-resolve",
+     "use": "local row, table = game.Data:Resolve(handle, fields)"
+    },
+    {
+     "id": "game.Data.Flush",
+     "name": "Flush",
+     "call": "game.Data:Flush",
+     "text": "Forgets everything that was read, so the next read asks the game again. Use it after the player changes the game's language. Rows handed out before stay as they are and are no longer filled in. Changed fires at the end of the frame, so every mod that keeps something worked out from rows can work it out again.",
+     "ref": "/docs/reference/data#game-data-flush",
+     "use": "game.Data:Flush()"
+    }
+   ]
+  },
+  {
+   "id": "WaxDataRow",
+   "name": "WaxDataRow",
+   "title": "WaxDataRow",
+   "kind": "alias",
+   "group": "data",
+   "text": "One row of a data table as plain Lua values, shaped like the game's own data files with every default filled in. `Name` is the row's name. A struct is a table and an array is a list. A name, a string and a text are Lua strings. A reference to an asset is its path, or nil when it points at nothing (false inside a list). A row is shared by everyone who reads it, so never change one.",
+   "ref": "/docs/reference/data#waxdatarow",
+   "type": "table<string, any>"
   },
   {
    "id": "globals",

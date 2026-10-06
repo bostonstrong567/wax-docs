@@ -315,6 +315,22 @@ container:Split(options?: WaxSplitOptions): WaxSplit
 
 <InExplorer id="WaxContainer.Split" />
 
+### `container:Slots(options?)` [#container-slots]
+
+Adds a block of square cells for pictures, such as items. Give it looks with Set.
+
+```lua
+container:Slots(options?: WaxSlotsOptions): WaxSlots
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxSlotsOptions`](/docs/reference/controls#waxslotsoptions) |
+
+**Returns** [`WaxSlots`](/docs/reference/controls#waxslots)
+
+<InExplorer id="WaxContainer.Slots" />
+
 ### `container:Progress(caption, value?, options?)` [#container-progress]
 
 Adds a progress bar. value is 0..1.
@@ -539,6 +555,38 @@ button:Spin()
 **Returns** nothing.
 
 <InExplorer id="WaxButton.Spin" />
+
+### `button:SetCaption(text)` [#button-setcaption]
+
+Replaces the caption of a button that was made with one.
+
+```lua
+button:SetCaption(text: any)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `any` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxButton.SetCaption" />
+
+### `button:SetActive(on)` [#button-setactive]
+
+Marks a button made with `tab = true` as the chosen tab, or as one of the others.
+
+```lua
+button:SetActive(on: boolean)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `on` | `boolean` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxButton.SetActive" />
 
 ## WaxIcon [#waxicon]
 
@@ -1272,6 +1320,92 @@ split:GetShare(): number
 
 <InExplorer id="WaxSplit.GetShare" />
 
+## WaxSlots [#waxslots]
+
+A block of square cells that each show a picture, a count and a mark.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`ui.Hovered`](/docs/reference/ui#ui-hovered), [`container:Slots`](/docs/reference/controls#container-slots). Below, `slots` stands for one of these.
+
+<InExplorer id="WaxSlots" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Activated` | `value`: `any`, `index`: `integer`, `look`: [`WaxSlotLook`](/docs/reference/controls#waxslotlook) | A cell was clicked. |
+| `RightClicked` | `value`: `any`, `index`: `integer`, `look`: [`WaxSlotLook`](/docs/reference/controls#waxslotlook) |  |
+| `MiddleClicked` | `value`: `any`, `index`: `integer`, `look`: [`WaxSlotLook`](/docs/reference/controls#waxslotlook) |  |
+| `Hovered` | `value`: `any`, `index`: `integer`, `look`: [`WaxSlotLook?`](/docs/reference/controls#waxslotlook) | The mouse came over a cell. |
+
+### `slots:Set(looks)` [#slots-set]
+
+Shows these looks, the first in the first cell. Cells past the end of the list are empty.
+
+```lua
+slots:Set(looks: WaxSlotLook[])
+```
+
+| Parameter | Type |
+| --- | --- |
+| `looks` | [`WaxSlotLook[]`](/docs/reference/controls#waxslotlook) |
+
+**Returns** nothing.
+
+<InExplorer id="WaxSlots.Set" />
+
+### `slots:SetLook(index, look)` [#slots-setlook]
+
+Changes one cell.
+
+```lua
+slots:SetLook(index: integer, look: WaxSlotLook?)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `index` | `integer` |
+| `look` | [`WaxSlotLook?`](/docs/reference/controls#waxslotlook) |
+
+**Returns** nothing.
+
+<InExplorer id="WaxSlots.SetLook" />
+
+### `slots:GetLook(index)` [#slots-getlook]
+
+```lua
+slots:GetLook(index: integer): WaxSlotLook?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `index` | `integer` |
+
+**Returns** [`WaxSlotLook?`](/docs/reference/controls#waxslotlook)
+
+<InExplorer id="WaxSlots.GetLook" />
+
+### `slots:Capacity()` [#slots-capacity]
+
+How many cells it has.
+
+```lua
+slots:Capacity(): integer
+```
+
+**Returns** `integer`
+
+<InExplorer id="WaxSlots.Capacity" />
+
+### `slots:Ready()` [#slots-ready]
+
+True once every cell exists. Cells are made a few a frame.
+
+```lua
+slots:Ready(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxSlots.Ready" />
+
 ## WaxLabelOptions [#waxlabeloptions]
 
 Used by [`container:Label`](/docs/reference/controls#container-label).
@@ -1285,6 +1419,8 @@ Used by [`container:Label`](/docs/reference/controls#container-label).
 | `size` | `number` |  |
 | `face` | `string` | Typeface of the "ui" family: "Book", "Medium", "Bold" ... |
 | `family` | [`WaxFontFamily`](/docs/reference/ui#waxfontfamily) | "ui" (the game's own interface font) when omitted. |
+| `align` | `"center"` \| `"right"` | Where the text sits in its line. Left when omitted. |
+| `weight` | `number` | In a row: its share of the width beside the other controls. 1 when omitted. |
 
 ## WaxButtonOptions [#waxbuttonoptions]
 
@@ -1298,6 +1434,7 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 | `stretch` | `boolean` | A button with a caption is as wide as its container. False keeps it as wide as its caption. An icon-only button is small unless this is true. |
 | `icon` | `string` | Icon name shown before the caption. The menu's Icons page lists the names. |
 | `spin` | `boolean` | The icon turns round once on every click, to show that something has started. |
+| `tab` | `boolean` | Makes it one of a row of tabs: SetActive marks the chosen one. |
 
 ## WaxIconOptions [#waxiconoptions]
 
@@ -1397,6 +1534,9 @@ Used by [`container:Grid`](/docs/reference/controls#container-grid).
 | `gap` | `number` | The space between cells. Default: the theme's spacing. |
 | `batch` | `integer` | How many cells are made in one frame. Default 24. Use fewer for cells with a lot in them. |
 | `height` | `number` | Default 300. On a page made with scroll = false the grid takes the space left when omitted. |
+| `spare` | `integer` | Rows kept ready above and below the ones that show, so a fast scroll does not show empty space. Default: half of what shows, between 2 and 6. |
+| `warm` | `boolean` | Makes the cells one a frame from the moment the grid exists, also while the menu is closed, so the list is there the first time it is shown. |
+| `view` | `number` | With `warm`: the height in pixels the list is expected to show. Default: the window's height. |
 
 ## WaxFlowOptions [#waxflowoptions]
 
@@ -1452,6 +1592,44 @@ Used by [`container:Split`](/docs/reference/controls#container-split).
 | `share` | `number` | The left area's part of the width, 0 to 1. Default 0.42. |
 | `least` | `number` | The narrowest an area may be. Default 240. With less room than two of these, one area shows at a time. |
 | `height` | `number` | Default 300. On a page made with scroll = false the split takes the space left when omitted. |
+
+## WaxSlotLook [#waxslotlook]
+
+What one cell of a Slots control shows. A cell with no look is empty and takes no clicks.
+
+Returned by [`ui.Hovered`](/docs/reference/ui#ui-hovered), [`slots:GetLook`](/docs/reference/controls#slots-getlook). Used by [`slots:Set`](/docs/reference/controls#slots-set), [`slots:SetLook`](/docs/reference/controls#slots-setlook).
+
+<InExplorer id="WaxSlotLook" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `image` (optional) | `string` | A picture of the game by its path, such as an item's icon. |
+| `icon` (optional) | `string` | An icon by name, for a cell with no picture. |
+| `count` (optional) | `string` \| `number` | Small text in the lower right corner. |
+| `mark` (optional) | `string` | A small icon in the upper left corner. |
+| `value` (optional) | `any` | What the signals and [`ui.Hovered`](/docs/reference/ui#ui-hovered) give for this cell. |
+| `tip` (optional) | `string` \| `table` \| `fun(): any` | The tooltip: a text, `{ title = "...", lines = { "text" or { "text", "warn" } } }`, or a function that returns one. |
+| `dim` (optional) | `boolean` | Draws the picture faint. |
+| `selected` (optional) | `boolean` | Marks the cell as the chosen one. |
+| `tone` (optional) | `"good"` \| `"warn"` \| `"bad"` \| `"accent"` | A short line of that colour under the picture. |
+| `plain` (optional) | `boolean` | A picture only: no box, and the mouse passes over it. |
+
+## WaxSlotsOptions [#waxslotsoptions]
+
+Used by [`container:Slots`](/docs/reference/controls#container-slots).
+
+<InExplorer id="WaxSlotsOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `columns` | `integer` | Default 9. |
+| `rows` | `integer` | Default 1. |
+| `size` | `number` | The side of a cell. Default 36. |
+| `gap` | `number` | Space between cells. Default 2. |
+| `backing` | `boolean` | False leaves out the box behind each cell. |
+| `align` | `"left"` \| `"center"` \| `"right"` | Where the block sits in its line. |
+| `below` | `number` | Space under the block. The theme's spacing when omitted. |
+| `looks` | [`WaxSlotLook[]`](/docs/reference/controls#waxslotlook) | What to show at the start. |
 
 ## Named values [#named-values]
 

@@ -21,6 +21,7 @@ Type name: `WaxUI`.
 | `Icons` | [`WaxIcons`](/docs/reference/ui#ui-icons) | Icon names: the bundled Lucide set ("shield", "wrench", "map-pin" ...) plus images that mods register. |
 | `Notifications` | [`WaxNotifications`](/docs/reference/ui#ui-notifications) |  |
 | `Debug` | [`WaxDebugPanel`](/docs/reference/ui#ui-debug) | The in-game debug panel. |
+| `Pictures` | [`WaxPictures`](/docs/reference/ui#ui-pictures) |  |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
@@ -29,13 +30,17 @@ Type name: `WaxUI`.
 | `KeyChanged` | `key`: `string?` | Fires with the new menu key. |
 | `ThemeChanged` | `name`: `string` | Fires with the theme's name after SetTheme or ResetTheme. |
 
-### `ui.Open()` [#ui-open]
+### `ui.Open(options?)` [#ui-open]
 
 Opens the menu: windows appear and the mouse is freed to use them.
 
 ```lua
-ui.Open()
+ui.Open(options?: { windows: boolean? })
 ```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `options` (optional) | `{ windows: boolean? }` | `windows = false` frees the mouse for panels only and leaves the windows hidden. |
 
 **Returns** nothing.
 
@@ -180,6 +185,96 @@ ui.Overlay(options?: WaxOverlayOptions): WaxOverlay
 **Returns** [`WaxOverlay`](/docs/reference/ui#waxoverlay)
 
 <InExplorer id="ui.Overlay" />
+
+### `ui.Panel(options?)` [#ui-panel]
+
+Creates a panel whose controls take the mouse. It has no title bar and shows beside the game's own screens.
+
+```lua
+ui.Panel(options?: WaxPanelOptions): WaxOverlay
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxPanelOptions`](/docs/reference/ui#waxpaneloptions) |
+
+**Returns** [`WaxOverlay`](/docs/reference/ui#waxoverlay)
+
+<InExplorer id="ui.Panel" />
+
+### `ui.Hovered()` [#ui-hovered]
+
+The value of the slot under the mouse, then its look and its Slots control. Nothing when no slot is under it.
+
+```lua
+ui.Hovered(): any, WaxSlotLook?, WaxSlots?
+```
+
+**Returns**
+
+- `any` (`value`)
+- [`WaxSlotLook?`](/docs/reference/controls#waxslotlook) (`look`)
+- [`WaxSlots?`](/docs/reference/controls#waxslots) (`control`)
+
+<InExplorer id="ui.Hovered" />
+
+### `ui.IsTyping()` [#ui-istyping]
+
+True while a text box of Wax has the keyboard.
+
+```lua
+ui.IsTyping(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="ui.IsTyping" />
+
+### `ui.ScreenSize()` [#ui-screensize]
+
+The size of the screen in the units windows and panels are laid out in.
+
+```lua
+ui.ScreenSize(): number, number
+```
+
+**Returns**
+
+- `number` (`width`)
+- `number` (`height`)
+
+<InExplorer id="ui.ScreenSize" />
+
+### `ui.FitGame(options?)` [#ui-fitgame]
+
+Draws the game's own menus (inventory, crafting, benches) smaller, which leaves room beside them for panels. They keep working as before. The request ends when the mod reloads.
+
+```lua
+ui.FitGame(options?: WaxFitOptions): WaxFit
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxFitOptions`](/docs/reference/ui#waxfitoptions) |
+
+**Returns** [`WaxFit`](/docs/reference/ui#waxfit)
+
+<InExplorer id="ui.FitGame" />
+
+### `ui.GameScreen()` [#ui-gamescreen]
+
+The game's own menu screen that is showing now: "UMG_MainMenu", "UMG_EscapeMenu", or a bench or container such as "UMG_Processor_C". For the main menu the second value is its tab: 0 inventory, 1 crafting, 2 tech tree, 3 talents, 4 map. Nothing when none shows.
+
+```lua
+ui.GameScreen(): string?, integer?
+```
+
+**Returns**
+
+- `string?` (`name`)
+- `integer?` (`tab`)
+
+<InExplorer id="ui.GameScreen" />
 
 ### `ui.Tag(target, options?)` [#ui-tag]
 
@@ -398,6 +493,40 @@ ui.AddSettings(container: WaxContainer)
 **Returns** nothing.
 
 <InExplorer id="ui.AddSettings" />
+
+## `ui.Pictures` [#ui-pictures]
+
+Type name: `WaxPictures`.
+
+<InExplorer id="ui.Pictures" />
+
+### `ui.Pictures.Check(path)` [#ui-pictures-check]
+
+The game path of a picture as it can be shown ("/Game/.../ITEM_Wood.ITEM_Wood"), or nil when the text is not one.
+
+```lua
+ui.Pictures.Check(path: string): string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `path` | `string` |
+
+**Returns** `string?`
+
+<InExplorer id="ui.Pictures.Check" />
+
+### `ui.Pictures.Stats()` [#ui-pictures-stats]
+
+How many game pictures were loaded, failed, are waiting and are kept in memory.
+
+```lua
+ui.Pictures.Stats(): { loaded: integer, failed: integer, waiting: integer, pinned: integer, worst_ms: number }
+```
+
+**Returns** `{ loaded: integer, failed: integer, waiting: integer, pinned: integer, worst_ms: number }`
+
+<InExplorer id="ui.Pictures.Stats" />
 
 ## `ui.Notifications` [#ui-notifications]
 
@@ -918,9 +1047,13 @@ statusBar:Clear()
 
 A panel pinned to the screen that stays up during play and never takes the mouse.
 
-It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer) can. You get one from [`ui.Overlay`](/docs/reference/ui#ui-overlay). Below, `overlay` stands for one of these.
+It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer) can. You get one from [`ui.Overlay`](/docs/reference/ui#ui-overlay), [`ui.Panel`](/docs/reference/ui#ui-panel). Below, `overlay` stands for one of these.
 
 <InExplorer id="WaxOverlay" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Scrolled` | `steps`: `integer` | On a panel made with [`ui.Panel`](/docs/reference/ui#ui-panel): the wheel was turned over it, 1 for down and -1 for up. The game does not see the wheel while the mouse is over a panel. |
 
 ### `overlay:SetVisible(shown)` [#overlay-setvisible]
 
@@ -979,6 +1112,85 @@ overlay:Destroy()
 **Returns** nothing.
 
 <InExplorer id="WaxOverlay.Destroy" />
+
+### `overlay:SetOffset(x?, y?)` [#overlay-setoffset]
+
+Moves it without changing its anchor. x and y keep their values when omitted.
+
+```lua
+overlay:SetOffset(x?: number, y?: number)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `x` (optional) | `number` |
+| `y` (optional) | `number` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxOverlay.SetOffset" />
+
+### `overlay:IsShowing()` [#overlay-isshowing]
+
+True while it is really on screen: switched on, and what it waits for (the menu, the mouse) is there.
+
+```lua
+overlay:IsShowing(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxOverlay.IsShowing" />
+
+## WaxFit [#waxfit]
+
+A request to draw the game's own menus smaller.
+
+You get one from [`ui.FitGame`](/docs/reference/ui#ui-fitgame). Below, `fit` stands for one of these.
+
+<InExplorer id="WaxFit" />
+
+### `fit:Set(scale, x?, y?)` [#fit-set]
+
+```lua
+fit:Set(scale: number, x?: number, y?: number)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `scale` | `number` |  |
+| `x` (optional) | `number` | Keeps its value when omitted. |
+| `y` (optional) | `number` | Keeps its value when omitted. |
+
+**Returns** nothing.
+
+<InExplorer id="WaxFit.Set" />
+
+### `fit:SetEnabled(on)` [#fit-setenabled]
+
+```lua
+fit:SetEnabled(on: boolean)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `on` | `boolean` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxFit.SetEnabled" />
+
+### `fit:Remove()` [#fit-remove]
+
+Gives the game's menus their own size back.
+
+```lua
+fit:Remove()
+```
+
+**Returns** nothing.
+
+<InExplorer id="WaxFit.Remove" />
 
 ## WaxNotification [#waxnotification]
 
@@ -1316,6 +1528,36 @@ Used by [`ui.Overlay`](/docs/reference/ui#ui-overlay).
 | `background` | `boolean` | False leaves out the panel behind the controls. |
 | `movable` | `boolean` | False stops the player dragging it while the menu is open. Where it was dragged to is remembered. |
 
+## WaxPanelOptions [#waxpaneloptions]
+
+Extends [`WaxOverlayOptions`](/docs/reference/ui#waxoverlayoptions). Used by [`ui.Panel`](/docs/reference/ui#ui-panel).
+
+<InExplorer id="WaxPanelOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `when` | `"cursor"` \| `"menu"` \| `"always"` | When it shows: "cursor" (the default) while the Wax menu is open or one of the game's own screens has the mouse, "menu" only with the Wax menu, "always" whenever it is switched on. |
+| `padding` | `number` | Space between its edge and its controls. |
+| `height` | `number` | A fixed height. As tall as its controls when omitted. |
+| `zoom` | `number` | Draws everything in it this much larger (1.25 is a quarter larger). Text stays sharp. |
+| `opacity` | `number` | How solid its background is, 0 to 1. 0.96 when omitted. |
+| `visible` | `boolean` | False makes it hidden until SetVisible(true). |
+| `on_press` | `fun()` | Runs when the panel is pressed where it has no control. |
+
+## WaxFitOptions [#waxfitoptions]
+
+Used by [`ui.FitGame`](/docs/reference/ui#ui-fitgame).
+
+<InExplorer id="WaxFitOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `scale` | `number` | How large the game's menus are drawn, 0.5 to 1. 0.85 when omitted. |
+| `corner` | [`WaxAnchor`](/docs/reference/ui#waxanchor) | The corner they shrink towards. "bottom-left" when omitted, which frees the right and the top. |
+| `x` | `number` | Moves them sideways after they are made smaller, as a share of the screen. Right is positive. |
+| `y` | `number` | Moves them up or down after they are made smaller, as a share of the screen. Down is positive. |
+| `enabled` | `boolean` | False makes the request wait for SetEnabled(true). |
+
 ## WaxNotifyOptions [#waxnotifyoptions]
 
 Used by [`ui.Notify`](/docs/reference/ui#ui-notify).
@@ -1353,6 +1595,8 @@ Used by [`ui.Hotkey`](/docs/reference/ui#ui-hotkey).
 | Option | Type | Description |
 | --- | --- | --- |
 | `in_menu` | `boolean` | Also reacts while the menu is open (off by default, so that typing in a box does not trigger it). |
+| `typing` | `boolean` | Also reacts while a text box has the keyboard (for a key meant for the box, such as Tab). |
+| `hover` | `boolean` | Makes it a key for the slot under the mouse: it only reacts while a slot is under it. |
 
 ## Named values [#named-values]
 
@@ -1390,7 +1634,7 @@ One of `"ui"`, `"mono"`, `"plain"`.
 
 ### WaxThemeName [#waxthemename]
 
-One of `"Midnight"`, `"Graphite"`, `"Abyss"`, `"Dune"`, `"Daylight"`, or any other `string`.
+One of `"Midnight"`, `"Graphite"`, `"Abyss"`, `"Dune"`, `"Prospector"`, `"Ember"`, `"Aurora"`, `"Nebula"`, `"Rosewood"`, `"Terminal"`, `"Daylight"`, `"Glacier"`, `"Sandstone"`, or any other `string`.
 
 <InExplorer id="WaxThemeName" />
 

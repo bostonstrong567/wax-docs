@@ -3,6 +3,7 @@ import { ArrowLeft, Download, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { type MouseEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FilterInput } from '@/components/filter-input';
+import { type ModPicture, picturesOf } from '@/lib/mod-pictures';
 import { appName, marketApi } from '@/lib/shared';
 
 type Release = {
@@ -210,10 +211,68 @@ function Actions({ mod, small, children }: { mod: Mod; small?: boolean; children
   );
 }
 
+// The pictures of a mod: one large, and a row of small ones to pick from when there are several.
+function Gallery({ pictures }: { pictures: ModPicture[] }) {
+  const [at, setAt] = useState(0);
+  const shown = pictures[Math.min(at, pictures.length - 1)];
+  return (
+    <section className="flex flex-col gap-3">
+      <a
+        href={shown.src}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open this picture at full size"
+        className="block overflow-hidden rounded-xl border outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+      >
+        <img src={shown.src} alt={shown.alt} width={shown.width} height={shown.height} className="h-auto w-full" />
+      </a>
+      <p className="text-sm text-fd-muted-foreground">{shown.alt}</p>
+      {pictures.length > 1 ? (
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+          {pictures.map((picture, index) => (
+            <button
+              key={picture.src}
+              type="button"
+              onClick={() => setAt(index)}
+              aria-label={`Show picture ${index + 1} of ${pictures.length}`}
+              aria-pressed={index === at}
+              className={`overflow-hidden rounded-lg border outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-fd-ring ${
+                index === at ? 'border-fd-primary' : 'opacity-60 hover:opacity-100'
+              }`}
+            >
+              <img
+                src={picture.src}
+                alt=""
+                width={picture.width}
+                height={picture.height}
+                loading="lazy"
+                decoding="async"
+                className="aspect-video w-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 // The name is the link to the mod, stretched over the card. The buttons sit above it.
 function ModCard({ mod, href, onOpen }: { mod: Mod; href: string; onOpen: (event: MouseEvent) => void }) {
+  const cover = picturesOf(mod.id)[0];
   return (
     <article className="relative flex min-w-0 flex-col gap-2 rounded-xl border bg-fd-card p-5 transition-colors hover:bg-fd-accent/60">
+      {cover ? (
+        <img
+          src={cover.src}
+          alt=""
+          width={cover.width}
+          height={cover.height}
+          loading="lazy"
+          decoding="async"
+          className="-mx-5 -mt-5 mb-2 aspect-video w-[calc(100%+2.5rem)] max-w-none rounded-t-[11px] border-b object-cover"
+        />
+      ) : null}
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="min-w-0 truncate font-medium">
           <a
@@ -256,6 +315,7 @@ function ModPage(props: {
     change(next, 'push');
   };
   const homepage = mod && /^https?:\/\//.test(mod.homepage) ? mod.homepage : '';
+  const pictures = mod ? picturesOf(mod.id) : [];
 
   return (
     <article className="flex flex-col gap-8">
@@ -290,6 +350,8 @@ function ModPage(props: {
               {mod.reviewed ? <Fact label="Status">Reviewed</Fact> : null}
             </dl>
           </header>
+
+          {pictures.length > 0 ? <Gallery key={mod.id} pictures={pictures} /> : null}
 
           <section className="flex flex-col items-start gap-3 rounded-xl border bg-fd-card p-5">
             <Actions mod={mod}>
