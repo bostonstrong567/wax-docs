@@ -1,11 +1,11 @@
 ---
 title: Notifications
-description: Short messages that slide in at a corner of the screen.
+description: Short messages in a corner of the screen.
 icon: Bell
 ---
 
-A **notification** is a short message in a corner of the screen. It shows while you play, it never takes
-the mouse, and it goes away by itself.
+A **notification** is a short message in a corner of the screen. It shows while you play and goes away by
+itself. It never takes the mouse.
 
 ```lua title="init.lua"
 ui.Notify("A plain note for the player.")
@@ -26,7 +26,7 @@ ui.Notify("The file could not be loaded.", { title = "Error", kind = "bad" })
 ui.Notify("Downloading the map", { title = "Working", progress = 0.6 })
 ```
 
-`ui.Notify(text, options)` shows a notification. The options are all optional.
+`ui.Notify(text, options)` shows a notification. You can leave out any option.
 
 | Option | What it does | When left out |
 | --- | --- | --- |
@@ -40,8 +40,8 @@ Write `ui.Notify` with a dot, not a colon.
 
 ## The same message twice
 
-If you show a message that is already on screen, Wax does not stack a copy. The one that is showing starts
-its time again and counts: `x2`, `x3`.
+If you show a message that is already on screen, Wax does not add a copy. The one that is showing starts
+its time again and shows a count: `x2`, `x3`.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Notifications", width = 300, height = 140 })
@@ -51,11 +51,11 @@ window:Button("Show it again", function()
 end)
 ```
 
-Click a few times, quickly. One notification, with a counter.
+Click a few times in a row. You get one notification with a counter.
 
 ## Change a notification that is showing
 
-`ui.Notify` gives the notification back. You can change it while it is on screen. That is how you show the
+`ui.Notify` gives the notification back. You can change it while it is on screen. Use that to show the
 progress of a job.
 
 ```lua title="init.lua"
@@ -81,7 +81,7 @@ end)
 | `notification:SetText(text)` | Replaces the text. |
 | `notification:SetTitle(title)` | Replaces the title. It does nothing on a notification made without a title. |
 | `notification:SetProgress(amount)` | Shows how far a job is, from 0 to 1. The notification then stays until it is closed. |
-| `notification:Close()` | Slides the notification away. |
+| `notification:Close()` | Closes the notification. |
 
 ## Where they appear, and how many
 
@@ -103,7 +103,7 @@ ui.Notify("Now I appear at the top right.")
 
 The corner and the limit are the same for every mod, so change them only if the player asks.
 
-When there are too many, the oldest one that is only counting down makes room first. So a notification that
+When there are too many, the oldest one that is only counting down is closed first. A notification that
 shows the progress of a job stays in view.
 
 ## Errors show up here too

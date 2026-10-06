@@ -4,8 +4,8 @@ description: Read your health, stamina, food, water and oxygen, and show them on
 icon: HeartPulse
 ---
 
-This page builds a small overlay that shows how your character is doing. It uses the game tree, an overlay
-and a task.
+This page builds a small overlay that shows your character's health, stamina, food, water and oxygen. It uses
+the game tree, an overlay and a task.
 
 ## Where the numbers are
 
@@ -36,7 +36,7 @@ command bar:
 game.Character.ActorState.Health
 ```
 
-The log answers with a number, for example `= 300`.
+The log shows a number, for example `= 300`.
 
 ## Show it on screen
 
@@ -85,12 +85,11 @@ end)
 3. `refresh` reads the numbers and puts them into the controls.
 4. The task calls `refresh` four times a second. `task.wait(0.25)` pauses the task, not the game. See [Tasks](/docs/tasks).
 
-Two details are worth copying into your own mods:
+Do these two things in your own mods too:
 
-- **It asks for the character every time.** `game.Character` is `nil` at the main menu, and it is a new object
-  after every map change. Never keep it for long.
-- **The bar is a share, not a number.** A progress bar takes a value from 0 to 1, so health is divided by
-  the full health.
+- Ask for the character every time, as `refresh` does. `game.Character` is `nil` at the main menu, and it is a
+  new object after every map change. Never keep it for long.
+- Give a progress bar a value from 0 to 1. Here health is divided by the full health.
 
 ## Warn when health is low
 

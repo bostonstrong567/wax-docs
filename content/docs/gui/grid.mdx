@@ -1,12 +1,12 @@
 ---
 title: Grid
-description: Show hundreds or thousands of items and still scroll smoothly.
+description: A scrolling list of cells for hundreds or thousands of items.
 icon: Grid3x3
 ---
 
 A **grid** shows a list of items in cells of the same size. It is made for long lists.
 
-A grid only builds the cells you can see. When you scroll, it reuses those cells for other items. So ten
+A grid only builds the cells you can see. When you scroll, it reuses those cells for other items. Ten
 items and ten thousand items cost about the same.
 
 <Shot
@@ -45,7 +45,7 @@ A grid needs two functions from you.
 
 **`make(cell)`** builds one cell. The grid calls it once for each cell it needs, not once for each item.
 
-- `cell` is a container. Add **one** control to it.
+- `cell` is a container. Add one control to it, and no more.
 - Give back whatever you need later to change the cell. Here that is a small table holding the button.
 
 **`show(made, item, index)`** fills a cell with an item. The grid calls it whenever a cell has to show another item.
@@ -54,7 +54,7 @@ A grid needs two functions from you.
 - `item` is the entry of your list to show.
 - `index` is its place in the list.
 
-Keep `show` quick. It runs many times while the user scrolls.
+Keep `show` fast. It runs many times while the user scrolls.
 
 ## Options
 
@@ -72,7 +72,7 @@ Keep `show` quick. It runs many times while the user scrolls.
 | Function | What it does |
 | --- | --- |
 | `grid:SetItems(items)` | Shows another list, starting from the top. |
-| `grid:Refresh()` | Shows every cell again. Call it after you changed the items themselves. |
+| `grid:Refresh()` | Shows every cell again. Call it after you change entries of the list you already gave. |
 | `grid:Count()` | How many items the grid has. |
 
 ## A plain list
@@ -101,12 +101,10 @@ window:Grid({
 })
 ```
 
-Five thousand lines, and it scrolls as if there were twenty.
-
 ## A grid that fills the page, with a search box
 
-On a page made with `scroll = false`, a grid without a `height` takes all the room that is left. Put a search
-box above it and you have a browser.
+On a page made with `scroll = false`, a grid without a `height` takes all the room that is left. This example
+puts a search box above it.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Icon finder", nav = "top", width = 420, height = 360 })
@@ -138,10 +136,8 @@ end)
 
 Type in the box and the grid shows the icons that match. Click one to copy its name.
 
-## Good to know
+## Not in overlays
 
-- **Use grids in windows.** A grid follows its scrolling only while the menu is open, so it does not belong in an overlay.
-- **New list or changed list?** For a new list, call `SetItems`. If you changed entries of the list you already gave, call `Refresh`.
-- **One control per cell.** `make` adds a single control to the cell it is given.
+Use grids in windows, not in overlays. A grid follows its scrolling only while the menu is open.
 
 Every option is listed in the [controls reference](/docs/reference/controls#waxgrid).

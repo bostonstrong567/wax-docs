@@ -1,6 +1,6 @@
 ---
 title: How a mod is built
-description: The files in a mod, the manifest, splitting code into files and using another mod.
+description: The files in a mod, mod.lua, splitting code into files and using another mod.
 icon: Package
 ---
 
@@ -16,7 +16,7 @@ Wax\mods\
 
 ## init.lua
 
-Wax runs `init.lua` from top to bottom when the mod loads. It runs again, from the top, each time the mod
+Wax runs `init.lua` from top to bottom when the mod loads. It runs it again, from the top, each time the mod
 reloads.
 
 ```lua title="MyMod\init.lua"
@@ -28,7 +28,7 @@ window:Label("Hello.")
 
 ## mod.lua
 
-`mod.lua` is the manifest. It is optional, and so is every field in it.
+`mod.lua` describes your mod. It is called the manifest. The file is optional, and so is every field in it.
 
 ```lua title="MyMod\mod.lua"
 return {
@@ -50,7 +50,7 @@ return {
 
 ## What every mod can use
 
-These names are ready in every file of your mod. You do not load them.
+These names are ready in every file of your mod. You don't load them.
 
 | Name | What it is |
 | --- | --- |
@@ -78,7 +78,7 @@ print(mod.dir)      -- the path of the mod's folder
 ### Each mod has its own globals
 
 A global variable you set in one mod is not seen by other mods. Two mods can both use the name `settings`
-and never clash.
+without clashing.
 
 ## More than one file
 
@@ -121,7 +121,7 @@ end
 return greeter
 ```
 
-A mod that wants to use it does two things. It lists the id under `dependencies`:
+A mod that uses it does two things. It lists the id under `dependencies`:
 
 ```lua title="MyMod\mod.lua"
 return {
@@ -148,7 +148,7 @@ Good to know:
 ## Wax cleans up after you
 
 Everything a mod sets up belongs to that mod: its windows, overlays, hotkeys, tasks and signal connections.
-When the mod reloads or is switched off, Wax removes all of it. You do not write clean-up code.
+When the mod reloads or is switched off, Wax removes all of it. You don't write clean-up code.
 
 ## Functions that are blocked
 
@@ -161,7 +161,6 @@ one raises an error that says why.
 | `RegisterKeyBind`, `RegisterKeyBindAsync` | [`ui.Hotkey`](/docs/gui/hotkeys) |
 | `RestartMod`, `RestartCurrentMod`, `UninstallMod`, `UninstallCurrentMod`, `ClearAllDelayedActions` | Nothing. Wax reloads mods by itself. |
 
-The originals are still reachable through `raw`, for example `raw.LoopAsync`. Use them at your own risk: they
-can crash the game.
+The originals are still reachable through `raw`, for example `raw.LoopAsync`. They can crash the game.
 
 The full list with reasons is in the [reference](/docs/reference/mods#blocked-functions).

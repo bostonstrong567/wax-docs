@@ -1,0 +1,127 @@
+---
+title: Creatures
+description: Find the animals and enemies in the world by kind, and hear when one appears, dies or leaves.
+icon: PawPrint
+---
+
+`game.Creatures` is a list of every animal and enemy in the world. Wax keeps it up to date while you play, so
+asking for it costs almost nothing.
+
+```lua
+for _, wolf in ipairs(game.Creatures:GetAll("Wolf")) do
+    print(wolf.Name)
+end
+```
+
+## Kinds
+
+A kind is named the way the game names it. These all work:
+
+| You write | It means |
+| --- | --- |
+| `"Wolf"` | Every kind of wolf. |
+| `"Conifer_Wolf"` | Only the forest wolf. |
+| `"Cave Worm"` | The name the game shows players. |
+| `"IcarusMountCharacter"` | A class name, for every mount. |
+
+Letter case, spaces and underscores do not matter, so `"cave worm"` and `"CaveWorm"` are the same.
+A name Wax does not know raises an error that suggests the nearest one:
+
+```text
+'Wolff' is not a creature kind. Did you mean 'Wolf'?
+```
+
+`game.Creatures:GetKinds()` lists every kind in your version of the game, with how many of each are in the
+world now. `game.Creatures:GetLiveKinds()` gives only the names of the kinds that are here.
+
+## Asking for creatures
+
+```lua
+-- every creature
+local all = game.Creatures:GetAll()
+
+-- wolves within 50 metres, nearest first
+local near = game.Creatures:GetAll("Wolf", { within = 50 })
+
+-- the closest creature of any kind, and how far it is
+local creature, metres = game.Creatures:GetNearest()
+
+-- how many deer there are
+local count = game.Creatures:Count("Deer")
+```
+
+The options:
+
+| Option | What it does |
+| --- | --- |
+| `within` | Only creatures this many metres away or nearer. The result is sorted nearest first. |
+| `from` | Where to measure from: an Instance or `{ X = , Y = , Z = }`. Your character when left out. |
+| `dead` | `true` also returns bodies that have not been cleared away yet. |
+| `sort = "nearest"` | Sorts nearest first without a distance limit. |
+
+Distances are in metres. Positions are the engine's own, where 100 is one metre.
+
+## Facts about one creature
+
+```lua
+local facts = game.Creatures:Describe(creature)
+print(facts.DisplayName, facts.Level, facts.Health, facts.MaxHealth, facts.IsAlive)
+```
+
+`Describe` returns plain values: `Kind`, `Variant`, `DisplayName`, `ClassName`, `Name`, `Level`, `Health`,
+`MaxHealth`, `IsAlive` and `Position`.
+
+## When creatures come and go
+
+```lua
+game.Creatures.Added:Connect(function(creature)
+    print("appeared:", game.Creatures:GetKind(creature))
+end)
+
+game.Creatures.Died:Connect(function(creature, info)
+    print(info.Kind, "died")
+end)
+
+game.Creatures.Removed:Connect(function(creature, info)
+    print(info.Kind, "is gone:", info.Reason)
+end)
+```
+
+| Signal | When it fires |
+| --- | --- |
+| `Added` | A creature appeared. It fires for creatures that appear from now on. |
+| `Died` | A creature was killed. Its body stays for a few seconds. |
+| `Removed` | A creature left the world. `info.Reason` is `"Destroyed"` or `"Unloaded"`. |
+| `Cleared` | The map changed. It fires once, in place of one `Removed` for each creature. |
+
+After `Removed`, the creature can no longer be used. You can still compare it with one you kept.
+
+## Now and later in one call
+
+`Observe` calls your function for every matching creature that is here now and for each one that appears
+later. If your function returns a function, that one runs when the creature is gone.
+
+```lua
+game.Creatures:Observe("Wolf", function(wolf)
+    local tag = ui.Tag(wolf, { text = "Wolf" })
+    return function() tag:Remove() end
+end)
+```
+
+`Observe` returns a connection. Call `:Disconnect()` on it to stop. Everything is undone when your mod reloads.
+
+## Players
+
+`game.Players` has the same for the characters of the people in your session:
+
+```lua
+game.Players:ObserveCharacters(function(character)
+    if game.Players:IsLocal(character) then return end
+    print(game.Players:GetName(character), "is here")
+end)
+```
+
+## In someone else's game
+
+When you join another player's game, your PC only knows the creatures near you. The list is shorter than the
+host's, and `Removed` also fires when a creature moves out of range.

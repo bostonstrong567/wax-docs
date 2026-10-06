@@ -30,7 +30,7 @@ end
 
 ## The object's own members
 
-Every other name is one of the object's **own** properties or functions. These are the ones the game gave it.
+Every other name is one of the object's own properties or functions. These are the ones the game gave it.
 
 ```lua title="init.lua"
 local character = game.Character
@@ -66,8 +66,8 @@ if character then
 end
 ```
 
-A quicker way is the command bar of the [Wax panel](/docs/debug-panel). Type `game.Character.` and press
-**Tab**. Type a few letters and Tab completes the name.
+The command bar of the [Wax panel](/docs/debug-panel) is faster. Type `game.Character.` and press
+**Tab**. Type a few letters and **Tab** completes the name.
 
 ## Wax checks what you write
 
@@ -81,8 +81,8 @@ state.Health = state.MaxHealth   -- a whole number: fine
 state.Health = "full"            -- an error: Health expects a whole number
 ```
 
-<Callout title="The game has the last word">
-  Writing a property changes the value the game holds. The game may change it again on its next update, and in
+<Callout title="The game can change the value again">
+  Writing a property changes the value the game holds. The game may change it again on its next update. In
   multiplayer the host decides what counts.
 </Callout>
 
@@ -98,7 +98,7 @@ state.Health = "full"            -- an error: Health expects a whole number
 
 ## Get, Set and Call
 
-There are three functions that do the same as the dot and the colon, with the name given as text.
+Three functions do the same as the dot and the colon, with the name given as text.
 
 ```lua
 local state = game.Character.ActorState
@@ -114,7 +114,7 @@ Use them in two cases:
 - The object has a property whose name Wax also uses, such as `Name` or `Parent`. `instance.Name` gives Wax's
   value. `instance:Get("Name")` gives the object's own.
 
-## Is it this kind of object?
+## Check what kind of object it is
 
 ```lua title="init.lua"
 local character = game.Character
@@ -131,9 +131,10 @@ end
 - `IsA(class_name)` is `true` when the object's class is that class, or is built on it.
 - `GetClassChain()` lists the class names from the object's own class up to `Object`.
 
-## Is it still there?
+## Check that it is still there
 
-Objects come and go. `IsValid()` is `false` once an object was destroyed, or once the map changed.
+The game makes and destroys objects all the time. `IsValid()` is `false` once the object is destroyed, or the
+map changes.
 
 ```lua
 local character = game.Character

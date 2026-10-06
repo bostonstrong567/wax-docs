@@ -1,0 +1,68 @@
+---
+title: Tags
+description: A line of text that stays over a creature, a player or anything else in the world.
+icon: Tag
+---
+
+A tag is a line of text that sits over something in the world and follows it. It shows while you play, not
+only when the menu is open.
+
+```lua
+local wolf = game.Creatures:GetNearest("Wolf")
+local tag = ui.Tag(wolf, { text = "Wolf" })
+```
+
+## What a tag can sit on
+
+| You pass | The tag |
+| --- | --- |
+| An actor | Follows it: a creature, a player's character, an item, something built. |
+| A part of an actor | Follows the actor, at the place of that part. |
+| A position | Stays on that spot in the world. |
+
+```lua
+-- mark where you are standing
+local here = game.Character:K2_GetActorLocation()
+ui.Tag({ X = here.X, Y = here.Y, Z = here.Z }, { text = "Camp", within = 500 })
+```
+
+## Options
+
+| Option | What it does |
+| --- | --- |
+| `text` | What the tag says. |
+| `color` | The text colour. White when left out. |
+| `size` | The text size. |
+| `within` | The tag only shows when the thing is this many metres away or nearer. 100 when left out. |
+| `lift` | How far above the thing's middle the tag sits, in centimetres. Wax works it out when left out. |
+
+## Changing a tag
+
+```lua
+tag:Set("Wolf  Lv 12")
+tag:SetColor("#ff5555")
+tag:SetRange(200)
+tag:Remove()
+```
+
+A tag removes itself when the thing it is on leaves the world, and when your mod reloads.
+
+## Tags that would overlap
+
+When several things stand close together, their tags would cover each other. Wax piles them up, with the tag
+of the nearest thing lowest. A tag with no room left is hidden until there is room.
+
+## Example: name and level over every wolf
+
+```lua title="init.lua"
+game.Creatures:Observe("Wolf", function(wolf)
+    local facts = game.Creatures:Describe(wolf)
+    local tag = ui.Tag(wolf, { text = facts.DisplayName .. "  Lv " .. facts.Level, within = 150 })
+    return function() tag:Remove() end
+end)
+```
+
+## Cost
+
+Each tag that is on screen is placed again every frame. A few dozen tags are fine. For hundreds, give them
+a smaller `within`.

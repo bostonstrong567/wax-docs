@@ -1,0 +1,51 @@
+---
+title: Get mods
+description: Find a mod on the Mods page and add it to your game with one click, or by hand.
+icon: Download
+---
+
+The [Mods page](/mods) lists the mods made for Wax. You can search it, filter it by category and tag, and open
+a mod to read what it does.
+
+## Add to game
+
+Press **Add to game** on a mod. Your browser asks if it may open Wax. Say yes.
+
+Wax then downloads the mod, checks it and puts it in your game's mods folder.
+
+- If ICARUS is running, the mod loads at once and a notice appears in the game.
+- If ICARUS is not running, a small window tells you the mod was added. It is there the next time you start
+  the game.
+
+The button works on a PC where Wax was installed with `Install Wax.cmd`. If nothing happens when you press it,
+use the download below.
+
+## Download a zip
+
+Press **Download zip** on a mod. Extract the zip into the mods folder of Wax:
+
+```text
+...\steamapps\common\Icarus\Icarus\Binaries\Win64\ue4ss\Mods\Wax\mods\
+```
+
+The zip holds one folder, named after the mod. That folder goes straight into `mods`. When the game is running,
+the mod shows up on the **Mods** page of the Wax menu, switched off. Switch it on there.
+
+## Manage your mods
+
+Open the Wax menu (F8) and go to **Mods**. Each mod has a card:
+
+| Control | What it does |
+| --- | --- |
+| **Enabled** | Switches the mod on or off. It stays that way after you restart the game. |
+| **Reload** | Loads the mod again. |
+| Up and down arrows | Move the mod in the list. Mods load in this order. |
+| Bin | Removes the mod. Wax asks first. |
+
+A removed mod is not erased. Its folder is renamed so that it starts with `.removed-`, and Wax leaves folders
+with such names alone. To get the mod back, rename the folder to the mod's name again.
+
+## Updating a mod
+
+Press **Add to game** again, or extract the new zip over the old folder. With the button, the old copy is kept
+under a `.removed-` name.

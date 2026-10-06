@@ -16,8 +16,8 @@ Close the menu and press **F6**.
 
 ## When a hotkey reacts
 
-- A hotkey reacts **during play**, while the menu is closed.
-- It does not react while the menu is open. That way, typing in a text box never sets it off.
+- A hotkey reacts during play, while the menu is closed.
+- It does not react while the menu is open, so typing in a text box never triggers it.
 - It goes away when your mod reloads. `init.lua` then makes it again.
 
 The game still sees the key too. Pick a key that the game does not use for something else.
@@ -42,16 +42,16 @@ A key is given by its name, as text.
 | Number pad | `"NumPadZero"` to `"NumPadNine"`, `"Multiply"`, `"Add"`, `"Subtract"`, `"Decimal"`, `"Divide"` |
 | Arrows | `"Up"`, `"Down"`, `"Left"`, `"Right"` |
 | Editing | `"Insert"`, `"Delete"`, `"Home"`, `"End"`, `"PageUp"`, `"PageDown"`, `"BackSpace"`, `"Enter"`, `"Tab"`, `"SpaceBar"`, `"CapsLock"` |
-| Modifiers | `"LeftShift"`, `"RightShift"`, `"LeftControl"`, `"RightControl"`, `"LeftAlt"`, `"RightAlt"` |
+| Shift, Control and Alt | `"LeftShift"`, `"RightShift"`, `"LeftControl"`, `"RightControl"`, `"LeftAlt"`, `"RightAlt"` |
 | Punctuation | `"Tilde"`, `"Hyphen"`, `"Equals"`, `"LeftBracket"`, `"RightBracket"`, `"Backslash"`, `"Semicolon"`, `"Apostrophe"`, `"Comma"`, `"Period"`, `"Slash"` |
 | Mouse | `"MiddleMouseButton"`, `"ThumbMouseButton"`, `"ThumbMouseButton2"` |
 
 You rarely need to type these. A [Keybind](/docs/gui/controls#keybind) control lets the player press the key,
-and hands you its name.
+and gives you its name.
 
 ## Let the player choose the key
 
-This is the usual pattern: a hotkey, a `Keybind` control to change it, and `storage` to remember the choice.
+This takes three parts: a hotkey, a `Keybind` control to change it, and `storage` to remember the choice.
 
 ```lua title="init.lua"
 local settings = storage.Load("keys", { ping = "F6" })

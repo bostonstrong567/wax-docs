@@ -4,8 +4,8 @@ description: Wait, repeat and delay without freezing the game.
 icon: Timer
 ---
 
-`init.lua` runs once, from top to bottom, and the game waits while it runs. So a mod cannot simply sit in a
-loop and wait: the game would freeze.
+`init.lua` runs once, from top to bottom, and the game waits while it runs. So a mod can't wait in a loop
+there. The game would freeze.
 
 A **task** is code that can pause. While it pauses, the game carries on.
 
@@ -26,7 +26,7 @@ print("The task above is still counting.")
 ```
 
 The task runs until its first `task.wait`. Then the rest of `init.lua` carries on, so the `print` happens
-while the countdown is still going.
+while the countdown is still running.
 
 ## Do something again and again
 
@@ -47,7 +47,7 @@ end)
 ```
 
 <Callout type="warn" title="Always wait inside a loop">
-  A loop without a wait never gives the game its turn. Wax stops any Lua code that runs for more than five
+  A loop without a wait never lets the game run. Wax stops any Lua code that runs for more than five
   seconds without pausing, and logs a `script timeout` error. The game still freezes for those five seconds.
 </Callout>
 
@@ -63,7 +63,8 @@ end)
 
 ## Stop a task
 
-`task.spawn` and `task.delay` give back the task. Hand it to `task.cancel` to stop it for good.
+`task.spawn` and `task.delay` give back the task. Pass it to `task.cancel` to stop it. A stopped task does not
+start again.
 
 ```lua title="init.lua"
 local reminder = task.delay(30, function()
@@ -86,7 +87,7 @@ end)
 | `task.wait(seconds)` | Pauses the task it is called in. Gives back how long it really waited. |
 | `task.delay(seconds, f, ...)` | Runs `f` after that many seconds. |
 | `task.defer(f, ...)` | Runs `f` at the end of the current frame. |
-| `task.cancel(thread)` | Stops a task for good. |
+| `task.cancel(thread)` | Stops a task. |
 | `task.label(thread, name)` | Names a task. The name shows up in error messages. |
 
 ### More about task.wait
@@ -105,11 +106,12 @@ end)
 
 ## Good to know
 
-- **Callbacks are tasks already.** The function you give to a button, a switch or a hotkey may call `task.wait`.
-- **Tasks end when the mod reloads.** You never have to stop them yourself.
-- **An error ends only that task.** The error goes to the log and shows as a notification. Your other tasks keep running.
-- **Tasks take turns.** Only one piece of Lua runs at a time, so two tasks never trip over each other in the
-  middle of a line. A task keeps its turn until it waits or finishes.
+- The function you give to a button, a switch or a hotkey already runs as a task. It may call `task.wait`.
+- Tasks end when the mod reloads. You never have to stop them yourself.
+- An error ends only the task it happens in. The error goes to the log and shows as a notification. Your other
+  tasks keep running.
+- Only one piece of Lua runs at a time. A task runs until it waits or finishes, and no other task interrupts it
+  in the middle of a line.
 
 ## Name your tasks
 

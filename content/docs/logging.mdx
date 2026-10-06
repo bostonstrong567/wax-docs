@@ -4,7 +4,7 @@ description: See what your mod is doing with print and log.
 icon: ScrollText
 ---
 
-The quickest way to see what your code does is to print it.
+To see what your code does, print it.
 
 ```lua title="init.lua"
 print("Hello from my mod")
@@ -30,7 +30,7 @@ brackets:
 
 ## Warnings and errors
 
-`print` is for everyday messages. `log` lets you say how serious a message is.
+`print` is for normal messages. `log` lets you say how serious a message is.
 
 ```lua title="init.lua"
 log:info("Loaded %s version %s", mod.name, mod.version)
@@ -43,12 +43,10 @@ log:error("Could not find %s", "the door")
 | `log:info(...)` | Normal messages. `print` writes at this level too. | Shown with the **Prints** switch. |
 | `log:warn(...)` | Something looks wrong, but the mod carries on. | Yellow. Shown with the **Warnings** switch. |
 | `log:error(...)` | Something failed. | Red. Shown with the **Errors** switch. Also pops up as a notification. |
-| `log:debug(...)` | Details you only want while hunting a bug. | Grey. |
+| `log:debug(...)` | Details you only want while looking for a bug. | Grey. |
 | `log:trace(...)` | Very fine detail. Dropped by default. | Not shown. |
 
-Two things to remember:
-
-- Write `log:info` with a **colon**.
+- Write `log:info` with a colon.
 - The first value is a pattern, as in Lua's `string.format`. `%s` stands for any value and `%d` for a whole number. The values after it fill those places.
 
 ## Repeated lines
@@ -61,7 +59,7 @@ When the same message is logged several times in a row, the log shows it once, w
 
 ## When your mod has an error
 
-You do not need to catch errors yourself. Wax catches them.
+You don't need to catch errors yourself. Wax catches them.
 
 - The error goes to the log, in red, with the file and line it came from.
 - A red notification shows the first line of the error.
@@ -81,8 +79,8 @@ window:Button("Still works", function()
 end)
 ```
 
-Click **Break something**. A red message appears and the log shows the line number. Click **Still works**.
-It still works.
+Click **Break something**. A red message appears and the log shows the line number. Then click **Still works**.
+Its message shows, because the error stopped only the first click.
 
 If the log says `switched off after 5 consecutive errors`, a function kept failing every time it ran, and
 Wax stopped calling it. Fix the error and save the file.

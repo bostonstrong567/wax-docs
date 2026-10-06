@@ -28,7 +28,7 @@ window:Toggle("Music", true, function(on)
 end)
 ```
 
-Every control also has a `Changed` [signal](/docs/signals). It does the same job, and you can connect to it
+Every control also has a `Changed` [signal](/docs/signals). It does the same thing, and you can connect to it
 later or more than once.
 
 ```lua
@@ -39,10 +39,8 @@ music.Changed:Connect(function(on)
 end)
 ```
 
-Two rules hold for every control:
-
 - Your function may call `task.wait`. It runs as a [task](/docs/tasks).
-- Changing a control from code with `Set` does **not** run your function. Only the user does.
+- Changing a control from code with `Set` does not run your function. Only a change by the user does.
 
 ## What every control can do
 
@@ -96,7 +94,7 @@ window:Label("Text after a separator.")
 
 | Option | What it does |
 | --- | --- |
-| `dim` | `true` uses the theme's quieter text colour. |
+| `dim` | `true` uses the theme's dimmer text colour. |
 | `color` | A colour of your own. Make one with `ui.Color("#RRGGBB")`, or take one from `ui.Theme()`. |
 | `size` | The text size. |
 | `face` | The weight of the game's interface font, such as `"Book"`, `"Medium"` or `"Bold"`. |
@@ -179,8 +177,8 @@ Pass `nil` as the caption and give an `icon` to get a small icon button.
 | --- | --- |
 | `primary` | `true` draws the button in the accent colour. Use it for the main action. |
 | `icon` | An [icon](/docs/gui/icons) shown before the caption. |
-| `spin` | `true` turns the icon round once on every click. It shows that something was set going. |
-| `stretch` | A button with a caption fills the width. `false` makes it only as wide as its caption. An icon button is small; `true` makes it fill the width. |
+| `spin` | `true` turns the icon round once on every click. It shows that the click started something. |
+| `stretch` | A button with a caption fills the width. `false` makes it only as wide as its caption. An icon button is small. `true` makes it fill the width. |
 
 | Function | What it does |
 | --- | --- |
@@ -248,6 +246,15 @@ end)
 | --- | --- | --- |
 | `toggle.Changed` | The user flips the switch. | `true` or `false`. |
 
+A switch can be given another caption later, and be set without its sliding animation. Both are for a row
+that is reused to show something else:
+
+```lua
+local flag = window:Toggle("Wolf", false)
+flag:SetCaption("Bear")
+flag:Set(true, true)
+```
+
 ## Slider
 
 <Shot
@@ -277,7 +284,7 @@ handle, or click the number and type a value.
 | `value` | The value to start at. | The same as `min`. |
 | `step` | Values snap to steps of this size, counted from `min`. | No snapping. |
 | `format` | How the number is written, as a `string.format` pattern. | `"%.2f"`, or `"%d"` with a step of 1 or more. |
-| `stacked` | `true` puts the caption above the track, `false` beside it. | Wax decides by the room there is. |
+| `stacked` | `true` puts the caption above the track, `false` beside it. | Beside it when there is room, above when there is not. |
 | `live` | `false` reports the value once, when the mouse lets go. Use it when a change is slow to apply. | `true` |
 
 | Function | What it does |
@@ -316,7 +323,7 @@ end)
 | --- | --- |
 | `text` | The text to start with. |
 | `hint` | Grey text shown while the box is empty. |
-| `stacked` | `true` puts the caption above the box, `false` beside it. Left out, Wax decides by the room there is. |
+| `stacked` | `true` puts the caption above the box, `false` beside it. Left out, it goes beside the box when there is room, above when there is not. |
 | `mono` | `true` uses a fixed-width font. Good for code. |
 
 | Function | What it does |
@@ -329,7 +336,7 @@ end)
 
 | Signal | Fires when | Your function gets |
 | --- | --- | --- |
-| `input.Changed` | The text is committed: Enter, or the box loses the cursor. | The text. |
+| `input.Changed` | The user finishes typing: Enter, or the box loses the cursor. | The text. |
 | `input.Entered` | Enter is pressed. It fires even when the text is the same as last time. | The text. |
 | `input.Typed` | The text changes while typing. Every letter. | The text. |
 
@@ -361,7 +368,7 @@ window:Dropdown("Difficulty", { "Easy", "Normal", "Hard", "Extreme" }, "Normal",
 end)
 ```
 
-`container:Dropdown(caption, choices, selected, on_change)` adds a list to pick one from.
+`container:Dropdown(caption, choices, selected, on_change)` adds a list the user picks one choice from.
 
 - `choices` is a list of values.
 - `selected` is the one chosen at the start. Left out, it is the first.
@@ -378,6 +385,30 @@ window at a time. A long list scrolls.
 | Signal | Fires when | Your function gets |
 | --- | --- | --- |
 | `dropdown.Changed` | The user picks a choice. | The choice. |
+
+## Color
+
+A colour the user can change. The row shows the colour and its code. A click opens a panel under it with a box
+of shades, a bar of hues, and the code as text.
+
+```lua
+local look = window:Color("Outline", "#ff7a00", function(color)
+    print("picked", color)
+end)
+```
+
+The value is a string such as `"#ff7a00"`.
+
+- Drag in the box to pick a shade, and along the bar to pick a hue.
+- Type or paste a code into the text box and press Enter. The button beside it copies the code.
+- A click anywhere else closes the panel.
+
+| Function or signal | What it does |
+| --- | --- |
+| `look:Get()` | The colour as `"#rrggbb"`. |
+| `look:Set(color)` | Sets the colour. It does not call your function. |
+| `look.Changed` | Fires with every change, also while the mouse is held down. |
+| `look.Released` | Fires once when the user lets go. Use it for saving. |
 
 ## Keybind
 
@@ -471,7 +502,7 @@ window:Field("Ping", "42 ms", { mono = true })
 
 | Option | What it does |
 | --- | --- |
-| `mono` | `true` shows the value in a small fixed-width font. Good for numbers that keep changing: the text does not jiggle. |
+| `mono` | `true` shows the value in a small fixed-width font. Good for numbers that keep changing, because the text does not shift as they change. |
 
 | Function | What it does |
 | --- | --- |
@@ -498,7 +529,7 @@ advanced:Label("Nothing here yet.")
 
 `container:Section(title, options)` adds a card with a title. The user clicks the title to open and close it.
 
-A section is a **container**. Add controls to the section, as you would to a window.
+A section is a container. Add controls to the section, as you would to a window.
 
 | Option | What it does |
 | --- | --- |
@@ -541,8 +572,8 @@ A row is a container too. `row.control` is the row itself, for `SetVisible`, `Se
 
 ## Flow
 
-`container:Flow(options)` adds an area where controls keep their own size and wrap onto new lines, like
-words in a sentence.
+`container:Flow(options)` adds an area where controls keep their own size. When a line is full, the next
+control goes onto a new line.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Flow", width = 300, height = 200 })
@@ -557,7 +588,7 @@ end
 
 | Option | What it does |
 | --- | --- |
-| `cell` | Makes it a tidy grid instead: every control gets the same width, at least this wide, and each line is full. |
+| `cell` | Makes it a grid instead. Every control gets the same width, at least this wide, and each line is full. |
 
 ## Console
 
@@ -592,7 +623,7 @@ Each line is a small table: the text, then an optional colour.
 | Function | What it does |
 | --- | --- |
 | `console:SetLines(lines)` | Shows these lines. |
-| `console:GetText()` | Everything being shown, as one piece of text. Hand it to `ui.Copy` to put it on the clipboard. |
+| `console:GetText()` | Everything being shown, as one piece of text. Pass it to `ui.Copy` to put it on the clipboard. |
 | `console:SetFollow(on)` | `true` scrolls to the newest line on every `SetLines`. It starts on. |
 
 A console shows the list you give it. To add a line, keep the list, add to it and call `SetLines` again:
@@ -621,8 +652,8 @@ end)
 
 ## Grid
 
-A grid shows a long list in tidy cells, and stays fast with thousands of items. It has its own page:
-[Grid](/docs/gui/grid).
+A grid shows a long list in cells of the same size. It builds only the cells you can see, so a list of
+thousands of items is fine. It has its own page: [Grid](/docs/gui/grid).
 
 ## Every option in one place
 

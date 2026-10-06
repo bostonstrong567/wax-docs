@@ -1,11 +1,11 @@
 ---
 title: Themes
-description: Five built-in looks, an accent colour, and themes of your own.
+description: The five built-in themes, the accent colour, and how to add a theme of your own.
 icon: Palette
 ---
 
-A **theme** is the set of colours every window, overlay and notification uses. One theme styles all mods at
-once, so they look like they belong together.
+A **theme** is the set of colours every window, overlay and notification uses. One theme applies to all mods
+at once.
 
 ## The built-in themes
 
@@ -39,15 +39,15 @@ once, so they look like they belong together.
 
 ## The player picks
 
-The theme belongs to the player. They choose it on the **Settings** page of the Wax panel, together with:
+The player chooses the theme, on the **Settings** page of the Wax panel. The same page has:
 
-- an **accent colour**: From the theme, Blue, Green, Teal, Amber, Orange, Red, Pink or Purple,
-- whether **animations** play,
-- the **interface size**.
+- The accent colour: From the theme, Blue, Green, Teal, Amber, Orange, Red, Pink or Purple.
+- A switch for animations.
+- The interface size.
 
 Wax remembers these choices.
 
-Your controls follow the theme by themselves. You do not have to do anything.
+Your controls follow the theme by themselves.
 
 ## Use the theme's colours
 
@@ -66,15 +66,15 @@ window:Label("The accent colour.", { color = theme.accent })
 window:Progress("Health", 0.35, { color = theme.bad })
 ```
 
-`ui.Theme()` gives the live theme. Pass its colours on as they are. They keep following the theme, even
+`ui.Theme()` gives the theme in use. Pass its colours on as they are. They keep following the theme, even
 after it changes.
 
-The colours you will use most:
+The colours you use most:
 
 | Name | What it is for |
 | --- | --- |
 | `text` | Normal text. |
-| `dim` | Quieter text. |
+| `dim` | Dimmer text. |
 | `accent` | The highlight colour. |
 | `good` | Success. Green in most themes. |
 | `warn` | Warnings. Yellow in most themes. |
@@ -115,8 +115,8 @@ window:Dropdown("Theme", ui.Themes(), ui.ThemeName(), function(name)
 end)
 ```
 
-Pick a theme from the list. Everything on screen takes the new colours where it stands. No window is rebuilt,
-and no mod is reloaded.
+Pick a theme from the list. Everything on screen changes to the new colours. No window is rebuilt, and no
+mod is reloaded.
 
 | Function | What it does |
 | --- | --- |
@@ -128,7 +128,7 @@ and no mod is reloaded.
 
 <Callout title="Ask first">
   `ui.SetTheme` changes the look of every mod, and Wax remembers the choice. Call it when the player asks for
-  it, for example from a dropdown as above. Do not call it just because your mod loaded.
+  it, for example from a dropdown as above. Don't call it when your mod loads.
 </Callout>
 
 ## Change single settings
@@ -152,7 +152,7 @@ In such a table a colour may be written as `"#RRGGBB"` or `0xRRGGBB`.
 - Colours apply at once.
 - Sizes and shapes (`font_size`, `spacing`, `window_shape` and the like) apply to what is built afterwards.
 - Single settings are not remembered. They last until the theme changes or the game closes.
-- `ui.ResetTheme()` puts **everything** back to Midnight, including a theme the player picked.
+- `ui.ResetTheme()` puts everything back to Midnight, including a theme the player picked.
 
 ## Add a theme of your own
 

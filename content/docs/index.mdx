@@ -1,6 +1,6 @@
 ---
-title: What is Wax?
-description: A Lua scripting framework for ICARUS. Write a mod, save it, and see it in the running game.
+title: About Wax
+description: Wax is a Lua scripting framework for ICARUS. It runs your mods inside the game.
 icon: Sparkles
 ---
 
@@ -8,10 +8,7 @@ Wax lets you write mods for ICARUS in Lua.
 
 A mod is a folder with one file in it, called `init.lua`. Wax runs that file inside the game.
 
-<Callout type="warn" title="Wax is in development">
-  Wax is not released yet, and there is nothing to download. These pages describe how it works today. Details
-  may still change before the first release.
-</Callout>
+This is an early version. The download is on the [Installing](/docs/install) page.
 
 ## What a mod looks like
 
@@ -25,29 +22,29 @@ window:Button("Say hi", function()
 end)
 ```
 
-Press **F8** in the game and the window is there. Click the button and a message slides in.
+Press **F8** in the game and the window is there. Click the button and a message shows in a corner of the screen.
 
 ## What you can do
 
-- **Look at the game.** Start at `game` and walk to the world, the player and every object. See [The game tree](/docs/game).
-- **Make an interface.** Windows, buttons, switches, sliders, lists, overlays and notifications. See [Controls](/docs/gui/controls).
-- **Run code over time.** Wait, repeat and delay without freezing the game. See [Tasks](/docs/tasks).
-- **React to events.** Run a function when the map changes or a switch is flipped. See [Signals](/docs/signals).
-- **Remember things.** Keep settings between game sessions. See [Saving settings](/docs/storage).
+- Read and change the game's objects. Start at `game` and go to the world, the player and every other object. See [The game tree](/docs/game).
+- Make an interface with windows, buttons, switches, sliders, lists, overlays and notifications. See [Controls](/docs/gui/controls).
+- Run code over time. Wait, repeat and delay without freezing the game. See [Tasks](/docs/tasks).
+- Run a function when something happens, such as a map change or a flipped switch. See [Signals](/docs/signals).
+- Keep settings between game sessions. See [Saving settings](/docs/storage).
 
 ## What Wax does for you
 
-- **Hot reload.** Save your file and the mod reloads in the running game. You do not restart anything. See [Hot reload](/docs/hot-reload).
-- **A menu in the game.** One key opens every mod's windows. See [The menu](/docs/menu).
-- **A panel for mod authors.** It lists your mods, shows the log and runs a line of Lua on the spot. See [The Wax panel](/docs/debug-panel).
-- **Errors you can read.** An error in your mod is caught. It shows up as a notification and in the log, with the line it happened on.
-- **Cleaning up.** Everything your mod makes is removed when the mod reloads. You do not write clean-up code.
+- When you save a file, the mod reloads in the running game. You don't restart anything. See [Hot reload](/docs/hot-reload).
+- One key opens every mod's windows. See [The menu](/docs/menu).
+- A panel in the game lists your mods, shows the log and runs a line of Lua. See [The Wax panel](/docs/debug-panel).
+- Wax catches an error in your mod. The error shows as a notification and in the log, with the line it happened on.
+- Everything your mod makes is removed when the mod reloads. You don't write clean-up code.
 
 ## Where to go next
 
 <Cards>
-  <Card title="Installing" href="/docs/install" description="Where Wax and your mods live." />
-  <Card title="Your first mod" href="/docs/first-mod" description="A window, a switch and a button in five minutes." />
-  <Card title="How a mod is built" href="/docs/mods" description="Files, the manifest and using other mods." />
+  <Card title="Installing" href="/docs/install" description="Download Wax and put it in the game." />
+  <Card title="Your first mod" href="/docs/first-mod" description="Make a window with a switch and a button." />
+  <Card title="How a mod is built" href="/docs/mods" description="Files, mod.lua and using other mods." />
   <Card title="Reference" href="/docs/reference" description="Every function, with its parameters." />
 </Cards>

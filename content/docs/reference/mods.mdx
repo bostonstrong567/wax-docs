@@ -19,7 +19,7 @@ Type name: `WaxModInfo`.
 
 ## `log` [#log]
 
-The mod's own log channel. Values after `fmt` are applied to it with string.format.
+The mod's own log channel. Values after `fmt` are put into it with string.format.
 
 Type name: `WaxLogger`.
 
@@ -126,7 +126,7 @@ storage.Load(name: string): table
 
 ### `storage.Save(name, value)` [#storage-save]
 
-Queues the table to be written under `name`; only numbers, strings, booleans and tables of them are kept.
+Queues the table to be written under `name`. Only numbers, strings, booleans and tables of them are kept.
 
 ```lua
 storage.Save(name: string, value: table)
@@ -159,7 +159,7 @@ print(...: any)
 
 ### `persist(key, default?)` [#persist]
 
-Returns the value kept under `key`, storing `default` (or a new table) on first use; it survives reloads of the mod.
+Returns the value kept under `key`, storing `default` (or a new table) on first use. The value survives reloads of the mod.
 
 ```lua
 persist<T>(key: string, default?: T): T
@@ -201,10 +201,10 @@ What a mod's `mod.lua` returns. The file is optional, and so is every field.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `name` (optional) | `string` | Display name; the folder name when omitted. |
+| `name` (optional) | `string` | Display name. The folder name when omitted. |
 | `version` (optional) | `string` | "0.0.0" when omitted. |
-| `main` (optional) | `string` | Entry file inside the mod's folder; "init.lua" when omitted. |
-| `dependencies` (optional) | `string[]` | Ids of mods that load first; each can then be reached with require("@Id"). |
+| `main` (optional) | `string` | Entry file inside the mod's folder. "init.lua" when omitted. |
+| `dependencies` (optional) | `string[]` | Ids of mods that load first. Each can then be reached with require("@Id"). |
 
 ## WaxLogEntry [#waxlogentry]
 
@@ -230,14 +230,10 @@ These UE4SS functions raise an error when a mod calls them. The reason is given 
 | `LoopAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
 | `ExecuteAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
 | `ExecuteWithDelay` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
-| `RegisterKeyBind` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
-| `RegisterKeyBindAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
-| `RestartMod` | Blocked in Wax mods: restarting a UE4SS mod destroys the Lua state Wax lives in. Reload the mod through Wax instead. |
-| `RestartCurrentMod` | Blocked in Wax mods: restarting a UE4SS mod destroys the Lua state Wax lives in. Reload the mod through Wax instead. |
-| `UninstallMod` | Blocked in Wax mods: it tears down the Lua state Wax lives in. |
-| `UninstallCurrentMod` | Blocked in Wax mods: it tears down the Lua state Wax lives in. |
+| `RegisterKeyBind` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`ui.Hotkey`](/docs/reference/ui#ui-hotkey). |
+| `RegisterKeyBindAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`ui.Hotkey`](/docs/reference/ui#ui-hotkey). |
+| `RestartMod` | Blocked in Wax mods: restarting a UE4SS mod destroys the Lua state Wax runs in. Reload the mod through Wax instead. |
+| `RestartCurrentMod` | Blocked in Wax mods: restarting a UE4SS mod destroys the Lua state Wax runs in. Reload the mod through Wax instead. |
+| `UninstallMod` | Blocked in Wax mods: it destroys the Lua state Wax runs in. |
+| `UninstallCurrentMod` | Blocked in Wax mods: it destroys the Lua state Wax runs in. |
 | `ClearAllDelayedActions` | Blocked in Wax mods: it cancels every mod's timers, and Wax's own frame loop with them. |
-
----
-
-*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*

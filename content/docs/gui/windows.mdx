@@ -24,7 +24,7 @@ end, { primary = true })
 Press **F8** to see it. The title bar has a button to roll the window up, and a cross to close it. The user
 can drag the window by its title bar and resize it by its bottom right corner.
 
-Everything you add with `window:Something(...)` is a control. They are all on the [Controls](/docs/gui/controls) page.
+Everything you add with `window:Something(...)` is a control. The [Controls](/docs/gui/controls) page lists them all.
 
 ## Options
 
@@ -72,7 +72,7 @@ end)
 | `window:IsVisible()` | `true` while it is shown. |
 | `window:SetTitle(text)` | Changes the title. |
 | `window:SetPosition(x, y)` | Moves it. It always stays on the screen. |
-| `window:SetSize(width, height)` | Resizes it. It never gets smaller than its smallest size. |
+| `window:SetSize(width, height)` | Resizes it. A window does not go below its smallest size. |
 | `window:SetMinimized(true)` | Rolls it up to its title bar. `false` rolls it back down. |
 | `window:IsMinimized()` | `true` while it is rolled up. |
 | `window:Destroy()` | Removes the window and everything on it. |
@@ -119,7 +119,8 @@ list wider.
 
 ## Pages along the top
 
-With `nav = "top"` the pages become tabs.
+With `nav = "top"` the pages become tabs. The tabs are all the same width, and the window cannot be made
+narrower than its tabs need.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Tabs", nav = "top", width = 400, height = 210 })
@@ -160,7 +161,7 @@ If you add a control straight to a window that has pages, Wax puts it on a first
 ### Load more when the user reaches the end
 
 A page has a signal called `NearEnd`. It fires when the user scrolls close to the bottom. Use it to add
-more content bit by bit.
+more as the user scrolls.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Endless", nav = "top", width = 360, height = 300 })
@@ -182,11 +183,11 @@ page.NearEnd:Connect(add_more)
 `NearEnd` also fires a few times a second while the page is not full yet. So do nothing when there is no more
 to add, as the first line of `add_more` does.
 
-For very long lists, a [Grid](/docs/gui/grid) is the better tool.
+For very long lists, use a [Grid](/docs/gui/grid) instead.
 
 ## A status bar
 
-`window:StatusBar()` adds a line along the bottom of a window. It is a good place to say what is going on.
+`window:StatusBar()` adds a line along the bottom of a window. Use it to say what your mod is doing.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Status bar", height = 145 })
@@ -206,12 +207,12 @@ status:Right("v1.2")
 | Function | What it does |
 | --- | --- |
 | `status:Set(text, options)` | Shows a message. `kind` sets the colour: `"info"`, `"good"`, `"warn"` or `"bad"`. `icon` adds an icon. |
-| `status:Busy(text)` | Shows a message with a turning indicator, until the next `Set`. |
+| `status:Busy(text)` | Shows a message with a spinning circle, until the next `Set`. |
 | `status:Progress(amount)` | Shows a thin line across the bar, from 0 to 1. `nil` hides it. |
 | `status:Right(text)` | Shows text at the right-hand end. |
 | `status:Clear()` | Empties the message and hides the line. |
 
-Here it is with a task that pretends to work:
+This example shows a status bar while a task counts through ten steps:
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Working", height = 160 })

@@ -28,6 +28,21 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
+/* One icon from the sheet of white icons, drawn in the text colour so it shows in both themes. */
+.sheet-icon {
+  display: block;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background-color: currentColor;
+  -webkit-mask-image: var(--icon-sheet);
+  mask-image: var(--icon-sheet);
+  -webkit-mask-position: var(--icon-at);
+  mask-position: var(--icon-at);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
 /* Function names in the "On this page" list read as plain text, not as code chips. */
 #nd-toc a code,
 [data-toc-popover-content] a code {

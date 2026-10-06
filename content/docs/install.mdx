@@ -1,20 +1,106 @@
 ---
 title: Installing
-description: Where Wax lives in the game folder, and where your mods go.
+description: Download Wax, put it in the game folder and check that it works.
 icon: Download
 ---
 
-<Callout type="warn" title="Not released yet">
-  Wax is still in development. There is no download yet, so there is nothing to install today. This page
-  shows where things live, so the rest of these pages make sense.
-</Callout>
+This is an early version of Wax.
 
-## What Wax needs
+## What you need
 
-- ICARUS on Steam, on Windows.
-- UE4SS, a script loader for Unreal Engine games. Wax runs on top of it.
+ICARUS on Steam, on Windows. You install nothing else. UE4SS, the script loader Wax runs on, is in the
+download.
 
-## Where Wax lives
+## Download
+
+Download `Wax-0.1.0.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
+The number in the file name is the version. Extract the whole zip before you run anything in it.
+
+The same page has the VS Code extension as a `.vsix` file. The [editor page](/docs/editor) says what it is for.
+
+| In the zip | What it is |
+| --- | --- |
+| `Install Wax.cmd` | Copies Wax into your game. |
+| `Update Wax.cmd` | Looks for a newer Wax and installs it. |
+| `Uninstall Wax.cmd` | Removes Wax from your game. |
+| `Wax-Setup.ps1` | The script those three files run. You don't need to open it. |
+| `README.txt` | The steps on this page, as a text file. |
+| `licenses` | The licences of UE4SS and of the Lucide icons. |
+| `game` | The files that go into the game folder. |
+
+Inside `game`:
+
+| In `game` | What it is |
+| --- | --- |
+| `dwmapi.dll` and the `ue4ss` folder | UE4SS. |
+| `ue4ss\Mods\Wax` | Wax. |
+| `ue4ss\Mods\Wax\mods\Hello` | An example mod. |
+
+## Install
+
+Close ICARUS first. Then install in one of two ways.
+
+### Install with the installer
+
+Double-click `Install Wax.cmd`. It finds the game through Steam and copies the files. If it can't find the
+game, it asks you for the folder.
+
+The installer also sets up the **Add to game** button of the [Mods page](/mods) for this PC.
+
+Windows may ask you to confirm first, because the file came from the internet.
+
+### Install by hand
+
+Copy everything inside the `game` folder into this folder of the game:
+
+```text
+...\steamapps\common\Icarus\Icarus\Binaries\Win64\
+```
+
+To find it, right-click ICARUS in Steam and choose **Manage**, then **Browse local files**. Open `Icarus`,
+then `Binaries`, then `Win64`.
+
+When you are done, `dwmapi.dll` and the `ue4ss` folder sit next to `Icarus-Win64-Shipping.exe`.
+
+### If you already use UE4SS
+
+Wax is tested on the UE4SS build in the zip, so the installer puts that build in. If it finds a different
+one, it first copies the old files to a folder inside `Win64`. The folder's name is `ue4ss-backup-` followed
+by the date and time. Your other UE4SS mods in `ue4ss\Mods` are left alone.
+
+## Check that it works
+
+<Steps>
+<Step>
+
+### Start the game
+
+Start ICARUS the way you always do. Nothing else has to run next to it.
+
+</Step>
+<Step>
+
+### Press F8
+
+The menu opens and you see the Wax panel. Its **Mods** page lists every mod Wax found. After a new install
+that is the example mod, Hello.
+
+</Step>
+<Step>
+
+### Look at the status line
+
+The bottom of the panel says how many mods loaded, and whether there were errors.
+
+</Step>
+</Steps>
+
+<Shot
+  src="panel-mods.png"
+  alt="The Wax panel on its Mods page. One mod called Hello is listed as loaded, with an Enabled switch and a Reload button. The status line reads 1 of 1 mods loaded, no errors."
+/>
+
+## Where Wax is
 
 Wax sits in the UE4SS mods folder inside the game:
 
@@ -42,36 +128,50 @@ Each mod is a folder inside `Wax\mods\`. The folder holds a file called `init.lu
 The folder name is the mod's id. Use only letters, digits, `_` and `-` in it. A folder with another kind of
 name is skipped, and the log says so.
 
-## Check that it works
+## Updating
 
-<Steps>
-<Step>
+Close ICARUS first.
 
-### Start the game
+### Update with the installer
 
-Start ICARUS the way you always do. Nothing else has to run next to it.
+Double-click `Update Wax.cmd`. It asks GitHub for the newest release and installs it if it is newer than
+yours.
 
-</Step>
-<Step>
+You can also download the newest zip and run its `Install Wax.cmd`. Installing over an old copy updates Wax.
 
-### Press F8
+Both ways keep your mods (`Wax\mods`), your settings (`Wax\saved`) and your UE4SS settings.
 
-The menu opens and you see the Wax panel. Its **Mods** page lists every mod Wax found.
+### Update by hand
 
-</Step>
-<Step>
+Download the newest zip and copy the contents of `game` into `Win64` again. Say yes when Windows asks to
+replace files.
 
-### Look at the status line
+Your own mods and your settings are not in the zip, so they stay. Two things are replaced by the copies from
+the zip:
 
-The bottom of the panel says how many mods loaded, and whether there were errors.
+- the example mod, `mods\Hello`
+- the UE4SS settings files `UE4SS-settings.ini`, `mods.txt` and `mods.json`
 
-</Step>
-</Steps>
+## Removing Wax
 
-<Shot
-  src="panel-mods.png"
-  alt="The Wax panel on its Mods page. One mod called Hello is listed as loaded, with an Enabled switch and a Reload button. The status line reads 1 of 1 mods loaded, no errors."
-/>
+Close ICARUS first.
+
+### Remove with the installer
+
+Double-click `Uninstall Wax.cmd`. It removes Wax. It asks before it removes your mods and settings, and
+before it removes UE4SS. Press **Enter** at a question to keep them.
+
+### Remove by hand
+
+Delete this folder:
+
+```text
+...\steamapps\common\Icarus\Icarus\Binaries\Win64\ue4ss\Mods\Wax\
+```
+
+Your mods and settings are in it. Copy `mods` and `saved` somewhere else first if you want to keep them.
+
+To remove UE4SS too, delete `dwmapi.dll` and the `ue4ss` folder from `Win64`.
 
 ## Switching a mod off, or removing it
 

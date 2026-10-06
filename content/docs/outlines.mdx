@@ -1,0 +1,113 @@
+---
+title: Outlines
+description: Outline creatures, players and other things so they show through walls, in any colour.
+icon: ScanEye
+---
+
+`game.Highlight` draws an outline round a thing in the world. The outline follows the shape of the model and
+shows through walls and trees. It can also fill the model with a colour.
+
+```lua
+local wolf = game.Creatures:GetNearest("Wolf")
+local mark = game.Highlight:Add(wolf, { Color = "Red" })
+
+-- later
+mark:Remove()
+```
+
+## What can be outlined
+
+Anything that has a shape:
+
+- An actor: a creature, a player's character, an item on the ground, a bench, a wall.
+- One part of an actor, such as a single mesh. Pass the part in place of the actor.
+
+```lua
+-- only the body of the nearest creature
+local creature = game.Creatures:GetNearest()
+game.Highlight:Add(creature.Mesh, { Color = "Pink" })
+
+-- every player's character
+for _, character in ipairs(game.Players:GetCharacters()) do
+    game.Highlight:Add(character, { Color = "Cyan" })
+end
+```
+
+For other things, find the actor first. `game:FindAll("ClassName")` returns every object of a class. It
+searches every object, so call it once, not every frame.
+
+## A whole kind at once
+
+```lua
+game.Creatures:Highlight("Wolf", { Color = "#ff7a00" })
+```
+
+This outlines every wolf that is here now and every wolf that appears later. It returns a connection. Call
+`:Disconnect()` on it to take the outlines off again.
+
+## Options
+
+| Option | What it does |
+| --- | --- |
+| `Color` | The outline's colour. `"Red"` when left out. |
+| `Fill` | `true` also fills the model with colour. `true` when left out. |
+| `FillColor` | The fill's colour, when it should differ from the outline. |
+
+A colour is a name from `game.Highlight.Colors`, a string such as `"#ff7a00"`, or a table such as
+`{ R = 1, G = 0.5, B = 0 }` with values from 0 to 1.
+
+```lua
+game.Highlight:Add(creature, { Color = "#00ff66", FillColor = "#ffd60a" })
+```
+
+## Change many outlines at once
+
+A look is a colour and fill that many outlines share. Change the look and every outline that uses it changes.
+
+```lua
+local look = game.Highlight:Look({ Color = "Cyan" })
+
+game.Creatures:Observe("Deer", function(deer)
+    local mark = game.Highlight:Add(deer, look)
+    return function() mark:Remove() end
+end)
+
+-- every deer turns orange
+look:Set({ Color = "Orange" })
+```
+
+## Settings for every outline
+
+```lua
+game.Highlight:Configure({ Fill = 0.3, Width = 2 })
+```
+
+`Fill` is how strong the fill is, from 0 to 1. `Width` is the line width, from 1 to 4.
+
+## Limits
+
+Wax uses the outline that the game itself draws. That gives it these limits:
+
+- There is room for four colours with a fill and three colours without one at the same time. A colour counts
+  once, however many things use it. When there is no room left, the nearest colour in use is shown.
+- An outline always shows through walls.
+- Trees, rocks and bushes cannot be outlined one at a time.
+- The outline needs your character. It is not drawn at the space station.
+
+## Example: outline what you pick
+
+```lua title="init.lua"
+local look = game.Highlight:Look({ Color = "#ff7a00", Fill = true })
+local watch = nil
+
+local window = ui.Window({ title = "Outlines", width = 320, height = 220 })
+
+window:Dropdown("Kind", game.Creatures:GetLiveKinds(), nil, function(kind)
+    if watch then watch:Disconnect() end
+    watch = game.Creatures:Highlight(kind, look)
+end)
+
+window:Color("Colour", "#ff7a00", function(color)
+    look:Set({ Color = color })
+end)
+```

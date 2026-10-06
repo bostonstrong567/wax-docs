@@ -1,6 +1,6 @@
 ---
 title: "game"
-description: "The game object tree: game, game.Players and the Instances they hand out."
+description: "The game tree: game, game.Players and the Instances they give you."
 icon: Globe
 ---
 
@@ -14,17 +14,19 @@ Type name: `WaxGame`.
 
 | Member | Type | Description |
 | --- | --- | --- |
-| `World` | [`WaxInstance`](/docs/reference/game#waxinstance) | The current world; its children are the actors in it. |
+| `World` | [`WaxInstance`](/docs/reference/game#waxinstance) | The current world. Its children are the actors in it. |
 | `GameInstance` | [`WaxInstance`](/docs/reference/game#waxinstance) | An engine object. Any member not listed here is one of the object's own reflected properties or functions. |
 | `GameState` | [`WaxInstance`](/docs/reference/game#waxinstance) | An engine object. Any member not listed here is one of the object's own reflected properties or functions. |
 | `GameMode` | [`WaxInstance?`](/docs/reference/game#waxinstance) | Nil when you are a client in someone else's game. |
 | `LocalPlayer` | [`WaxInstance`](/docs/reference/game#waxinstance) | The local player's controller. |
-| `Character` | [`WaxInstance?`](/docs/reference/game#waxinstance) | The pawn the local player controls; nil at the main menu. |
+| `Character` | [`WaxInstance?`](/docs/reference/game#waxinstance) | The pawn the local player controls. nil at the main menu. |
 | `Engine` | [`WaxInstance`](/docs/reference/game#waxinstance) | An engine object. Any member not listed here is one of the object's own reflected properties or functions. |
 | `Viewport` | [`WaxInstance`](/docs/reference/game#waxinstance) | The game viewport. |
 | `MapName` | `string?` | The name of the current world. |
-| `InProspect` | `boolean` | True while the game state is a prospect's. |
+| `InProspect` | `boolean` | True while you are in a prospect. |
 | `Players` | [`WaxPlayers`](/docs/reference/game#game-players) |  |
+| `Creatures` | [`WaxCreatures`](/docs/reference/game#game-creatures) | The animals and enemies in the world, kept as a live list. A kind is named the way the game names it: "Wolf", "Conifer_Wolf", "Cave Worm". Letter case, spaces and underscores do not matter. A wrong name raises an error that suggests the right one. |
+| `Highlight` | [`WaxHighlight`](/docs/reference/game#game-highlight) | Outlines actors so they show through walls, using the outline the game itself draws. The game has room for four filled colours and three outline-only colours at a time. A colour counts once, however many actors use it. |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
@@ -32,7 +34,7 @@ Type name: `WaxGame`.
 
 ### `game.wrap(object)` [#game-wrap]
 
-The Instance for a UE4SS object, or nil for a null or invalid one; the same object always gives the same Instance.
+The Instance for a UE4SS object, or nil for a null or invalid one. The same object always gives the same Instance.
 
 ```lua
 game.wrap(object: any): WaxInstance?
@@ -60,7 +62,7 @@ game:Find(class_name: string): WaxInstance?
 
 ### `game:FindAll(class_name)` [#game-findall]
 
-Every live object of a class; it searches all objects, so never call it per frame.
+Every live object of a class. It searches all objects, so never call it per frame.
 
 ```lua
 game:FindAll(class_name: string): WaxInstance[]
@@ -98,7 +100,7 @@ game:GetChildren(): WaxInstance[]
 
 ### `game:GetService(name)` [#game-getservice]
 
-The member of game with this name, as game[name] gives it.
+The member of game with this name, the same as game[name].
 
 ```lua
 game:GetService(name: WaxGameMember): any
@@ -116,11 +118,16 @@ Type name: `WaxPlayers`.
 
 | Member | Type | Description |
 | --- | --- | --- |
-| `LocalPlayer` | [`WaxInstance`](/docs/reference/game#waxinstance) | The local player's controller, as game.LocalPlayer. |
+| `LocalPlayer` | [`WaxInstance`](/docs/reference/game#waxinstance) | The local player's controller, the same as game.LocalPlayer. |
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `CharacterAdded` | `character: WaxInstance` | Fires when a player's character appears. |
+| `CharacterRemoved` | `character: WaxInstance` | Fires when a player's character leaves the world. |
 
 ### `game.Players:GetPlayers()` [#game-players-getplayers]
 
-One Instance per player in the session (their player state); works for the host and for clients.
+One Instance per player in the session (their player state). Works for the host and for clients.
 
 ```lua
 game.Players:GetPlayers(): WaxInstance[]
@@ -138,11 +145,276 @@ game.Players:GetCharacters(): WaxInstance[]
 
 **Returns** [`WaxInstance[]`](/docs/reference/game#waxinstance)
 
+### `game.Players:ObserveCharacters(fn)` [#game-players-observecharacters]
+
+Calls fn(character) for each player's character that is here now and each that appears later (a join, a respawn). If fn returns a function, that runs when the character is gone or the watch is stopped.
+
+```lua
+game.Players:ObserveCharacters(fn: fun(character: WaxInstance): (fun()?)): WaxConnection
+```
+
+| Parameter | Type |
+| --- | --- |
+| `fn` | `fun(character: WaxInstance): (fun()?)` |
+
+**Returns** [`WaxConnection`](/docs/reference/tasks#waxconnection)
+
+### `game.Players:GetName(character)` [#game-players-getname]
+
+The name of the player who controls a character, or nil while the game has not said yet.
+
+```lua
+game.Players:GetName(character: WaxInstance): string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `character` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+
+**Returns** `string?`
+
+### `game.Players:IsLocal(character)` [#game-players-islocal]
+
+True for the character this player controls.
+
+```lua
+game.Players:IsLocal(character: WaxInstance): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `character` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+
+**Returns** `boolean`
+
+## `game.Creatures` [#game-creatures]
+
+The animals and enemies in the world, kept as a live list. A kind is named the way the game names it: "Wolf", "Conifer_Wolf", "Cave Worm". Letter case, spaces and underscores do not matter. A wrong name raises an error that suggests the right one.
+
+Type name: `WaxCreatures`.
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Added` | `creature: WaxInstance` | Fires for each creature that appears from now on. |
+| `Removed` | `creature: WaxInstance, info: WaxCreatureEnd` | Fires when a creature leaves the world. The Instance can no longer be used, only compared. |
+| `Died` | `creature: WaxInstance, info: WaxCreatureEnd` | Fires when a creature is killed, a few seconds before it is removed. |
+| `Cleared` | nothing | Fires once when the map changes, in place of one Removed per creature. |
+
+### `game.Creatures:GetAll(kind?, options?)` [#game-creatures-getall]
+
+Every creature, or those of one kind. Dead ones are left out unless asked for.
+
+```lua
+game.Creatures:GetAll(kind?: string, options?: WaxCreatureQuery): WaxInstance[]
+game.Creatures:GetAll(options: WaxCreatureQuery): WaxInstance[]
+```
+
+| Parameter | Type |
+| --- | --- |
+| `kind` (optional) | `string` |
+| `options` (optional) | [`WaxCreatureQuery`](/docs/reference/game#waxcreaturequery) |
+
+**Returns** [`WaxInstance[]`](/docs/reference/game#waxinstance)
+
+### `game.Creatures:GetNearest(kind?, options?)` [#game-creatures-getnearest]
+
+The closest matching creature and its distance in metres, or nil.
+
+```lua
+game.Creatures:GetNearest(kind?: string, options?: WaxCreatureQuery): WaxInstance?
+game.Creatures:GetNearest(options: WaxCreatureQuery): WaxInstance?, number?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `kind` (optional) | `string` |
+| `options` (optional) | [`WaxCreatureQuery`](/docs/reference/game#waxcreaturequery) |
+
+**Returns** [`WaxInstance?`](/docs/reference/game#waxinstance) , number?
+
+### `game.Creatures:Count(kind?)` [#game-creatures-count]
+
+How many creatures of a kind are in the world now.
+
+```lua
+game.Creatures:Count(kind?: string): integer
+```
+
+| Parameter | Type |
+| --- | --- |
+| `kind` (optional) | `string` |
+
+**Returns** `integer`
+
+### `game.Creatures:GetKinds()` [#game-creatures-getkinds]
+
+Every kind this version of the game has, with how many of each are here now.
+
+```lua
+game.Creatures:GetKinds(): WaxCreatureKind[]
+```
+
+**Returns** [`WaxCreatureKind[]`](/docs/reference/game#waxcreaturekind)
+
+### `game.Creatures:GetLiveKinds()` [#game-creatures-getlivekinds]
+
+The names of the kinds that are in the world now.
+
+```lua
+game.Creatures:GetLiveKinds(): string[]
+```
+
+**Returns** `string[]`
+
+### `game.Creatures:GetKind(creature)` [#game-creatures-getkind]
+
+The kind and variant of a creature, or nil when it is not a creature in the world.
+
+```lua
+game.Creatures:GetKind(creature: WaxInstance): string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `creature` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+
+**Returns** `string?` , string?
+
+### `game.Creatures:Describe(creature)` [#game-creatures-describe]
+
+The common facts about one creature as plain values.
+
+```lua
+game.Creatures:Describe(creature: WaxInstance): WaxCreatureFacts
+```
+
+| Parameter | Type |
+| --- | --- |
+| `creature` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+
+**Returns** [`WaxCreatureFacts`](/docs/reference/game#waxcreaturefacts)
+
+### `game.Creatures:Observe(kind?, fn)` [#game-creatures-observe]
+
+Calls fn(creature) for each matching creature that is here now and each that appears later. If fn returns a function, that runs when the creature is gone or the watch is stopped.
+
+```lua
+game.Creatures:Observe(kind?: string, fn: fun(creature: WaxInstance): (fun()?)): WaxConnection
+game.Creatures:Observe(fn: fun(creature: WaxInstance): (fun()?)): WaxConnection
+```
+
+| Parameter | Type |
+| --- | --- |
+| `kind` (optional) | `string` |
+| `fn` | `fun(creature: WaxInstance): (fun()?)` |
+
+**Returns** [`WaxConnection`](/docs/reference/tasks#waxconnection)
+
+### `game.Creatures:Highlight(kind?, options?)` [#game-creatures-highlight]
+
+Outlines every creature of a kind, now and as more appear. Disconnect the result to stop.
+
+```lua
+game.Creatures:Highlight(kind?: string, options?: WaxHighlightOptions|WaxHighlightLook): WaxConnection
+```
+
+| Parameter | Type |
+| --- | --- |
+| `kind` (optional) | `string` |
+| `options` (optional) | [`WaxHighlightOptions`](/docs/reference/game#waxhighlightoptions) \| [`WaxHighlightLook`](/docs/reference/game#waxhighlightlook) |
+
+**Returns** [`WaxConnection`](/docs/reference/tasks#waxconnection)
+
+## `game.Highlight` [#game-highlight]
+
+Outlines actors so they show through walls, using the outline the game itself draws. The game has room for four filled colours and three outline-only colours at a time. A colour counts once, however many actors use it.
+
+Type name: `WaxHighlight`.
+
+| Member | Type | Description |
+| --- | --- | --- |
+| `Colors` | `string[]` | The colour names that can be used. |
+
+### `game.Highlight:Add(target, options?)` [#game-highlight-add]
+
+Outlines anything with a shape: an actor (a creature, a player's character, an item, something built) or one mesh part of an actor.
+
+```lua
+game.Highlight:Add(target: WaxInstance, options?: WaxHighlightOptions|WaxHighlightLook): WaxHighlightMark
+```
+
+| Parameter | Type |
+| --- | --- |
+| `target` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+| `options` (optional) | [`WaxHighlightOptions`](/docs/reference/game#waxhighlightoptions) \| [`WaxHighlightLook`](/docs/reference/game#waxhighlightlook) |
+
+**Returns** [`WaxHighlightMark`](/docs/reference/game#waxhighlightmark)
+
+### `game.Highlight:Remove(target)` [#game-highlight-remove]
+
+```lua
+game.Highlight:Remove(target: WaxInstance)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `target` | [`WaxInstance`](/docs/reference/game#waxinstance) |
+
+**Returns** nothing.
+
+### `game.Highlight:Clear()` [#game-highlight-clear]
+
+Takes every outline off.
+
+```lua
+game.Highlight:Clear()
+```
+
+**Returns** nothing.
+
+### `game.Highlight:GetAll()` [#game-highlight-getall]
+
+The actors that are outlined now.
+
+```lua
+game.Highlight:GetAll(): WaxInstance[]
+```
+
+**Returns** [`WaxInstance[]`](/docs/reference/game#waxinstance)
+
+### `game.Highlight:Look(options?)` [#game-highlight-look]
+
+A look to give to many outlines, so one call changes them all.
+
+```lua
+game.Highlight:Look(options?: WaxHighlightOptions): WaxHighlightLook
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxHighlightOptions`](/docs/reference/game#waxhighlightoptions) |
+
+**Returns** [`WaxHighlightLook`](/docs/reference/game#waxhighlightlook)
+
+### `game.Highlight:Configure(options)` [#game-highlight-configure]
+
+Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4).
+
+```lua
+game.Highlight:Configure(options: { Fill?: number, Width?: number }): { Fill: number, Width: number }
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` | `{ Fill?: number, Width?: number }` |
+
+**Returns** `{ Fill: number, Width: number }`
+
 ## WaxInstance [#waxinstance]
 
 An engine object. Any member not listed here is one of the object's own reflected properties or functions.
 
-You get one from [`game.Players:GetPlayers`](/docs/reference/game#game-players-getplayers), [`game.Players:GetCharacters`](/docs/reference/game#game-players-getcharacters), [`game.wrap`](/docs/reference/game#game-wrap), [`game:Find`](/docs/reference/game#game-find), [`game:FindAll`](/docs/reference/game#game-findall), [`game:GetTagged`](/docs/reference/game#game-gettagged), [`game:GetChildren`](/docs/reference/game#game-getchildren). Below, `instance` stands for one of these.
+You get one from [`game.Players:GetPlayers`](/docs/reference/game#game-players-getplayers), [`game.Players:GetCharacters`](/docs/reference/game#game-players-getcharacters), [`game.Creatures:GetAll`](/docs/reference/game#game-creatures-getall), [`game.Creatures:GetNearest`](/docs/reference/game#game-creatures-getnearest), [`game.Highlight:GetAll`](/docs/reference/game#game-highlight-getall), [`game.wrap`](/docs/reference/game#game-wrap), [`game:Find`](/docs/reference/game#game-find), [`game:FindAll`](/docs/reference/game#game-findall) and others. Below, `instance` stands for one of these.
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -199,7 +471,7 @@ instance:Call(name: string, ...: any): any
 
 ### `instance:IsValid()` [#instance-isvalid]
 
-False once the object has been destroyed or its map has gone.
+False once the object has been destroyed or the map has changed.
 
 ```lua
 instance:IsValid(): boolean
@@ -243,7 +515,7 @@ instance:GetMembers(): string[]
 
 ### `instance:GetParent()` [#instance-getparent]
 
-The actor or component this one is attached to; the world for a free actor; otherwise the object's outer.
+The actor or component this one is attached to. For an actor attached to nothing it is the world, and for anything else the object's outer.
 
 ```lua
 instance:GetParent(): WaxInstance?
@@ -253,7 +525,7 @@ instance:GetParent(): WaxInstance?
 
 ### `instance:GetChildren()` [#instance-getchildren]
 
-Actors for the world, components and attached actors for an actor, attached components for a component.
+The children: actors for the world, components and attached actors for an actor, attached components for a component.
 
 ```lua
 instance:GetChildren(): WaxInstance[]
@@ -263,7 +535,7 @@ instance:GetChildren(): WaxInstance[]
 
 ### `instance:FindFirstChild(name, recursive?)` [#instance-findfirstchild]
 
-The first child with this Name, or nil; `recursive` searches every descendant.
+The first child with this Name, or nil. `recursive` searches every descendant.
 
 ```lua
 instance:FindFirstChild(name: string, recursive?: boolean): WaxInstance?
@@ -344,7 +616,7 @@ instance:GetAttributes(): table<string, any>
 
 ### `instance:SetAttribute(name, value)` [#instance-setattribute]
 
-Stores a value on the Instance under `name`; nil removes it.
+Stores a value on the Instance under `name`. nil removes it.
 
 ```lua
 instance:SetAttribute(name: string, value: any)
@@ -359,7 +631,7 @@ instance:SetAttribute(name: string, value: any)
 
 ### `instance:GetAttributeChangedSignal(name)` [#instance-getattributechangedsignal]
 
-A signal for one attribute, fired with (value, previous); without a name, for all of them with (name, value, previous).
+A signal for one attribute, fired with (value, previous). Without a name it covers every attribute and fires with (name, value, previous).
 
 ```lua
 instance:GetAttributeChangedSignal(name: string): WaxSignal<fun(value: any, previous: any)>
@@ -374,7 +646,7 @@ instance:GetAttributeChangedSignal(): WaxSignal<fun(name: string, value: any, pr
 
 ### `instance:AddTag(tag)` [#instance-addtag]
 
-Marks the Instance with a tag; [`game:GetTagged(tag)`](/docs/reference/game#game-gettagged) finds it again.
+Marks the Instance with a tag. [`game:GetTagged(tag)`](/docs/reference/game#game-gettagged) finds it again.
 
 ```lua
 instance:AddTag(tag: string)
@@ -424,14 +696,134 @@ instance:GetTags(): string[]
 
 **Returns** `string[]`
 
+## WaxHighlightLook [#waxhighlightlook]
+
+A colour and fill that many outlines share. Changing it changes all of them at once.
+
+You get one from [`game.Highlight:Look`](/docs/reference/game#game-highlight-look). Below, `look` stands for one of these.
+
+### `look:Set(options)` [#look-set]
+
+```lua
+look:Set(options: WaxHighlightOptions)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` | [`WaxHighlightOptions`](/docs/reference/game#waxhighlightoptions) |
+
+**Returns** nothing.
+
+## WaxHighlightMark [#waxhighlightmark]
+
+One outlined actor.
+
+You get one from [`game.Highlight:Add`](/docs/reference/game#game-highlight-add). Below, `mark` stands for one of these.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `Instance` | [`WaxInstance`](/docs/reference/game#waxinstance) | An engine object. Any member not listed here is one of the object's own reflected properties or functions. |
+| `Active` | `boolean` | False once it was removed or its actor is gone. |
+
+### `mark:Remove()` [#mark-remove]
+
+Takes the outline off. Safe to call twice, and after the actor is gone.
+
+```lua
+mark:Remove()
+```
+
+**Returns** nothing.
+
+### `mark:Set(options)` [#mark-set]
+
+```lua
+mark:Set(options: WaxHighlightOptions)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` | [`WaxHighlightOptions`](/docs/reference/game#waxhighlightoptions) |
+
+**Returns** nothing.
+
+### `mark:SetColor(color)` [#mark-setcolor]
+
+```lua
+mark:SetColor(color: string|{ R: number, G: number, B: number })
+```
+
+| Parameter | Type |
+| --- | --- |
+| `color` | `string` \| `{ R: number, G: number, B: number }` |
+
+**Returns** nothing.
+
+## WaxCreatureQuery [#waxcreaturequery]
+
+Used by [`game.Creatures:GetAll`](/docs/reference/game#game-creatures-getall), [`game.Creatures:GetNearest`](/docs/reference/game#game-creatures-getnearest).
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `within` (optional) | `number` | Only creatures this many metres away or nearer. The result is then sorted nearest first. |
+| `from` (optional) | [`WaxInstance`](/docs/reference/game#waxinstance) \| `{ X: number, Y: number, Z: number }` | Where to measure from. Your character when omitted. |
+| `dead` (optional) | `boolean` | True also returns bodies that have not been cleared away yet. |
+| `sort` (optional) | `"nearest"` | Sorts nearest first without a distance limit. |
+
+## WaxCreatureKind [#waxcreaturekind]
+
+Returned by [`game.Creatures:GetKinds`](/docs/reference/game#game-creatures-getkinds).
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Name` | `string` | The kind's name in the game's data, such as "Wolf". |
+| `DisplayName` | `string` | The name the game shows players. |
+| `Tag` | `string` | The game's own tag for the kind, such as "NPC.Wolf". |
+| `Variants` | `string[]` | The versions of the kind, such as "Conifer_Wolf" and "Snow_Wolf". |
+| `Count` | `integer` | How many are in the world now. |
+
+## WaxCreatureFacts [#waxcreaturefacts]
+
+Returned by [`game.Creatures:Describe`](/docs/reference/game#game-creatures-describe).
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Kind` | `string` |  |
+| `Variant` | `string` |  |
+| `DisplayName` | `string` |  |
+| `ClassName` | `string` |  |
+| `Name` | `string` |  |
+| `IsAlive` | `boolean` |  |
+| `Health` | `integer?` |  |
+| `MaxHealth` | `integer?` |  |
+| `Level` | `integer?` |  |
+| `Position` | `{ X: number, Y: number, Z: number }` | In the engine's units: 100 is one metre. |
+
+## WaxCreatureEnd [#waxcreatureend]
+
+| Field | Type |
+| --- | --- |
+| `Kind` | `string` |
+| `Variant` | `string` |
+| `ClassName` | `string` |
+| `Name` | `string` |
+| `Reason` | `"Destroyed"` \| `"Unloaded"` |
+| `Position` (optional) | `{ X: number, Y: number, Z: number }` |
+
+## WaxHighlightOptions [#waxhighlightoptions]
+
+Used by [`game.Creatures:Highlight`](/docs/reference/game#game-creatures-highlight), [`look:Set`](/docs/reference/game#look-set), [`mark:Set`](/docs/reference/game#mark-set), [`game.Highlight:Add`](/docs/reference/game#game-highlight-add), [`game.Highlight:Look`](/docs/reference/game#game-highlight-look).
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `Color` | `string` \| `{ R: number, G: number, B: number }` | A name from game.Highlight.Colors, "#rrggbb", or values from 0 to 1. "Red" when omitted. |
+| `Fill` | `boolean` | Also tints the whole model. True when omitted. |
+| `FillColor` | `string` \| `{ R: number, G: number, B: number }` \| `false` | The tint's colour when it is not the outline's. false goes back to the outline's colour. |
+
 ## Named values [#named-values]
 
 Short names for a fixed set of values. Where a function asks for one of these, pass one of the values listed.
 
 ### WaxGameMember [#waxgamemember]
 
-One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"MapChanged"`.
-
----
-
-*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*
+One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"Creatures"`, `"Highlight"`, `"MapChanged"`.

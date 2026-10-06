@@ -40,10 +40,10 @@ local settings = storage.Load("settings", { enabled = true, volume = 65 })
 ```
 
 - The first value is a name. Use letters, digits, `_` and `-` only.
-- The second value is a table of **defaults**.
-- You get a copy of the defaults, with whatever was saved before laid over it.
+- The second value is a table of defaults.
+- You get a copy of the defaults with the saved values put on top. A saved value wins over a default with the same name.
 
-So the first time, you get the defaults. Later, you get the saved values. If you add a new setting to the
+The first time, you get the defaults. Later, you get the saved values. If you add a new setting to the
 defaults in a later version of your mod, players get it too.
 
 Only the top level is combined. A table inside your settings is taken whole from what was saved.
@@ -55,7 +55,7 @@ storage.Save("settings", settings)
 ```
 
 - Give it the same name and the table to keep.
-- It is safe to call often. Wax waits a moment and writes once, even if you saved ten times while dragging a slider.
+- You can call it often. Wax waits a moment and writes once, even if you save ten times while dragging a slider.
 
 ### What can be saved
 
@@ -74,7 +74,8 @@ Every mod has its own names. Two mods can both save under `"settings"` without c
 
 ## persist: values that live through a reload
 
-`persist` keeps a table alive while the game runs. It is for state, not for settings.
+`persist` keeps a table for as long as the game runs. Use it for values your mod is working with, such as a
+counter. Settings belong in `storage`.
 
 ```lua title="init.lua"
 local state = persist("state", { clicks = 0 })
@@ -91,14 +92,14 @@ end)
 Click a few times, then save `init.lua` again. The mod reloads and the count is still there. Without
 `persist` it would start at zero after every save.
 
-- `persist("state", { clicks = 0 })` gives back the **same table** every time.
+- `persist("state", { clicks = 0 })` gives back the same table every time.
 - The second value is only used the first time.
-- Change what is inside the table. Do not replace the table.
+- Change what is inside the table. Don't replace the table.
 - Each mod has its own keys.
 
 ## What Wax remembers by itself
 
-You do not have to save these. Wax does it:
+You don't have to save these. Wax does it:
 
 - Where each window is, and how big it is.
 - Where you dragged each overlay.

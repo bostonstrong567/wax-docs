@@ -1,10 +1,10 @@
 ---
 title: The game tree
-description: Start at game and walk to the world, the player and every object in it.
+description: Start at game and reach the world, the player and every object in it.
 icon: Globe
 ---
 
-Everything in the game hangs off one name: `game`.
+You reach everything in the game from one name: `game`.
 
 ```lua title="init.lua"
 print("Map:", game.MapName)
@@ -28,11 +28,11 @@ Open the **Log** page of the [Wax panel](/docs/debug-panel) to see what it print
 | `game.LocalPlayer` | Your player controller. |
 | `game.Character` | The character you control. `nil` at the main menu. |
 | `game.Players` | The players in the session. See below. |
-| `game.GameState` | The game state. |
-| `game.GameMode` | The game mode. `nil` when you are a client in someone else's game. |
-| `game.GameInstance` | The game instance. |
-| `game.Engine` | The engine. |
-| `game.Viewport` | The game viewport. |
+| `game.GameState` | The state of the session, shared with every player. |
+| `game.GameMode` | The rules of the session. `nil` when you are a client in someone else's game. |
+| `game.GameInstance` | The object the game keeps from when it starts until it closes. |
+| `game.Engine` | The Unreal Engine object. |
+| `game.Viewport` | The game's view on the screen. |
 | `game.MapName` | The name of the current world, as text. |
 | `game.InProspect` | `true` while you are in a prospect. |
 | `game.MapChanged` | A [signal](/docs/signals) that fires when the world changes. |
@@ -67,7 +67,7 @@ end)
 
 <Callout type="warn" title="Objects do not survive a map change">
   An Instance you got before the map changed is gone afterwards. Using it raises an error that tells you to
-  get it again. So ask `game` for a fresh one each time you need it, instead of keeping an old one for long.
+  get it again. Ask `game` for a new one each time you need it. Don't keep an old one for long.
 </Callout>
 
 ## Players
@@ -111,10 +111,10 @@ print("Controllers:", #everyone)
   it many times a second.
 </Callout>
 
-## Walking the world
+## The actors in the world
 
-The children of `game.World` are the actors in the world. This counts them by class and prints the five most
-common ones.
+An actor is one thing placed in the world, such as a character or a tree. The children of `game.World` are
+the actors. This counts them by class and prints the five most common ones.
 
 ```lua title="init.lua"
 local counts = {}

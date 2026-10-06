@@ -67,7 +67,7 @@ container:Spacer(height?: number): WaxControl
 
 ### `container:Button(caption?, on_click?, options?)` [#container-button]
 
-Adds a button; on_click runs on each click. With an icon and no caption it is an icon button.
+Adds a button. on_click runs on each click. With an icon and no caption it is an icon button.
 
 ```lua
 container:Button(caption?: string, on_click?: fun(), options?: WaxButtonOptions): WaxButton
@@ -83,7 +83,7 @@ container:Button(caption?: string, on_click?: fun(), options?: WaxButtonOptions)
 
 ### `container:Icon(name, options?)` [#container-icon]
 
-Adds an icon on its own, by name; browse the names on the menu's Icons page.
+Adds an icon on its own, by name. The menu's Icons page lists the names.
 
 ```lua
 container:Icon(name: string, options?: WaxIconOptions): WaxIcon
@@ -98,7 +98,7 @@ container:Icon(name: string, options?: WaxIconOptions): WaxIcon
 
 ### `container:Toggle(caption, initial?, on_change?)` [#container-toggle]
 
-Adds a switch; on_change(on) runs when the user flips it.
+Adds a switch. on_change(on) runs when the user flips it.
 
 ```lua
 container:Toggle(caption: string, initial?: boolean, on_change?: fun(on: boolean)): WaxToggle
@@ -114,7 +114,7 @@ container:Toggle(caption: string, initial?: boolean, on_change?: fun(on: boolean
 
 ### `container:Slider(caption, options?, on_change?)` [#container-slider]
 
-Adds a slider with a read-out; on_change(value) runs while the user drags it.
+Adds a slider with a read-out. on_change(value) runs while the user drags it.
 
 ```lua
 container:Slider(caption: string, options?: WaxSliderOptions, on_change?: fun(value: number)): WaxSlider
@@ -130,7 +130,7 @@ container:Slider(caption: string, options?: WaxSliderOptions, on_change?: fun(va
 
 ### `container:Input(caption?, options?, on_commit?)` [#container-input]
 
-Adds a text box; on_commit(text) runs when Enter is pressed or the box loses focus.
+Adds a text box. on_commit(text) runs when Enter is pressed or the box loses focus.
 
 ```lua
 container:Input(caption?: string, options?: WaxInputOptions, on_commit?: fun(text: string)): WaxInput
@@ -146,7 +146,7 @@ container:Input(caption?: string, options?: WaxInputOptions, on_commit?: fun(tex
 
 ### `container:Dropdown(caption, choices, selected?, on_change?)` [#container-dropdown]
 
-Adds a dropdown that opens in place; on_change(choice) runs when the user picks one.
+Adds a dropdown that opens in place. on_change(choice) runs when the user picks one.
 
 ```lua
 container:Dropdown<T>(caption: string, choices: T[], selected?: T, on_change?: fun(choice: T)): WaxDropdown
@@ -193,7 +193,7 @@ container:Title(content: string, description?: string): WaxTitle
 
 ### `container:Row()` [#container-row]
 
-Adds a row; controls added to the returned container sit side by side and share the width.
+Adds a row. Controls added to the returned container sit side by side and share the width.
 
 ```lua
 container:Row(): WaxRow
@@ -201,9 +201,25 @@ container:Row(): WaxRow
 
 **Returns** [`WaxRow`](/docs/reference/controls#waxrow)
 
+### `container:Color(caption, color?, on_change?)` [#container-color]
+
+A colour the user can change.
+
+```lua
+container:Color(caption: string, color?: string, on_change?: fun(color: string)): WaxColorControl
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `caption` | `string` |  |
+| `color` (optional) | `string` | "#rrggbb". White when omitted. |
+| `on_change` (optional) | `fun(color: string)` |  |
+
+**Returns** [`WaxColorControl`](/docs/reference/controls#waxcolorcontrol)
+
 ### `container:Grid(options)` [#container-grid]
 
-Adds a grid that can hold thousands of items and still scroll freely: it only ever builds the cells in view.
+Adds a grid for any number of items. It builds only the cells in view, with the `make` and `show` functions in `options`.
 
 ```lua
 container:Grid(options: WaxGridOptions): WaxGrid
@@ -217,7 +233,7 @@ container:Grid(options: WaxGridOptions): WaxGrid
 
 ### `container:Flow(options?)` [#container-flow]
 
-Adds a flowing area; controls added to the returned container keep their own size and wrap onto new lines.
+Adds an area where controls keep their own size and wrap onto new lines. Add them to the returned container.
 
 ```lua
 container:Flow(options?: WaxFlowOptions): WaxRow
@@ -231,7 +247,7 @@ container:Flow(options?: WaxFlowOptions): WaxRow
 
 ### `container:Progress(caption, value?, options?)` [#container-progress]
 
-Adds a progress bar; value is 0..1.
+Adds a progress bar. value is 0..1.
 
 ```lua
 container:Progress(caption: string, value?: number, options?: WaxProgressOptions): WaxProgress
@@ -263,7 +279,7 @@ container:Field(name: string, value?: any, options?: WaxFieldOptions): WaxField
 
 ### `container:Keybind(caption, key?, on_change?)` [#container-keybind]
 
-Adds a key the user can rebind by clicking it and pressing a key; on_change(key) gets the engine's key name.
+Adds a key the user can rebind by clicking it and pressing a key. on_change(key) gets the engine's key name.
 
 ```lua
 container:Keybind(caption: string, key?: string, on_change?: fun(key: string)): WaxKeybind
@@ -313,7 +329,7 @@ control:Destroy()
 
 ### `control:SetVisible(shown)` [#control-setvisible]
 
-Shows or hides the control; a hidden control takes no room.
+Shows or hides the control. A hidden control takes no room.
 
 ```lua
 control:SetVisible(shown: boolean)
@@ -327,7 +343,7 @@ control:SetVisible(shown: boolean)
 
 ### `control:SetEnabled(enabled)` [#control-setenabled]
 
-Greys the control out and stops it reacting, or brings it back.
+Greys the control out and stops it reacting, or makes it usable again.
 
 ```lua
 control:SetEnabled(enabled: boolean)
@@ -458,17 +474,67 @@ toggle:Get(): boolean
 
 **Returns** `boolean`
 
-### `toggle:Set(on)` [#toggle-set]
+### `toggle:Set(on, instant?)` [#toggle-set]
 
 Turns the switch on or off without firing Changed.
 
 ```lua
-toggle:Set(on: boolean)
+toggle:Set(on: boolean, instant?: boolean)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `on` | `boolean` |  |
+| `instant` (optional) | `boolean` | True skips the sliding animation, for a switch that is being reused for another row. |
+
+**Returns** nothing.
+
+### `toggle:SetCaption(text)` [#toggle-setcaption]
+
+Changes the text beside the switch.
+
+```lua
+toggle:SetCaption(text: string)
 ```
 
 | Parameter | Type |
 | --- | --- |
-| `on` | `boolean` |
+| `text` | `string` |
+
+**Returns** nothing.
+
+## WaxColorControl [#waxcolorcontrol]
+
+A colour selector. It opens a panel with a shade box, a hue bar and the colour as text that can be typed, pasted or copied.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Color`](/docs/reference/controls#container-color). Below, `colorControl` stands for one of these.
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Changed` | `color: string` | Fires with "#rrggbb" on every change, also while the mouse is held. |
+| `Released` | `color: string` | Fires once when the user lets go, or commits a typed colour. Use it for saving. |
+
+### `colorControl:Get()` [#colorcontrol-get]
+
+The colour as "#rrggbb".
+
+```lua
+colorControl:Get(): string
+```
+
+**Returns** `string`
+
+### `colorControl:Set(color)` [#colorcontrol-set]
+
+Sets the colour without firing Changed.
+
+```lua
+colorControl:Set(color: string)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `color` | `string` | "#rrggbb" |
 
 **Returns** nothing.
 
@@ -508,14 +574,14 @@ title:SetDescription(description: any)
 
 ## WaxSlider [#waxslider]
 
-The number beside a slider can be clicked and typed into.
+A slider. The number beside it can be clicked and typed into.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Slider`](/docs/reference/controls#container-slider). Below, `slider` stands for one of these.
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Changed` | `value: number` | Fires with each new value while the user drags (once, on letting go, with live = false), and when a number is typed. |
-| `Released` | `value: number` | Fires once when the user lets go, for changes too heavy to apply mid-drag. |
+| `Released` | `value: number` | Fires once when the user lets go, for changes too heavy to apply during the drag. |
 
 ### `slider:Get()` [#slider-get]
 
@@ -548,12 +614,12 @@ It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) ca
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Changed` | `text: string` | Fires when the text is committed (Enter, or the box losing focus). |
-| `Entered` | `text: string` | Fires only when Enter is pressed, also when the text is the same as last time (for a command line). |
+| `Entered` | `text: string` | Fires only when Enter is pressed, even when the text is the same as last time (for a command line). |
 | `Typed` | `text: string` | Fires on every change to the text while typing. |
 
 ### `input:Get()` [#input-get]
 
-The text in the box right now.
+The text in the box.
 
 ```lua
 input:Get(): string
@@ -611,7 +677,7 @@ input:Set(text: any)
 
 ## WaxDropdown [#waxdropdown]
 
-A dropdown opens in place under its header; the chosen row is highlighted, and one list is open per window at a time.
+A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Dropdown`](/docs/reference/controls#container-dropdown). Below, `dropdown` stands for one of these.
 
@@ -645,7 +711,7 @@ dropdown:Set(choice: any)
 
 ## WaxSection [#waxsection]
 
-A collapsible card: a container for controls.
+A collapsible card. It is a container for controls.
 
 It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer) can. You get one from [`container:Section`](/docs/reference/controls#container-section). Below, `section` stands for one of these.
 
@@ -825,7 +891,7 @@ console:SetLines(lines: WaxConsoleLine[])
 
 ### `console:SetFollow(on)` [#console-setfollow]
 
-Turns scrolling to the newest line on every SetLines on or off; it starts on.
+Turns scrolling to the newest line on every SetLines on or off. It starts on.
 
 ```lua
 console:SetFollow(on: boolean)
@@ -884,7 +950,7 @@ Used by [`container:Label`](/docs/reference/controls#container-label).
 | Option | Type | Description |
 | --- | --- | --- |
 | `dim` | `boolean` | Uses the theme's secondary text colour. |
-| `color` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `color` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
 | `size` | `number` |  |
 | `face` | `string` | Typeface of the "ui" family: "Book", "Medium", "Bold" ... |
 | `family` | [`WaxFontFamily`](/docs/reference/ui#waxfontfamily) | "ui" (the game's own interface font) when omitted. |
@@ -896,9 +962,9 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 | Option | Type | Description |
 | --- | --- | --- |
 | `primary` | `boolean` | Draws the button in the accent colour. |
-| `stretch` | `boolean` | A button with a caption is as wide as its container; false keeps it as wide as its caption. An icon-only button is small unless this is true. |
-| `icon` | `string` | Icon name shown before the caption; browse the names on the menu's Icons page. |
-| `spin` | `boolean` | The icon turns round once on every click, to show that something was set going. |
+| `stretch` | `boolean` | A button with a caption is as wide as its container. False keeps it as wide as its caption. An icon-only button is small unless this is true. |
+| `icon` | `string` | Icon name shown before the caption. The menu's Icons page lists the names. |
+| `spin` | `boolean` | The icon turns round once on every click, to show that something has started. |
 
 ## WaxIconOptions [#waxiconoptions]
 
@@ -917,10 +983,10 @@ Used by [`container:Slider`](/docs/reference/controls#container-slider).
 | --- | --- | --- |
 | `min` | `number` | Default 0. |
 | `max` | `number` | Default 1. |
-| `value` | `number` | The starting value; `min` when omitted. |
+| `value` | `number` | The starting value. `min` when omitted. |
 | `step` | `number` | Values snap to this step, counted from `min`. |
-| `format` | `string` | string.format pattern for the read-out; "%.2f" when omitted, or "%d" with a step of 1 or more. |
-| `stacked` | `boolean` | True puts the caption above the track, false beside it; decided by the room there is when omitted. |
+| `format` | `string` | string.format pattern for the read-out. "%.2f" when omitted, or "%d" with a step of 1 or more. |
+| `stacked` | `boolean` | True puts the caption above the track, false beside it. When omitted, the room available decides. |
 | `live` | `boolean` | False reports the value once, when the mouse lets go, for changes too heavy to make while dragging. True when omitted. |
 
 ## WaxInputOptions [#waxinputoptions]
@@ -931,7 +997,7 @@ Used by [`container:Input`](/docs/reference/controls#container-input).
 | --- | --- | --- |
 | `text` | `string` | The starting text. |
 | `hint` | `string` | Greyed text shown while the box is empty. |
-| `stacked` | `boolean` | True puts the caption above the box, false beside it; decided by the room there is when omitted. |
+| `stacked` | `boolean` | True puts the caption above the box, false beside it. When omitted, the room available decides. |
 | `mono` | `boolean` | A fixed-width font, for code. |
 
 ## WaxSectionOptions [#waxsectionoptions]
@@ -965,8 +1031,8 @@ Used by [`container:Console`](/docs/reference/controls#container-console).
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `height` | `number` | Default 220; on a page made with scroll = false it takes what is left when omitted. |
-| `max` | `integer` | How many lines are shown at most; default 150. |
+| `height` | `number` | Default 220. On a page made with scroll = false it takes the space left when omitted. |
+| `max` | `integer` | The most lines shown. Default 150. |
 
 ## WaxGridOptions [#waxgridoptions]
 
@@ -976,10 +1042,10 @@ Used by [`container:Grid`](/docs/reference/controls#container-grid).
 | --- | --- | --- |
 | `make` (required) | `fun(cell: WaxContainer): any` | Called once for each cell that is needed: add one control to `cell` and return whatever `show` needs. |
 | `show` (required) | `fun(made: any, item: any, index: integer)` | Called whenever a cell is to show another item. |
-| `items` | `any[]` | The list to show; any length. |
-| `cell` | `number` | Least width of a cell; default 38. As many columns as fit share the width. |
+| `items` | `any[]` | The list to show, of any length. |
+| `cell` | `number` | Least width of a cell. Default 38. As many columns as fit share the width. |
 | `cell_height` | `number` | Default: the same as `cell`. |
-| `height` | `number` | Default 300; on a page made with scroll = false the grid takes what is left when omitted. |
+| `height` | `number` | Default 300. On a page made with scroll = false the grid takes the space left when omitted. |
 
 ## WaxFlowOptions [#waxflowoptions]
 
@@ -998,7 +1064,3 @@ Short names for a fixed set of values. Where a function asks for one of these, p
 One console line: the text, then an optional colour.
 
 The same as `{ [1]: any, [2]: WaxColor? }`.
-
----
-
-*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*

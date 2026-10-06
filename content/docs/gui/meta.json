@@ -1,4 +1,14 @@
 {
   "title": "Interface",
-  "pages": ["windows", "controls", "grid", "notifications", "overlays", "hotkeys", "themes", "icons"]
+  "pages": [
+    "windows",
+    "controls",
+    "grid",
+    "tags",
+    "notifications",
+    "overlays",
+    "hotkeys",
+    "themes",
+    "icons"
+  ]
 }

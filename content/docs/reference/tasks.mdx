@@ -58,7 +58,7 @@ task.delay(seconds: number, f: function|thread, ...: any): thread
 
 ### `task.wait(seconds?)` [#task-wait]
 
-Pauses the calling task for `seconds` (at least until the next frame) and returns the time it waited; tasks only.
+Pauses the calling task for `seconds` (at least until the next frame) and returns the time it waited. It only works inside a task.
 
 ```lua
 task.wait(seconds?: number): number
@@ -72,7 +72,7 @@ task.wait(seconds?: number): number
 
 ### `task.cancel(thread)` [#task-cancel]
 
-Stops a task for good.
+Stops a task. It cannot be resumed afterwards.
 
 ```lua
 task.cancel(thread: thread)
@@ -105,7 +105,7 @@ Type name: `WaxSignalLibrary`.
 
 ### `Signal.new(name?)` [#signal-new]
 
-Creates a signal; the name labels its handlers in error reports.
+Creates a signal. The name labels its handlers in error reports.
 
 ```lua
 Signal.new(name?: string): WaxSignal
@@ -121,7 +121,7 @@ Signal.new(name?: string): WaxSignal
 
 What Connect returns: one handler's link to a signal.
 
-You get one from [`signal:Connect`](/docs/reference/tasks#signal-connect), [`signal:Once`](/docs/reference/tasks#signal-once). Below, `connection` stands for one of these.
+You get one from [`game.Players:ObserveCharacters`](/docs/reference/game#game-players-observecharacters), [`game.Creatures:Observe`](/docs/reference/game#game-creatures-observe), [`game.Creatures:Highlight`](/docs/reference/game#game-creatures-highlight), [`signal:Connect`](/docs/reference/tasks#signal-connect), [`signal:Once`](/docs/reference/tasks#signal-once). Below, `connection` stands for one of these.
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -183,7 +183,7 @@ signal:Wait(): ...any
 
 ### `signal:Fire(...)` [#signal-fire]
 
-Calls every handler with these values; each runs as a task and may pause.
+Calls every handler with these values. Each runs as a task and may pause.
 
 ```lua
 signal:Fire(...: any)
@@ -197,7 +197,7 @@ signal:Fire(...: any)
 
 ### `signal:FireDirect(...)` [#signal-firedirect]
 
-Calls every handler directly, without a task; handlers must not pause.
+Calls every handler directly, without a task. Handlers must not pause.
 
 ```lua
 signal:FireDirect(...: any)
@@ -218,7 +218,3 @@ signal:DisconnectAll()
 ```
 
 **Returns** nothing.
-
----
-
-*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*

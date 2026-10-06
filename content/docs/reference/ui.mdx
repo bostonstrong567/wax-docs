@@ -105,7 +105,7 @@ ui.IsPreview(): boolean
 
 ### `ui.SetToggleKey(key)` [#ui-settogglekey]
 
-Sets the key that opens and closes the menu, by the engine's key name ("F8"); nil leaves the menu without a key.
+Sets the key that opens and closes the menu, by the engine's key name ("F8"). nil leaves the menu without a key.
 
 ```lua
 ui.SetToggleKey(key: string?)
@@ -129,7 +129,7 @@ ui.GetToggleKey(): string?
 
 ### `ui.Window(options?)` [#ui-window]
 
-Creates a window in the menu; it is removed again when the mod reloads.
+Creates a window in the menu. It is removed again when the mod reloads.
 
 ```lua
 ui.Window(options?: WaxWindowOptions): WaxWindow
@@ -155,9 +155,24 @@ ui.Overlay(options?: WaxOverlayOptions): WaxOverlay
 
 **Returns** [`WaxOverlay`](/docs/reference/ui#waxoverlay)
 
+### `ui.Tag(target, options?)` [#ui-tag]
+
+Puts a line of text over an actor, over one part of an actor, or on a spot in the world. It follows what it is on, shows through walls, and tags that would cover each other pile up. The tag goes away by itself when the actor does.
+
+```lua
+ui.Tag(target: WaxInstance|{ X: number, Y: number, Z: number }, options?: WaxTagOptions): WaxTag
+```
+
+| Parameter | Type |
+| --- | --- |
+| `target` | [`WaxInstance`](/docs/reference/game#waxinstance) \| `{ X: number, Y: number, Z: number }` |
+| `options` (optional) | [`WaxTagOptions`](/docs/reference/ui#waxtagoptions) |
+
+**Returns** [`WaxTag`](/docs/reference/ui#waxtag)
+
 ### `ui.Notify(text, options?)` [#ui-notify]
 
-Shows a short message in a corner of the screen; the same message again restarts the one already showing.
+Shows a short message in a corner of the screen. Sending the same message again restarts the one already showing.
 
 ```lua
 ui.Notify(text: any, options?: WaxNotifyOptions): WaxNotification
@@ -182,7 +197,7 @@ ui.Windows(): WaxWindow[]
 
 ### `ui.Hotkey(key, callback, options?)` [#ui-hotkey]
 
-Runs `callback` when the key is pressed during play; it goes away when the mod reloads.
+Runs `callback` when the key is pressed during play. The hotkey is removed when the mod reloads.
 
 ```lua
 ui.Hotkey(key: string, callback: fun(), options?: WaxHotkeyOptions): WaxHotkey
@@ -190,7 +205,7 @@ ui.Hotkey(key: string, callback: fun(), options?: WaxHotkeyOptions): WaxHotkey
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `key` | `string` | An engine key name such as "F6", "K" or "MiddleMouseButton" (a Keybind control yields these). |
+| `key` | `string` | An engine key name such as "F6", "K" or "MiddleMouseButton" (a Keybind control gives you these). |
 | `callback` | `fun()` |  |
 | `options` (optional) | [`WaxHotkeyOptions`](/docs/reference/ui#waxhotkeyoptions) |  |
 
@@ -208,7 +223,7 @@ ui.MinScale(): number
 
 ### `ui.SetScale(scale)` [#ui-setscale]
 
-Sets the interface size, 1 being normal; the result is kept between [`ui.MinScale()`](/docs/reference/ui#ui-minscale) and 2 and returned.
+Sets the interface size, where 1 is normal. The size is kept between [`ui.MinScale()`](/docs/reference/ui#ui-minscale) and 2, and the size applied is returned.
 
 ```lua
 ui.SetScale(scale: number): number
@@ -232,7 +247,7 @@ ui.GetScale(): number
 
 ### `ui.SetTheme(theme)` [#ui-settheme]
 
-Switches to a named theme, or changes single settings from a table. Everything on screen takes the new colours where it stands: no window is rebuilt and no mod is reloaded. Sizes and shapes apply to what is built afterwards.
+Switches to a named theme, or changes single settings from a table. Everything on screen takes the new colours in place, so no window is rebuilt and no mod is reloaded. Sizes and shapes apply to what is built afterwards.
 
 ```lua
 ui.SetTheme(theme: WaxThemeName|WaxThemeSettings)
@@ -306,7 +321,7 @@ ui.Color(hex: string|integer, alpha?: number): WaxColor
 
 ### `ui.Theme()` [#ui-theme]
 
-The live theme table. Its colours follow the theme: pass them as they are (color = `ui.Theme().accent`).
+The table of the theme in use. Its colours follow the theme, so pass them as they are (color = `ui.Theme().accent`).
 
 ```lua
 ui.Theme(): WaxTheme
@@ -388,7 +403,7 @@ Type name: `WaxIcons`.
 
 ### `ui.Icons.Names()` [#ui-icons-names]
 
-Every icon name, sorted; the menu's Icons page shows them.
+Every icon name, sorted. The menu's Icons page shows them.
 
 ```lua
 ui.Icons.Names(): string[]
@@ -427,7 +442,7 @@ ui.Icons.Find(text?: string, limit?: integer): string[]
 
 ### `ui.Icons.Register(name, file)` [#ui-icons-register]
 
-Adds an icon from a PNG file (white on transparent works best: it is tinted when drawn).
+Adds an icon from a PNG file. White on transparent works best, because the icon is tinted when drawn.
 
 ```lua
 ui.Icons.Register(name: string, file: string)
@@ -448,7 +463,7 @@ Type name: `WaxDebugPanel`.
 
 ### `ui.Debug.Page(name, options?)` [#ui-debug-page]
 
-Adds a page to the debug panel for the calling mod; it goes away when the mod reloads.
+Adds a page to the debug panel for the calling mod. The page is removed when the mod reloads.
 
 ```lua
 ui.Debug.Page(name: string, options?: WaxPageOptions): WaxPage
@@ -483,13 +498,13 @@ ui.Debug.Show()
 
 ## WaxPage [#waxpage]
 
-A page of a window with navigation: a container for controls.
+A page of a window that has navigation. It is a container for controls.
 
 It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer) can. You get one from [`window:Page`](/docs/reference/ui#window-page), [`ui.Debug.Page`](/docs/reference/ui#ui-debug-page).
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
-| `NearEnd` | nothing | Fires while the end of the page is in view: when the user scrolls close to the bottom, and a few times a second while the page is not full. Add more content then; do nothing when there is no more. |
+| `NearEnd` | nothing | Fires while the end of the page is in view: when the user scrolls close to the bottom, and a few times a second while the page is not full. Add more content in the handler, or do nothing when there is no more. |
 
 ## WaxWindow [#waxwindow]
 
@@ -573,7 +588,7 @@ window:Show()
 
 ### `window:Hide()` [#window-hide]
 
-Hides the window; hiding the last one closes the menu.
+Hides the window. Hiding the last one closes the menu.
 
 ```lua
 window:Hide()
@@ -607,7 +622,7 @@ window:IsVisible(): boolean
 
 ### `window:SetMinimized(minimized)` [#window-setminimized]
 
-Rolls the window up to its title bar, or back down.
+Minimises the window to its title bar, or restores it.
 
 ```lua
 window:SetMinimized(minimized: boolean)
@@ -621,7 +636,7 @@ window:SetMinimized(minimized: boolean)
 
 ### `window:IsMinimized()` [#window-isminimized]
 
-True while the window is rolled up.
+True while the window is minimised.
 
 ```lua
 window:IsMinimized(): boolean
@@ -631,7 +646,7 @@ window:IsMinimized(): boolean
 
 ### `window:StatusBar(text?)` [#window-statusbar]
 
-Adds a line along the bottom of the window for what is going on, or returns the one the window already has.
+Adds a status line along the bottom of the window, or returns the one the window already has. `text` sets its message.
 
 ```lua
 window:StatusBar(text?: any): WaxStatusBar
@@ -655,7 +670,7 @@ window:Destroy()
 
 ### `window:Page(name, options?)` [#window-page]
 
-Adds a page to a window made with nav = "side" or "top"; the first page added is selected.
+Adds a page to a window made with nav = "side" or "top". The first page added is selected.
 
 ```lua
 window:Page(name: string, options?: WaxPageOptions): WaxPage
@@ -704,7 +719,7 @@ You get one from [`window:StatusBar`](/docs/reference/ui#window-statusbar). Belo
 
 ### `statusBar:Set(message?, options?)` [#statusbar-set]
 
-Shows a message, in place of a busy indicator.
+Shows a message and removes the busy indicator.
 
 ```lua
 statusBar:Set(message?: any, options?: WaxStatusOptions)
@@ -733,7 +748,7 @@ statusBar:Busy(message?: any)
 
 ### `statusBar:Progress(amount?)` [#statusbar-progress]
 
-Shows a thin progress line across the top of the bar, 0..1; nil hides it.
+Shows a thin progress line across the top of the bar. `amount` is 0..1, and nil hides the line.
 
 ```lua
 statusBar:Progress(amount?: number)
@@ -801,7 +816,7 @@ overlay:IsVisible(): boolean
 
 ### `overlay:SetAnchor(anchor, x?, y?)` [#overlay-setanchor]
 
-Pins the overlay somewhere else; x and y keep their values when omitted.
+Pins the overlay somewhere else. x and y keep their values when omitted.
 
 ```lua
 overlay:SetAnchor(anchor: WaxAnchor, x?: number, y?: number)
@@ -845,7 +860,7 @@ notification:SetText(text: any)
 
 ### `notification:SetTitle(title)` [#notification-settitle]
 
-Replaces the title; does nothing on a notification made without one.
+Replaces the title. Does nothing on a notification made without one.
 
 ```lua
 notification:SetTitle(title: string)
@@ -859,7 +874,7 @@ notification:SetTitle(title: string)
 
 ### `notification:SetProgress(amount)` [#notification-setprogress]
 
-Shows how far a task is, 0..1, in place of the countdown; the notification then stays until closed.
+Shows how far a task is, 0..1, in place of the countdown. The notification then stays until closed.
 
 ```lua
 notification:SetProgress(amount: number)
@@ -873,10 +888,66 @@ notification:SetProgress(amount: number)
 
 ### `notification:Close()` [#notification-close]
 
-Slides the notification away.
+Closes the notification.
 
 ```lua
 notification:Close()
+```
+
+**Returns** nothing.
+
+## WaxTag [#waxtag]
+
+A line of text that stays over something in the world.
+
+You get one from [`ui.Tag`](/docs/reference/ui#ui-tag). Below, `tag` stands for one of these.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `Instance` | [`WaxInstance?`](/docs/reference/game#waxinstance) | What the tag is on. nil for a tag on a spot. |
+
+### `tag:Set(text)` [#tag-set]
+
+```lua
+tag:Set(text: string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `string` |
+
+**Returns** nothing.
+
+### `tag:SetColor(color)` [#tag-setcolor]
+
+```lua
+tag:SetColor(color: WaxColor|string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `color` | [`WaxColor`](/docs/reference/ui#waxcolor) \| `string` |
+
+**Returns** nothing.
+
+### `tag:SetRange(metres)` [#tag-setrange]
+
+```lua
+tag:SetRange(metres: number)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `metres` | `number` |
+
+**Returns** nothing.
+
+### `tag:Remove()` [#tag-remove]
+
+Takes the tag off. Safe to call twice, and after the thing it was on is gone.
+
+```lua
+tag:Remove()
 ```
 
 **Returns** nothing.
@@ -911,7 +982,7 @@ hotkey:SetKey(key: string)
 
 ## WaxUnknownOption [#waxunknownoption]
 
-The type of every key an options table does not have, so that a misspelt option is reported.
+Stands for any key an options table does not list, so that the editor reports a misspelt option.
 
 ## WaxOptions [#waxoptions]
 
@@ -919,13 +990,13 @@ The base of every options table.
 
 | Option | Type | Description |
 | --- | --- | --- |
-| any other key (`[string]`) | [`WaxUnknownOption`](/docs/reference/ui#waxunknownoption) | The type of every key an options table does not have, so that a misspelt option is reported. |
+| any other key (`[string]`) | [`WaxUnknownOption`](/docs/reference/ui#waxunknownoption) | Stands for any key an options table does not list, so that the editor reports a misspelt option. |
 
 ## WaxColor [#waxcolor]
 
-A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color).
+A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color).
 
-Returned by [`ui.Color`](/docs/reference/ui#ui-color). Used by [`label:SetColor`](/docs/reference/controls#label-setcolor), [`progress:SetColor`](/docs/reference/controls#progress-setcolor), [`field:SetColor`](/docs/reference/controls#field-setcolor).
+Returned by [`ui.Color`](/docs/reference/ui#ui-color). Used by [`tag:SetColor`](/docs/reference/ui#tag-setcolor), [`label:SetColor`](/docs/reference/controls#label-setcolor), [`progress:SetColor`](/docs/reference/controls#progress-setcolor), [`field:SetColor`](/docs/reference/controls#field-setcolor).
 
 | Field | Type |
 | --- | --- |
@@ -936,7 +1007,7 @@ Returned by [`ui.Color`](/docs/reference/ui#ui-color). Used by [`label:SetColor`
 
 ## WaxTheme [#waxtheme]
 
-The live theme. Its colours change in place when the theme changes, so a colour taken from here ([`ui.Theme().good`](/docs/reference/ui#ui-theme)) keeps following the theme wherever it was used. Change the theme with [`ui.SetTheme`](/docs/reference/ui#ui-settheme), not by writing to this table.
+The theme in use. Its colours change in place when the theme changes, so a colour taken from here ([`ui.Theme().good`](/docs/reference/ui#ui-theme)) follows the theme wherever you used it. Change the theme with [`ui.SetTheme`](/docs/reference/ui#ui-settheme), not by writing to this table.
 
 Returned by [`ui.Theme`](/docs/reference/ui#ui-theme).
 
@@ -948,16 +1019,16 @@ Returned by [`ui.Theme`](/docs/reference/ui#ui-theme).
 | `card` | [`WaxColor`](/docs/reference/ui#waxcolor) | Section background. |
 | `card_line` | [`WaxColor`](/docs/reference/ui#waxcolor) | Section outline. |
 | `raised` | [`WaxColor`](/docs/reference/ui#waxcolor) | Buttons and tracks. |
-| `hover` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
-| `press` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `hover` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `press` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
 | `line` | [`WaxColor`](/docs/reference/ui#waxcolor) | Separators. |
-| `text` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `text` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
 | `dim` | [`WaxColor`](/docs/reference/ui#waxcolor) | Secondary text. |
-| `accent` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
-| `accent_hover` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
-| `good` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
-| `warn` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
-| `bad` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine wants; make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `accent` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `accent_hover` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `good` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `warn` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
+| `bad` | [`WaxColor`](/docs/reference/ui#waxcolor) | A colour in the linear form the engine uses. Make one with [`ui.Color`](/docs/reference/ui#ui-color). |
 | `clear` | [`WaxColor`](/docs/reference/ui#waxcolor) | Fully transparent. |
 | `on_accent` | [`WaxColor`](/docs/reference/ui#waxcolor) | Text and knobs drawn on top of the accent colour. |
 | `font_size` | `number` |  |
@@ -970,7 +1041,7 @@ Returned by [`ui.Theme`](/docs/reference/ui#ui-theme).
 | `nav_width` | `number` | Default width of a side navigation column. |
 | `window_shape` | [`WaxShape`](/docs/reference/ui#waxshape) |  |
 | `control_shape` | [`WaxShape`](/docs/reference/ui#waxshape) |  |
-| `animation` | `number` | Seconds for open, close and expand transitions; 0 turns animation off. |
+| `animation` | `number` | Seconds for open, close and expand animations. 0 turns animation off. |
 
 ## WaxThemeSettings [#waxthemesettings]
 
@@ -1017,7 +1088,7 @@ Used by [`ui.Window`](/docs/reference/ui#ui-window).
 | Option | Type | Description |
 | --- | --- | --- |
 | `title` | `string` | "Window" when omitted. |
-| `icon` | `string` | Icon name shown before the title; browse the names on the menu's Icons page. |
+| `icon` | `string` | Icon name shown before the title. The menu's Icons page lists the names. |
 | `width` | `number` | Default 340, or 520 with side navigation. |
 | `height` | `number` | Default 420, or 380 with pages. |
 | `x` | `number` |  |
@@ -1026,7 +1097,7 @@ Used by [`ui.Window`](/docs/reference/ui#ui-window).
 | `visible` | `boolean` | False creates the window hidden. |
 | `nav` | [`WaxNav`](/docs/reference/ui#waxnav) | Gives the window pages, listed down the side or along the top. |
 | `nav_width` | `number` | Width of the side navigation column. |
-| `remember` | `boolean` | False stops Wax keeping where the user moved and sized the window between sessions. |
+| `remember` | `boolean` | False stops Wax remembering the window's position and size between sessions. |
 
 ## WaxPageOptions [#waxpageoptions]
 
@@ -1034,9 +1105,9 @@ Used by [`window:Page`](/docs/reference/ui#window-page), [`ui.Debug.Page`](/docs
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `icon` | `string` | Icon name shown before the page's name; browse the names on the menu's Icons page. |
-| `bottom` | `boolean` | Lists the page at the foot of a side navigation column. |
-| `scroll` | `boolean` | False makes a page that does not scroll: its controls stack from the top and a Grid or Console without a height takes what is left. |
+| `icon` | `string` | Icon name shown before the page's name. The menu's Icons page lists the names. |
+| `bottom` | `boolean` | Lists the page at the bottom of a side navigation column. |
+| `scroll` | `boolean` | False makes a page that does not scroll. Its controls stack from the top, and a Grid or Console with no height takes the space left. |
 
 ## WaxStatusOptions [#waxstatusoptions]
 
@@ -1044,8 +1115,8 @@ Used by [`statusBar:Set`](/docs/reference/ui#statusbar-set).
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `kind` | [`WaxKind`](/docs/reference/ui#waxkind) | Sets the colour of the text and the icon; "info" when omitted. |
-| `icon` | `string` | Icon name shown before the text; browse the names on the menu's Icons page. |
+| `kind` | [`WaxKind`](/docs/reference/ui#waxkind) | Sets the colour of the text and the icon. "info" when omitted. |
+| `icon` | `string` | Icon name shown before the text. The menu's Icons page lists the names. |
 
 ## WaxOverlayOptions [#waxoverlayoptions]
 
@@ -1053,9 +1124,9 @@ Used by [`ui.Overlay`](/docs/reference/ui#ui-overlay).
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `anchor` | [`WaxAnchor`](/docs/reference/ui#waxanchor) | Where on the screen the panel is pinned; "top-right" when omitted. |
-| `x` | `number` | Distance in from the anchor's edge; default 16. |
-| `y` | `number` | Distance in from the anchor's edge; default 16. |
+| `anchor` | [`WaxAnchor`](/docs/reference/ui#waxanchor) | Where on the screen the panel is pinned. "top-right" when omitted. |
+| `x` | `number` | Distance in from the anchor's edge. Default 16. |
+| `y` | `number` | Distance in from the anchor's edge. Default 16. |
 | `width` | `number` | Default 240. |
 | `title` | `string` | Adds a heading. |
 | `background` | `boolean` | False leaves out the panel behind the controls. |
@@ -1068,10 +1139,22 @@ Used by [`ui.Notify`](/docs/reference/ui#ui-notify).
 | Option | Type | Description |
 | --- | --- | --- |
 | `title` | `string` | A bold line above the text. |
-| `kind` | [`WaxKind`](/docs/reference/ui#waxkind) | Sets the colour and the icon; "info" when omitted. |
-| `icon` | `string` | Icon name used in place of the kind's own; browse the names on the menu's Icons page. |
-| `seconds` | `number` | Time on screen; default 4, and 0 keeps it until closed. |
-| `progress` | `number` | 0..1: shows progress in place of the countdown and keeps the notification until closed. |
+| `kind` | [`WaxKind`](/docs/reference/ui#waxkind) | Sets the colour and the icon. "info" when omitted. |
+| `icon` | `string` | Icon name used in place of the kind's own. The menu's Icons page lists the names. |
+| `seconds` | `number` | Time on screen. Default 4, and 0 keeps it until closed. |
+| `progress` | `number` | 0..1. Shows progress in place of the countdown and keeps the notification until closed. |
+
+## WaxTagOptions [#waxtagoptions]
+
+Used by [`ui.Tag`](/docs/reference/ui#ui-tag).
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `text` | `string` |  |
+| `color` | [`WaxColor`](/docs/reference/ui#waxcolor) \| `string` |  |
+| `size` | `number` |  |
+| `within` | `number` | Metres. Farther away than this the tag is not shown. Default 100. |
+| `lift` | `number` | How far above the thing's middle the tag sits, in centimetres. Worked out from the thing when omitted. |
 
 ## WaxHotkeyOptions [#waxhotkeyoptions]
 
@@ -1079,7 +1162,7 @@ Used by [`ui.Hotkey`](/docs/reference/ui#ui-hotkey).
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `in_menu` | `boolean` | Also react while the menu is open (off by default, so typing in a box does not trigger it). |
+| `in_menu` | `boolean` | Also reacts while the menu is open (off by default, so that typing in a box does not trigger it). |
 
 ## Named values [#named-values]
 
@@ -1112,7 +1195,3 @@ One of `"Midnight"`, `"Graphite"`, `"Abyss"`, `"Dune"`, `"Daylight"`, or any oth
 ### WaxShape [#waxshape]
 
 One of `"frame6"`, `"frame8"`, `"frame12"`, `"top8"`, `"glow12"`, `"glow12_soft"`, `"round2"`, `"round3"`, `"round4"`, `"round5"`, `"round6"`, `"round7"`, `"round8"`, `"round9"`, `"round10"`, `"round12"`.
-
----
-
-*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*

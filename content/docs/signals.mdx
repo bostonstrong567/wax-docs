@@ -13,7 +13,7 @@ game.MapChanged:Connect(function(name)
 end)
 ```
 
-When a signal happens we say it **fires**. `game.MapChanged` fires when the world changes, and it hands your
+When the event happens, the signal **fires**. `game.MapChanged` fires when the world changes, and it gives your
 function the new map's name.
 
 ## Signals that Wax gives you
@@ -47,9 +47,10 @@ window:Button("Stop printing", function()
 end)
 ```
 
-When your mod reloads, Wax disconnects everything it connected. You only need `Disconnect` to stop early.
+When your mod reloads, Wax disconnects everything the mod connected. You only need `Disconnect` to stop
+before that.
 
-## Just once
+## Only once
 
 `Once` is like `Connect`, but your function runs for the next fire only.
 
@@ -73,8 +74,7 @@ end)
 
 ## Make your own signal
 
-`Signal.new` makes a signal. `Fire` makes it happen. Whatever you pass to `Fire` reaches every connected
-function.
+`Signal.new` makes a signal. `Fire` fires it. Whatever you pass to `Fire` reaches every connected function.
 
 ```lua title="init.lua"
 local scored = Signal.new("scored")
@@ -101,8 +101,8 @@ Scored 5
 
 The newest connection runs first. That is why `First score!` comes before `Scored 10`.
 
-Your own signals are handy for keeping the parts of a mod apart. One file fires `scored`. Another file
-listens and updates the window. Neither has to know how the other works.
+Use your own signals to keep the parts of a mod apart. One file fires `scored`. Another file listens and
+updates the window. Neither has to know how the other works.
 
 ## The functions
 
@@ -120,7 +120,7 @@ listens and updates the window. Neither has to know how the other works.
 
 ## Good to know
 
-- **A connected function is a task.** It may call `task.wait`. (With `FireDirect` it may not.)
-- **An error in one function does not stop the others.** It goes to the log.
+- A connected function runs as a task, so it may call `task.wait`. With `FireDirect` it may not.
+- An error in one function does not stop the others. It goes to the log.
 
 Every function is listed in the [signals reference](/docs/reference/tasks#waxsignal).

@@ -4,8 +4,8 @@ description: More than 1,500 icons by name, and how to add your own.
 icon: Shapes
 ---
 
-Wax comes with the Lucide icon set: more than 1,500 simple line icons. You use an icon by its **name**,
-such as `"shield"`, `"wrench"` or `"map-pin"`.
+Wax comes with the Lucide icon set: more than 1,500 line icons. You use an icon by its name, such as
+`"shield"`, `"wrench"` or `"map-pin"`.
 
 ## Where icons go
 
@@ -35,6 +35,8 @@ status:Set("All good", { kind = "good", icon = "check-circle" })
 
 Open the **Icons** page of the [Wax panel](/docs/debug-panel#icons). Type in the search box. Click an icon and a
 notification shows its name.
+
+Every icon is also on the [Icons page](/icons) of this site, where a click copies the name.
 
 <Shot
   src="panel-icons.png"
@@ -74,8 +76,8 @@ window:Icon("my-logo", { size = 48 })
 ```
 
 - `mod.dir` is the path of your mod's folder, so this finds `logo.png` next to `init.lua`.
-- A **white shape on a see-through background** works best. Wax tints the icon when it draws it, so a white
-  icon takes the theme's colours.
+- Use a white shape on a see-through background. Wax colours the icon when it draws it, so a white icon
+  takes the theme's colours.
 - Your icon is there while your mod is loaded.
 
 Every function is listed in the [ui reference](/docs/reference/ui#ui-icons).

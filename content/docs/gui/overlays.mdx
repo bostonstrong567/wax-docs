@@ -5,7 +5,7 @@ icon: Layers
 ---
 
 An **overlay** is a panel pinned to the screen. It stays up while you play, and it never takes the mouse.
-Clicks go straight through it. Use it for things you only read: a clock, your position, a health bar.
+Clicks go through it. Use it for things you only read, such as your position or a health bar.
 
 <Shot
   src="overlay.png"
@@ -20,12 +20,12 @@ local position = hud:Field("Position", "", { mono = true })
 local oxygen = hud:Progress("Oxygen", 0.8)
 ```
 
-An overlay is a container, like a window. Add controls to it the same way. Since nobody can click an overlay,
+An overlay is a container, like a window. Add controls to it the same way. Nobody can click an overlay, so
 use controls that show things: `Label`, `Heading`, `Field`, `Progress`, `Icon`, `Separator`.
 
 ## Keep it up to date
 
-The example above shows values that never change. A [task](/docs/tasks) fixes that.
+The example above shows values that never change. Use a [task](/docs/tasks) to update them.
 
 ```lua title="init.lua"
 local hud = ui.Overlay({ title = "Status", anchor = "top-left" })
@@ -54,7 +54,7 @@ game.MapChanged:Connect(function(name)
 end)
 ```
 
-Walk around and the position follows you. For a bar that shows a real value, see
+Walk around and the position changes. For a bar that shows a real value, see
 [Example: player stats](/docs/player-stats).
 
 ## Options
@@ -67,7 +67,7 @@ Walk around and the position follows you. For a bar that shows a real value, see
 | `x`, `y` | How far in from that edge of the screen. | 16 |
 | `width` | The width of the panel. | 240 |
 | `title` | A heading at the top. | No heading. |
-| `background` | `false` leaves out the dark panel, so the controls float on the game. | `true` |
+| `background` | `false` leaves out the dark panel, so only the controls are drawn over the game. | `true` |
 
 There are nine anchors. Each name says where on the screen it is:
 
@@ -97,13 +97,13 @@ end)
 
 ## The player can move it
 
-Open the menu with **F8**. Every overlay gets an outline, and you can drag it to a better place. Wax
+Open the menu with **F8**. Every overlay gets an outline, and you can drag it to another place. Wax
 remembers where you left it.
 
 ## Let the player switch it off
 
-Not everyone wants a panel on screen all the time. Pair an overlay with a switch in a window, and save the
-choice.
+Some players do not want a panel on screen all the time. Add a switch for the overlay to a window, and save
+the choice.
 
 ```lua title="init.lua"
 local settings = storage.Load("settings", { overlay = true })

@@ -1,27 +1,41 @@
 ---
 title: Editor setup
-description: Completion and help while you type, with the Wax for Icarus extension for VS Code.
+description: The Wax for Icarus extension for VS Code, and what you can do without it.
 icon: CodeXml
 ---
 
-A mod is made of plain text files. Any text editor works.
+A mod is made of plain text files, so any text editor works.
 
-For more comfort there is an extension for Visual Studio Code, called **Wax for Icarus**.
-
-<Callout type="warn" title="Still being written">
-  The extension is in development, like Wax itself. It is not released yet. This page stays short until it is.
-</Callout>
+For Visual Studio Code there is an extension called **Wax for Icarus**.
 
 ## What the extension gives you
 
-- **Completion.** Type `ui.` and pick from a list of everything `ui` offers. Each entry comes with a short description.
-- **A New Mod command.** It makes the folder and the first files for you.
-- **Run in game.** Send the code you are working on to the running game.
-- **The log.** See what your mod printed without leaving the editor.
+| Part | What it does |
+| --- | --- |
+| New Mod | A command that makes the folder and the first files of a mod. |
+| Completion and error checking | Type `ui.` and pick from a list of everything `ui` offers. Each entry has a short description. Mistakes are marked as you type. |
+| Run in game | Sends the open file, or the lines you selected, to the running game. |
+| The log | Shows the game's log in the Output panel. |
+| Problems | Lists your mod's errors in the Problems panel, each with its file and line. |
+| Mods view | Lists every mod with its state. Its buttons reload a mod, switch it off or on, and open it. |
+
+## How to get it
+
+Install Wax into the game first. See [Installing](/docs/install).
+
+The extension is a `.vsix` file on the same
+[release page](https://github.com/bostonstrong567/icarus-wax/releases/latest) as Wax.
+
+1. Download the `.vsix` file.
+2. In VS Code, open the Extensions view and click the `...` menu.
+3. Choose **Install from VSIX...** and pick the file.
+
+The extension may not be on the VS Code Marketplace yet. To check, search the Extensions view for
+"Wax for Icarus". Its id is `RobertCincotta.wax-icarus`.
 
 ## Without the extension
 
-You do not need it to write mods.
+You don't need it to write mods.
 
 - Saving a file reloads your mod. That is [hot reload](/docs/hot-reload), and it works with any editor.
 - The log is on the **Log** page of the [Wax panel](/docs/debug-panel), inside the game.

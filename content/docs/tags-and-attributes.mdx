@@ -4,13 +4,13 @@ description: Put your own labels and values on any object, and find the objects 
 icon: Tags
 ---
 
-Sometimes you want to remember something **about an object**. Which trees did I already count? How often did
-I visit this place? Tags and attributes let you write that on the object itself.
+Tags and attributes store something about an object on the object itself. Use them to remember which trees
+you already counted, or how often you visited a place.
 
 - A **tag** is a label. An object has it, or it does not.
 - An **attribute** is a named value: a number, some text, `true` or `false`, or a table.
 
-Both are kept by Wax. The game does not know about them.
+Wax keeps both. The game does not know about them.
 
 ## Tags
 
@@ -84,16 +84,16 @@ if character then
 end
 ```
 
-Call `GetAttributeChangedSignal()` with no name to hear about **every** attribute. That signal fires with the
+Call `GetAttributeChangedSignal()` with no name to get a signal for every attribute. That signal fires with the
 name, the new value and the one before.
 
 Setting an attribute to the value it already has does nothing, and the signal does not fire.
 
 ## How long they last
 
-- They live through a **reload of your mod**.
+- They live through a reload of your mod.
 - All mods share them. Another mod can read a tag you set. Pick names that are your own, such as `mymod.seen`.
-- They are forgotten when **the map changes**, together with the objects they were on.
+- They are forgotten when the map changes, together with the objects they were on.
 - They are not saved. After a restart of the game they are gone.
 
 To keep something between game sessions, use [`storage`](/docs/storage).

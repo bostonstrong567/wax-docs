@@ -35,7 +35,7 @@ const PAGES = {
     slug: 'game',
     icon: 'Globe',
     title: 'game',
-    description: 'The game object tree: game, game.Players and the Instances they hand out.',
+    description: 'The game tree: game, game.Players and the Instances they give you.',
     lead: ['WaxGame'],
   },
   'task.lua': {
@@ -505,7 +505,7 @@ function build(models) {
     const config = PAGES[model.file] ?? {
       slug: anchorOf(path.basename(model.file, '.lua')),
       title: path.basename(model.file, '.lua'),
-      description: `Generated from ${model.file}.`,
+      description: `What ${model.file} defines.`,
     };
     model.config = config;
     for (const entry of model.classes) pageOf.set(entry.name, config.slug);
@@ -768,7 +768,6 @@ function build(models) {
       table(out, ['Function', 'Note'], blocked.map((fn) => [code(fn.display, true), prose(fn.description, true)]));
     }
 
-    out.push('---', '', '*This page is written by a script from the type definitions that ship with Wax, so it always matches them.*', '');
     files.set(`${config.slug}.mdx`, out.join('\n'));
   }
   return files;
