@@ -1,8 +1,25 @@
 'use client';
-import { ArrowLeft, Download, Plus } from 'lucide-react';
+import { Download, Plus, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { type MouseEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FilterInput } from '@/components/filter-input';
+import {
+  ago,
+  BackToList,
+  BUTTON,
+  day,
+  Fact,
+  type Go,
+  LINK,
+  MAIN_ACTION,
+  Notice,
+  plain,
+  SECOND_ACTION,
+  When,
+} from '@/components/mod-parts';
+import { type Draft, NO_DRAFT, SubmissionView, SubmitView } from '@/components/mod-submit';
+import { Score, VoteButtons } from '@/components/mod-votes';
+import { ApiError, getJson, onMarket, repoName, sentence, UNREACHABLE, votesOf } from '@/lib/market';
 import { type ModPicture, picturesOf } from '@/lib/mod-pictures';
 import { appName, marketApi } from '@/lib/shared';
 
@@ -26,10 +43,17 @@ type Mod = {
   homepage: string;
   reviewed: boolean;
   downloads: number;
+  created_at?: string;
   updated_at: string;
   latest: Release;
   versions?: Release[];
+  // An older catalogue sends none of these four.
+  pictures?: { url: string; width: number; height: number }[];
+  repo?: string;
+  needs_wax?: string;
+  votes?: { up: number; down: number };
 };
+type Shown = ModPicture & { caption: string };
 type ModList = { total: number; mods: Mod[] };
 type Category = { name: string; mods: number };
 type Tag = { tag: string; mods: number };
@@ -38,35 +62,42 @@ const SORTS = [
   ['updated', 'Recently updated'],
   ['new', 'Newest'],
   ['downloads', 'Most downloaded'],
+  ['votes', 'Most liked'],
   ['name', 'Name'],
 ] as const;
 type Sort = (typeof SORTS)[number][0];
 
-type Query = { q: string; category: string; tags: string[]; sort: Sort; page: number; mod: string };
+// At most one of mod, submission and submit is set: the view that is open over the list.
+type Query = {
+  q: string;
+  category: string;
+  tags: string[];
+  sort: Sort;
+  page: number;
+  mod: string;
+  submission: string;
+  submit: boolean;
+};
 type Change = (next: Query, how?: 'replace' | 'push') => void;
 
 const PER_PAGE = 24;
 const TAGS_SHOWN = 12;
-const UNREACHABLE = 'The mod catalogue cannot be reached right now.';
-const LINK = 'text-fd-primary underline underline-offset-4';
-const BUTTON =
-  'rounded-lg border bg-fd-card px-3 py-1.5 text-sm font-medium transition-colors outline-none hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring disabled:pointer-events-none disabled:opacity-40';
-const MAIN_ACTION =
-  'inline-flex items-center gap-1.5 rounded-lg border border-transparent bg-fd-primary text-sm font-medium text-fd-primary-foreground transition-opacity outline-none hover:opacity-90 focus-visible:ring-2 focus-visible:ring-fd-ring';
-const SECOND_ACTION =
-  'inline-flex items-center gap-1.5 rounded-lg border bg-fd-background text-sm font-medium transition-colors outline-none hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring';
 
 function readQuery(search: string): Query {
   const params = new URLSearchParams(search);
   const page = Number(params.get('page'));
   const tags = params.getAll('tag').map((tag) => tag.trim().toLowerCase().replace(/[\s_]+/g, '-'));
+  const mod = params.get('mod') ?? '';
+  const submission = mod ? '' : (params.get('submission') ?? '').trim();
   return {
     q: (params.get('q') ?? '').trim().slice(0, 200),
     category: (params.get('category') ?? '').trim(),
     tags: [...new Set(tags.filter(Boolean))].slice(0, 10),
     sort: SORTS.find(([key]) => key === params.get('sort'))?.[0] ?? 'updated',
     page: Number.isInteger(page) && page >= 1 ? page : 1,
-    mod: params.get('mod') ?? '',
+    mod,
+    submission,
+    submit: !mod && !submission && params.get('submit') === '1',
   };
 }
 
@@ -83,35 +114,15 @@ function searchOf(query: Query, extra: Record<string, string> = {}) {
   return text ? `?${text}` : '';
 }
 
-const addressOf = (query: Query) => searchOf(query, query.mod ? { mod: query.mod } : {}) || './';
-
-class ApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
-  }
+function viewOf(query: Query): Record<string, string> {
+  if (query.mod) return { mod: query.mod };
+  if (query.submission) return { submission: query.submission };
+  return query.submit ? { submit: '1' } : {};
 }
 
-async function getJson<T>(path: string, signal: AbortSignal): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(`${marketApi}${path}`, { signal, headers: { Accept: 'application/json' } });
-  } catch (error) {
-    if (signal.aborted) throw error;
-    throw new ApiError(UNREACHABLE, 0);
-  }
-  const body: unknown = await response.json().catch(() => null);
-  if (body === null || typeof body !== 'object') throw new ApiError(UNREACHABLE, response.status);
-  if (!response.ok) {
-    const said = (body as { error?: unknown }).error;
-    throw new ApiError(response.status < 500 && typeof said === 'string' ? said : UNREACHABLE, response.status);
-  }
-  return body as T;
-}
+const addressOf = (query: Query) => searchOf(query, viewOf(query)) || './';
+const listOf = (query: Query): Query => ({ ...query, mod: '', submission: '', submit: false });
 
-const sentence = (error: unknown) => (error instanceof ApiError ? error.message : UNREACHABLE);
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 const count = (n: number, one: string, many: string) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
 const zipUrl = (id: string, version: string) =>
@@ -125,15 +136,24 @@ function bytes(n: number) {
   return `${(n / 1048576).toFixed(1)} MB`;
 }
 
-function day(iso: string) {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-// A click with a modifier key, or with another button, is left to the browser.
-function plain(event: MouseEvent) {
-  return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+// The catalogue's pictures of a mod when it gives any, else the ones kept on this site.
+function picturesFor(mod: Mod): Shown[] {
+  const given = (Array.isArray(mod.pictures) ? mod.pictures : []).flatMap((picture, index) => {
+    const src = onMarket(picture?.url);
+    if (!src) return [];
+    const sized = picture.width > 0 && picture.height > 0;
+    return [
+      {
+        src,
+        alt: `Picture ${index + 1} of ${mod.name}`,
+        caption: '',
+        width: sized ? picture.width : 1920,
+        height: sized ? picture.height : 1080,
+      },
+    ];
+  });
+  if (given.length > 0) return given;
+  return picturesOf(mod.id).map((picture) => ({ ...picture, caption: picture.alt }));
 }
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: ReactNode }) {
@@ -150,28 +170,6 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
     >
       {children}
     </button>
-  );
-}
-
-function Notice({ text, action, onAction }: { text: string; action?: string; onAction?: () => void }) {
-  return (
-    <div className="flex flex-col items-start gap-3 rounded-xl border bg-fd-card p-6">
-      <p>{text}</p>
-      {action && onAction ? (
-        <button type="button" onClick={onAction} className={BUTTON}>
-          {action}
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function Fact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-fd-muted-foreground">{label}</dt>
-      <dd className="text-sm">{children}</dd>
-    </div>
   );
 }
 
@@ -212,7 +210,7 @@ function Actions({ mod, small, children }: { mod: Mod; small?: boolean; children
 }
 
 // The pictures of a mod: one large, and a row of small ones to pick from when there are several.
-function Gallery({ pictures }: { pictures: ModPicture[] }) {
+function Gallery({ pictures }: { pictures: Shown[] }) {
   const [at, setAt] = useState(0);
   const shown = pictures[Math.min(at, pictures.length - 1)];
   return (
@@ -222,11 +220,17 @@ function Gallery({ pictures }: { pictures: ModPicture[] }) {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Open this picture at full size"
-        className="block overflow-hidden rounded-xl border outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+        className="block overflow-hidden rounded-xl border bg-fd-card outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
       >
-        <img src={shown.src} alt={shown.alt} width={shown.width} height={shown.height} className="h-auto w-full" />
+        <img
+          src={shown.src}
+          alt={shown.alt}
+          width={shown.width}
+          height={shown.height}
+          className="h-auto max-h-[80vh] w-full object-contain"
+        />
       </a>
-      <p className="text-sm text-fd-muted-foreground">{shown.alt}</p>
+      {shown.caption ? <p className="text-sm text-fd-muted-foreground">{shown.caption}</p> : null}
       {pictures.length > 1 ? (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
           {pictures.map((picture, index) => (
@@ -258,8 +262,11 @@ function Gallery({ pictures }: { pictures: ModPicture[] }) {
 }
 
 // The name is the link to the mod, stretched over the card. The buttons sit above it.
-function ModCard({ mod, href, onOpen }: { mod: Mod; href: string; onOpen: (event: MouseEvent) => void }) {
-  const cover = picturesOf(mod.id)[0];
+function ModCard(props: { mod: Mod; href: string; onOpen: (event: MouseEvent) => void; now: number | null }) {
+  const { mod, href, onOpen } = props;
+  const cover = picturesFor(mod)[0];
+  // The words depend on the visitor's clock, so the date stands in until the clock has been read.
+  const updated = props.now === null ? day(mod.updated_at) : ago(mod.updated_at, props.now);
   return (
     <article className="relative flex min-w-0 flex-col gap-2 rounded-xl border bg-fd-card p-5 transition-colors hover:bg-fd-accent/60">
       {cover ? (
@@ -273,23 +280,30 @@ function ModCard({ mod, href, onOpen }: { mod: Mod; href: string; onOpen: (event
           className="-mx-5 -mt-5 mb-2 aspect-video w-[calc(100%+2.5rem)] max-w-none rounded-t-[11px] border-b object-cover"
         />
       ) : null}
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="min-w-0 truncate font-medium">
-          <a
-            href={href}
-            onClick={onOpen}
-            className="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-fd-ring"
-          >
-            {mod.name}
-          </a>
-        </h2>
-        <span className="shrink-0 font-mono text-xs text-fd-muted-foreground">{mod.latest.version}</span>
-      </div>
+      <h2 className="min-w-0 truncate font-medium">
+        <a
+          href={href}
+          onClick={onOpen}
+          className="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-fd-ring"
+        >
+          {mod.name}
+        </a>
+      </h2>
       {mod.author ? <p className="-mt-1 truncate text-xs text-fd-muted-foreground">by {mod.author}</p> : null}
       {mod.summary ? <p className="line-clamp-3 text-sm text-fd-muted-foreground">{mod.summary}</p> : null}
-      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-2 text-xs text-fd-muted-foreground">
+      <p className="mt-auto truncate pt-2 text-xs text-fd-muted-foreground">
+        <span className="font-mono">{mod.latest.version}</span>
+        {updated ? (
+          <>
+            {' \u00b7 '}
+            <When iso={mod.updated_at}>Updated {updated}</When>
+          </>
+        ) : null}
+      </p>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fd-muted-foreground">
         {mod.category ? <span className="rounded-full border px-2 py-0.5">{mod.category}</span> : null}
         <span>{count(mod.downloads, 'download', 'downloads')}</span>
+        <Score votes={votesOf(mod.votes)} />
         {mod.reviewed ? <span>Reviewed</span> : null}
       </div>
       <div className="relative z-10 self-start pt-1">
@@ -308,25 +322,22 @@ function ModPage(props: {
   onRetry?: () => void;
 }) {
   const { id, mod, error, query, change } = props;
-  const list: Query = { ...query, mod: '' };
+  const list = listOf(query);
   const go = (next: Query) => (event: MouseEvent) => {
     if (!plain(event)) return;
     event.preventDefault();
     change(next, 'push');
   };
   const homepage = mod && /^https?:\/\//.test(mod.homepage) ? mod.homepage : '';
-  const pictures = mod ? picturesOf(mod.id) : [];
+  const source = mod ? repoName(mod.repo) : '';
+  const needsWax = mod && typeof mod.needs_wax === 'string' ? mod.needs_wax.trim() : '';
+  const pictures = mod ? picturesFor(mod) : [];
+  const votes = mod ? votesOf(mod.votes) : null;
+  const firstDay = mod ? day(mod.created_at) : '';
 
   return (
     <article className="flex flex-col gap-8">
-      <a
-        href={addressOf(list)}
-        onClick={go(list)}
-        className="inline-flex items-center gap-1.5 self-start text-sm text-fd-muted-foreground transition-colors hover:text-fd-foreground"
-      >
-        <ArrowLeft aria-hidden="true" className="size-4" />
-        All mods
-      </a>
+      <BackToList list={{ href: addressOf(list), onClick: go(list) }} />
 
       {error ? (
         <Notice text={error} action="Try again" onAction={props.onRetry} />
@@ -338,17 +349,34 @@ function ModPage(props: {
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{mod.name}</h1>
               <span className="font-mono text-sm text-fd-muted-foreground">{mod.latest.version}</span>
+              {needsWax ? (
+                <span className="rounded-full border px-2.5 py-0.5 text-xs text-fd-muted-foreground">
+                  Needs Wax {needsWax}
+                </span>
+              ) : null}
             </div>
-            <dl className="flex flex-wrap gap-x-8 gap-y-3">
-              {mod.author ? <Fact label="Author">{mod.author}</Fact> : null}
-              {mod.category ? <Fact label="Category">{mod.category}</Fact> : null}
-              <Fact label="Downloads">{mod.downloads.toLocaleString('en-US')}</Fact>
-              {day(mod.updated_at) ? <Fact label="Updated">{day(mod.updated_at)}</Fact> : null}
-              <Fact label="Id">
-                <span className="font-mono">{mod.id}</span>
-              </Fact>
-              {mod.reviewed ? <Fact label="Status">Reviewed</Fact> : null}
-            </dl>
+            <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-4">
+              <dl className="flex flex-wrap gap-x-8 gap-y-3">
+                {mod.author ? <Fact label="Author">{mod.author}</Fact> : null}
+                {mod.category ? <Fact label="Category">{mod.category}</Fact> : null}
+                <Fact label="Downloads">{mod.downloads.toLocaleString('en-US')}</Fact>
+                {day(mod.updated_at) ? (
+                  <Fact label="Updated">
+                    <When iso={mod.updated_at}>{day(mod.updated_at)}</When>
+                  </Fact>
+                ) : null}
+                {firstDay && firstDay !== day(mod.updated_at) ? (
+                  <Fact label="First published">
+                    <When iso={mod.created_at}>{firstDay}</When>
+                  </Fact>
+                ) : null}
+                <Fact label="Id">
+                  <span className="font-mono">{mod.id}</span>
+                </Fact>
+                {mod.reviewed ? <Fact label="Status">Reviewed</Fact> : null}
+              </dl>
+              {votes ? <VoteButtons key={mod.id} id={mod.id} first={votes} /> : null}
+            </div>
           </header>
 
           {pictures.length > 0 ? <Gallery key={mod.id} pictures={pictures} /> : null}
@@ -379,10 +407,24 @@ function ModPage(props: {
             ) : (
               <p className="text-fd-muted-foreground">This mod has no description.</p>
             )}
-            {homepage ? (
-              <a href={homepage} target="_blank" rel="noopener noreferrer nofollow" className={`self-start text-sm ${LINK}`}>
-                Homepage
-              </a>
+            {homepage || source ? (
+              <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+                {homepage ? (
+                  <a href={homepage} target="_blank" rel="noopener noreferrer nofollow" className={LINK}>
+                    Homepage
+                  </a>
+                ) : null}
+                {source ? (
+                  <a
+                    href={`https://github.com/${source}`}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className={LINK}
+                  >
+                    Source
+                  </a>
+                ) : null}
+              </div>
             ) : null}
             {mod.tags.length > 0 ? (
               <div className="flex flex-wrap gap-2">
@@ -487,6 +529,9 @@ export function ModBrowser() {
     data: null,
     error: '',
   });
+  const [draft, setDraft] = useState<Draft>(NO_DRAFT);
+  const [now, setNow] = useState<number | null>(null);
+  const [likedSort, setLikedSort] = useState(true);
   const listScroll = useRef(0);
   const mounted = useRef(false);
 
@@ -497,13 +542,14 @@ export function ModBrowser() {
       setText(next.q);
     };
     read();
+    setNow(Date.now());
     window.addEventListener('popstate', read);
     return () => window.removeEventListener('popstate', read);
   }, []);
 
   const change: Change = useCallback((next, how = 'replace') => {
     setQuery(next);
-    const url = `${window.location.pathname}${searchOf(next, next.mod ? { mod: next.mod } : {})}`;
+    const url = `${window.location.pathname}${searchOf(next, viewOf(next))}`;
     if (how === 'push') window.history.pushState(null, '', url);
     else window.history.replaceState(null, '', url);
   }, []);
@@ -541,12 +587,21 @@ export function ModBrowser() {
       },
       (error) => {
         if (controller.signal.aborted) return;
+        // An older catalogue does not know the sort by votes and answers 400.
+        if (error instanceof ApiError && error.status === 400 && /[?&]sort=votes(&|$)/.test(listSearch)) {
+          setLikedSort(false);
+          return;
+        }
         setAnswered(true);
         setList({ search: listSearch, data: null, error: sentence(error) });
       },
     );
     return () => controller.abort();
   }, [listSearch, attempt]);
+
+  useEffect(() => {
+    if (query && !likedSort && query.sort === 'votes') change({ ...query, sort: 'updated' });
+  }, [query, likedSort, change]);
 
   const shown = query?.mod ?? '';
   useEffect(() => {
@@ -580,28 +635,64 @@ export function ModBrowser() {
     if (query && current && list.data && query.page > pages) change({ ...query, page: pages });
   }, [query, current, list.data, pages, change]);
 
-  // Opening a mod starts at the top. Going back returns to the place in the list.
+  // Opening a mod or another view starts at the top. Going back returns to the place in the list.
+  const view = query ? new URLSearchParams(viewOf(query)).toString() : '';
   useLayoutEffect(() => {
-    if (mounted.current) window.scrollTo(0, shown ? 0 : listScroll.current);
+    if (mounted.current) window.scrollTo(0, view ? 0 : listScroll.current);
     mounted.current = true;
-  }, [shown]);
+  }, [view]);
 
   const fetched = shown && detail.id === shown ? detail : null;
   const listed = shown ? (list.data?.mods.find((mod) => mod.id === shown) ?? null) : null;
-  const shownName = fetched?.data?.name ?? listed?.name ?? '';
+  const title = fetched?.data?.name ?? listed?.name ?? (query?.submission ? 'Submission' : query?.submit ? 'Submit a mod' : '');
   useEffect(() => {
-    if (!shownName) return;
+    if (!title) return;
     const before = document.title;
-    document.title = `${shownName} | ${appName}`;
+    const wanted = `${title} | ${appName}`;
+    const apply = () => {
+      if (document.title !== wanted) document.title = wanted;
+    };
+    apply();
+    // The page's own title is put back once when it has loaded, so the head is watched.
+    const watcher = new MutationObserver(apply);
+    watcher.observe(document.head, { subtree: true, childList: true, characterData: true });
     return () => {
+      watcher.disconnect();
       document.title = before;
     };
-  }, [shownName]);
+  }, [title]);
 
   function retry() {
     setList({ search: null, data: null, error: '' });
     setDetail({ id: '', data: null, error: '' });
     setAttempt((n) => n + 1);
+  }
+
+  const go = (next: Query): Go => ({
+    href: addressOf(next),
+    onClick: (event) => {
+      if (!plain(event)) return;
+      event.preventDefault();
+      change(next, 'push');
+    },
+  });
+
+  if (query?.submission) {
+    const back = listOf(query);
+    return <SubmissionView id={query.submission} list={go(back)} mod={(id) => go({ ...back, mod: id })} />;
+  }
+
+  if (query?.submit) {
+    const back = listOf(query);
+    return (
+      <SubmitView
+        draft={draft}
+        setDraft={setDraft}
+        list={go(back)}
+        status={(id) => go({ ...back, submission: id })}
+        categories={categories.map((entry) => entry.name)}
+      />
+    );
   }
 
   if (query && shown) {
@@ -643,11 +734,26 @@ export function ModBrowser() {
   const chosen = query?.tags ?? [];
   const offered = tags.map((entry) => entry.tag).slice(0, allTags ? undefined : TAGS_SHOWN);
   const tagChips = [...offered, ...chosen.filter((tag) => !offered.includes(tag))];
+  // Before the address is read this is a plain link, which the browser follows.
+  const submit = query ? go({ ...query, submit: true }) : null;
 
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Mods</h1>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Mods</h1>
+          <a
+            href={submit?.href ?? '?submit=1'}
+            onClick={(event) => {
+              listScroll.current = window.scrollY;
+              submit?.onClick(event);
+            }}
+            className={`${SECOND_ACTION} px-3.5 py-2`}
+          >
+            <Upload aria-hidden="true" className="size-4" />
+            Submit a mod
+          </a>
+        </div>
         <p className="max-w-2xl text-fd-muted-foreground">
           This is the catalogue of Wax mods. Open a mod to read what it does. You can add it to your game from here or
           download its zip.
@@ -664,7 +770,7 @@ export function ModBrowser() {
               onChange={(event) => set({ sort: event.target.value as Sort })}
               className="h-10 rounded-lg border bg-fd-card px-3 text-sm text-fd-foreground outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
             >
-              {SORTS.map(([key, label]) => (
+              {SORTS.filter(([key]) => likedSort || key !== 'votes').map(([key, label]) => (
                 <option key={key} value={key}>
                   {label}
                 </option>
@@ -754,6 +860,7 @@ export function ModBrowser() {
               <ModCard
                 key={mod.id}
                 mod={mod}
+                now={now}
                 href={searchOf(query, { mod: mod.id })}
                 onOpen={(event) => {
                   if (!plain(event)) return;

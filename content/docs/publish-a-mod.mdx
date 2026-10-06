@@ -1,0 +1,347 @@
+---
+title: Publish a mod
+description: Put your mod in the catalogue, so other players can add it to their game from the Mods page.
+icon: Upload
+---
+
+The [Mods page](/mods) is the catalogue of Wax mods. This page says how your mod gets into it.
+
+## How publishing works
+
+<Steps>
+<Step>
+
+### Your mod lives on GitHub
+
+Put the mod in a public repository on GitHub. The catalogue reads it from there.
+
+</Step>
+<Step>
+
+### You submit the address
+
+Press **Submit a mod** on the Mods page and give the address of the repository.
+
+</Step>
+<Step>
+
+### The mod is checked at once
+
+The catalogue fetches the repository and checks it. You see the result on the same page.
+
+</Step>
+<Step>
+
+### A person looks at it
+
+A mod that passed the checks waits for review. It is listed after a person has looked at it.
+
+</Step>
+</Steps>
+
+Every new version goes the same way and is looked at again.
+
+A mod is code that runs inside other people's games. So a person reads every version before players can add
+it.
+
+## The repository
+
+One repository holds one mod. `mod.lua` and `init.lua` are at the top of the repository, not inside a folder.
+
+```text
+session-clock\
+    mod.lua              what the mod is: id, name, version and more
+    init.lua             the code that runs
+    format.lua           optional: more Lua files
+    data\
+        words.json       optional: files your code reads
+    pictures\
+        1-main.png       optional: pictures for the Mods page
+        2-hidden.png
+    README.md            optional: for people who read the repository
+    LICENSE
+```
+
+- The repository can have any name. The mod's id comes from `mod.lua`.
+- Lay out your other Lua files as you like. [How a mod is built](/docs/mods#more-than-one-file) shows how one
+  file loads another.
+- To publish two mods, make two repositories.
+- The whole repository, as GitHub packs it, can be at most 15 MB and 5,000 files and folders.
+- Two files cannot have names that differ only in capital letters, and a name Windows reserves, such as
+  `con.lua`, is not taken. Links to other files are not taken either.
+
+## mod.lua
+
+On your own PC `mod.lua` is optional. A published mod needs it. This one has every field:
+
+```lua title="mod.lua"
+return {
+    id = "SessionClock",
+    name = "Session Clock",
+    version = "1.2.0",
+    description = "Shows how long you have been playing.\n\nA small overlay in the top right corner counts the minutes since the mod loaded. Press F6 to hide it or to show it again. Your choice is kept for the next session.",
+    author = "your-name",
+    category = "Tools",
+    tags = { "clock", "overlay", "time" },
+    homepage = "https://github.com/your-name/session-clock",
+    dependencies = {},
+    wax = "0.2.0",
+}
+```
+
+| Field | Needed | What it is |
+| --- | --- | --- |
+| `id` | Yes | The name the catalogue, the game and other mods know your mod by. Letters, digits and underscores only. It starts with a letter and is at most 64 characters long. It never changes. |
+| `name` | Yes | The name players see, on the Mods page and in the game. |
+| `version` | Yes | Three numbers with dots between them, such as `1.2.0`. |
+| `description` | Yes | What the mod does, in at least 20 characters. The first line is the summary on the mod's card. |
+| `author` | Yes | Your name, as the Mods page shows it. |
+| `category` | Yes | One of the catalogue's categories. The [Mods page](/mods) lists them, and so does the view you submit from. |
+| `tags` | Yes | 1 to 10 short words that players can filter the list by. |
+| `homepage` | No | A web address with more about the mod. The mod's page links to it. |
+| `dependencies` | No | Ids of other mods that must load before this one. The mod's page tells players to install them too. |
+| `wax` | No | The lowest Wax version the mod needs. The mod's page shows it as "Needs Wax 0.2.0". |
+
+`mod.lua` may only hold plain values like the ones above. It cannot call functions.
+
+### The id
+
+Pick the id once. Players get the mod as a folder with that name, other mods load it by that name, and saved
+settings are filed under it.
+
+On your own PC the folder name is the id. So name your folder in `Wax\mods\` the same as `id`. Then the mod
+you test is the mod players get.
+
+### The description
+
+The first line is the summary. Keep it to one sentence that says what the mod does.
+
+Leave an empty line after it, then write the rest: what the player sees, how to open it and which keys it
+uses. In `mod.lua`, `\n` starts a new line, so `\n\n` leaves an empty one.
+
+## init.lua
+
+`init.lua` is the code that runs, as in every mod. This is all of Session Clock:
+
+```lua title="init.lua"
+local settings = storage.Load("settings", { shown = true })
+
+local hud = ui.Overlay({ title = "Session", anchor = "top-right" })
+local played = hud:Field("Played", "0 min")
+hud:SetVisible(settings.shown)
+
+task.spawn(function()
+    local minutes = 0
+    while true do
+        task.wait(60)
+        minutes = minutes + 1
+        played:Set(minutes .. " min")
+    end
+end)
+
+ui.Hotkey("F6", function()
+    settings.shown = not settings.shown
+    hud:SetVisible(settings.shown)
+    storage.Save("settings", settings)
+end)
+```
+
+## Pictures
+
+Pictures are optional. Put them in a folder called `pictures` at the top of the repository.
+
+| What | Rule |
+| --- | --- |
+| How many | Up to 6 |
+| File type | PNG, JPEG or WebP |
+| File size | At most 1.5 MB each |
+| Width | At least 640 pixels |
+| Longest side | At most 2560 pixels |
+
+The pictures are shown in the order of their file names. The first one is the cover. The mod's card shows
+the cover, and the mod's page shows all of them.
+
+Start each name with a number to set the order:
+
+```text
+pictures\
+    1-main.png
+    2-hidden.png
+    3-settings.png
+```
+
+1920 by 1080 pixels is a good size. The card shows the cover in that shape and cuts off what does not fit.
+
+Take the pictures in the game. Show what the mod looks like for a player.
+
+The pictures sit directly in `pictures`, not in folders inside it. A picture you replace in a later version
+can take a day to change on the Mods page.
+
+## What goes into the download
+
+The catalogue makes a zip from the repository. **Add to game** and **Download zip** give players that zip.
+It holds one folder, named after the mod's id.
+
+Everything in the repository goes into the zip, except:
+
+- the `pictures` folder
+- every file and folder whose name starts with a dot, such as `.gitignore` and `.github`
+- `README.md`, `LICENSE`, `LICENSE.txt`, `LICENSE.md` and `CHANGELOG.md` at the top of the repository
+- a `docs` folder at the top of the repository
+
+Every file that goes into the zip must be of one of these types:
+
+```text
+.lua  .json  .txt  .md  .png  .jpg  .jpeg  .webp  .ogg  .wav  .csv
+```
+
+A file of another type fails the check. Take it out of the repository.
+
+The zip has limits:
+
+| What | Limit |
+| --- | --- |
+| Size of the zip | At most 5 MB |
+| Size of the files when unzipped | At most 20 MB |
+| Number of files | At most 500 |
+
+## Versions and tags
+
+A version is one commit of your repository. Mark it with a git tag: the letter `v` and the version from
+`mod.lua`.
+
+```text
+git commit -am "Version 1.2.0"
+git tag v1.2.0
+git push origin main v1.2.0
+```
+
+When you submit, you can name the tag or leave the field empty.
+
+| You submit | The catalogue takes |
+| --- | --- |
+| The tag `v1.2.0` | The commit with that tag. |
+| No tag, and the repository has releases | The latest release. Its tag must be a version tag such as `v1.2.0`. |
+| No tag, and no releases | The newest commit of the default branch. |
+
+The rules:
+
+- A tag must match the version in `mod.lua`. The tag `v1.2.0` goes with `version = "1.2.0"`.
+- A version can be published once. You cannot replace `1.2.0` with other code.
+- A commit that is waiting for review cannot be submitted a second time.
+- At most 3 submissions of one repository can wait for review at a time.
+- The id belongs to the repository that first published it. No other repository can publish under that id.
+
+### Publish an update
+
+1. Change the mod.
+2. Raise `version` in `mod.lua`, for example from `1.2.0` to `1.2.1`.
+3. Commit, tag the commit `v1.2.1` and push.
+4. Submit the repository again.
+
+The new version is checked and looked at like the first one. Until it is listed, players get the version
+that is listed now.
+
+## What the checks look for
+
+The checks run as soon as you submit. Each one ends as a problem, a warning or a pass.
+
+- A **problem** stops the submission. Fix it in the repository and submit again.
+- A **warning** does not stop it. The reviewer sees it too.
+
+This is what is checked:
+
+| Check | What it looks for |
+| --- | --- |
+| The layout | `mod.lua` and `init.lua` at the top of the repository. |
+| `mod.lua` | Every field, by the rules in the table above. |
+| The files | The file types, the sizes and the number of files. The pictures, by the rules above. |
+| The Lua code | Every `.lua` file must compile. A file that does not is reported with its name and the line. |
+| Calls that are refused | See below. |
+| Calls the reviewer looks at | See below. |
+
+### Calls that are refused
+
+These UE4SS functions break Wax or the game's Lua for every mod, not only for yours. A mod that calls one is
+not taken.
+
+| Refused | Use this instead |
+| --- | --- |
+| `RegisterKeyBind`, `RegisterKeyBindAsync` | [`ui.Hotkey`](/docs/gui/hotkeys) |
+| `LoopAsync`, `ExecuteAsync`, `ExecuteWithDelay` | [`task.spawn`](/docs/tasks), `task.wait` and `task.delay` |
+| `LoopInGameThreadAfterFrames` | A loop inside `task.spawn` with a `task.wait` in it. `task.wait()` with no number waits one frame. |
+| `RegisterBeginPlayPostHook`, `RegisterEndPlayPreHook` | For creatures and players, the signals of [`game.Creatures`](/docs/creatures#when-creatures-come-and-go) and `game.Players`. |
+| `RestartMod`, `RestartCurrentMod`, `UninstallMod`, `UninstallCurrentMod`, `ClearAllDelayedActions` | Nothing. Wax reloads mods by itself. |
+
+Wax blocks most of these in the game as well.
+[Functions that are blocked](/docs/mods#functions-that-are-blocked) says why.
+
+### Calls the reviewer looks at
+
+These are allowed. The checks point them out, and the reviewer reads closely what the mod does with them.
+
+| What | For example |
+| --- | --- |
+| Running programs | `os.execute`, `io.popen` |
+| Reading and writing files outside `storage` | `io.open`, `os.remove`, `os.rename` |
+| Loading code from text | `load`, `loadfile`, `dofile` |
+| The `debug` library | `debug.getinfo`, `debug.sethook` |
+| Raw engine access | `raw`, and what it gives you |
+
+A mod that needs one of them says so in its description, with the reason. Settings belong in
+[`storage`](/docs/storage), which needs none of these.
+
+## Review
+
+A person reads the mod's code and its description, and looks at its pictures. This is done by hand, so there
+is no fixed time for it.
+
+A mod is turned down when:
+
+- It does something its description does not tell the player.
+- It runs programs, fetches code or touches files, and the reviewer cannot see a good reason.
+- Its code is made hard to read on purpose, for example packed or encoded.
+- It harms other players, their saves or their PCs, or it breaks Wax or other mods.
+- It is another person's mod, published without their permission.
+- Its name, description or pictures mislead, or do not belong on a public page.
+
+When a mod is not accepted, its status page shows a note from the reviewer. Fix what the note says and
+submit again. The version can stay the same, because it was never listed.
+
+<Callout type="warn" title="Listed does not mean safe">
+  A listed mod was read by a person once. That is not a promise that it is safe. It is also not a promise
+  that it still works after the game is patched. ICARUS is patched often, and a patch can break a mod until
+  its author updates it.
+</Callout>
+
+### Limits
+
+From one internet address, the catalogue takes 5 submissions an hour and 20 a day. A submission that fails
+the checks counts too. After that it asks you to wait.
+
+## Before you submit
+
+- Try the mod in the game. Copy the repository into `Wax\mods\` as a folder named after the id, start the
+  game and use every part of the mod.
+- Look at the **Log** page of the Wax panel. It should show no errors from your mod.
+- `mod.lua` has every needed field, and `version` is one you have not published before.
+- The id is the one you want to keep.
+- The description says what the mod does and how to open it.
+- The pictures are in `pictures`, in the right order, and within the limits.
+- The repository is public and holds nothing you do not want to share.
+- The commit has the tag `v` and the version, and the tag is pushed.
+
+## Submit
+
+Open the [Mods page](/mods) and press **Submit a mod**. Paste the address of the repository:
+
+```text
+https://github.com/your-name/session-clock
+```
+
+Type the tag, or leave that field empty, and press **Submit**.
+
+- When there are problems, the page lists each one, with the file and the line where it has them. What you
+  typed stays in the form.
+- When the mod passes, the page says it is waiting for review and gives you an address. Keep that address.
+  It shows whether the mod was listed, and the reviewer's note when it was not.

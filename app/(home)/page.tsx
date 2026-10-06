@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Shot } from '@/components/shot';
 import icons from '@/lib/icon-names.json';
+import { basePath } from '@/lib/shared';
 
 const firstMod = `local window = ui.Window({
     title = "My first mod",
@@ -134,6 +135,19 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      <figure className="-mt-4 flex flex-col gap-3">
+        <img
+          src={`${basePath}/img/showcase.webp`}
+          alt="The Wax panel in the game. One window shows the explorer with the player picked and a list of its properties, one lists the mods, and one shows what Wax costs each frame."
+          width={1840}
+          height={976}
+          className="h-auto w-full rounded-xl border"
+        />
+        <figcaption className="text-sm text-fd-muted-foreground">
+          The panel that comes with Wax, open in the game: the explorer, your mods and the frame cost.
+        </figcaption>
+      </figure>
 
       <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">

@@ -7,6 +7,7 @@
     "first-mod",
     "mods",
     "get-mods",
+    "publish-a-mod",
     "hot-reload",
     "menu",
     "debug-panel",

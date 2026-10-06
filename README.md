@@ -237,16 +237,35 @@ the rows that are in view.
 everything it shows. The address of the service is `marketApi` in `lib\shared.ts`. It is a full address
 because the GitHub Pages copy of the site is on another host.
 
-The page uses these routes of the service: `/mods`, `/mods/:id`, `/mods/:id/download/:version`, `/categories`
-and `/tags`. In the Wax workspace they are described in `wax\market\README.md`.
+The page uses these routes of the service: `/mods`, `/mods/:id`, `/mods/:id/download/:version`,
+`/mods/:id/vote` (to read and to send the visitor's vote), `/categories`, `/tags`, `/submissions` (to send a
+mod in) and `/submissions/:id`. In the Wax workspace they are described in `wax\market\README.md`. The calls
+are in `lib\market.ts`.
+
+The page also works with a catalogue that is older than the page. Pictures, the source link, the needed Wax
+version and votes are shown only when the catalogue sends them. When the catalogue answers 400 to
+`sort=votes`, the list goes back to the default order and the choice is taken out of the sort list.
+
+A card says when its mod was last updated in words ("3 days ago"). The words depend on the visitor's clock,
+so they are worked out in the browser. The built files hold no such words.
+
+A mod's pictures come from the catalogue (`pictures` in what `/mods` answers, as paths on the catalogue's
+host). When the catalogue gives none, the page shows the ones listed in `lib\mod-pictures.ts`, whose files are
+in `public\mods\`.
+
+**Submit a mod** opens a form in the same page (`components\mod-submit.tsx`). It checks the address in the
+browser, sends it to `/submissions` and shows what the catalogue answers: the checks, and the address of the
+submission's status view. The rules a mod has to meet are on the docs page `content\docs\publish-a-mod.mdx`.
+Change that page when the catalogue's rules change.
 
 Each mod has two actions. **Add to game** is a link to `wax://install/<id>`, with the mod's id as the
 catalogue gives it. Wax registers that address on the player's PC when it is installed, and its helper fetches
 the mod and puts it in the game. The page does not check whether the address is registered. **Download zip** is
 a link to the newest zip.
 
-The search, the filters, the sort order, the page number and the open mod are kept in the address bar
-(`?q=`, `?category=`, `?tag=`, `?sort=`, `?page=`, `?mod=`), so a link shows the same view.
+The search, the filters, the sort order, the page number and the open view are kept in the address bar
+(`?q=`, `?category=`, `?tag=`, `?sort=`, `?page=`, and one of `?mod=`, `?submit=1` and `?submission=`), so a
+link shows the same view.
 
 Two things to know when it shows "The mod catalogue cannot be reached right now.":
 

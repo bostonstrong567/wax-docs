@@ -2729,7 +2729,7 @@
       {
        "name": "key",
        "type": "string",
-       "text": "An engine key name such as \"F6\", \"K\" or \"MiddleMouseButton\" (a Keybind control gives you these)."
+       "text": "An engine key name such as \"F6\", \"K\" or \"MiddleMouseButton\" (a Keybind control gives you these). It can be held with Ctrl, Shift or Alt: \"Ctrl+Three\", \"Ctrl+Shift+K\"."
       },
       {
        "name": "callback",
