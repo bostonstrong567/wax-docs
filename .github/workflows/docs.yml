@@ -63,3 +63,42 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # The same site built without a path prefix, kept on the "site" branch for a server that serves it at its own address.
+  site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build for the root of a site
+        run: npm run build
+        env:
+          DOCS_BASE_PATH: ""
+
+      - name: Check links
+        run: npm run check
+        env:
+          DOCS_BASE_PATH: ""
+
+      - name: Put the build on the site branch
+        run: |
+          cd out
+          touch .nojekyll
+          git init -q -b site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Site build ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" site
