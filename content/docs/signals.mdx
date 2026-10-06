@@ -1,0 +1,126 @@
+---
+title: Signals
+description: Run a function when something happens.
+icon: Radio
+---
+
+A **signal** is an event you can listen to. You connect a function to it. Each time the event happens, your
+function runs.
+
+```lua title="init.lua"
+game.MapChanged:Connect(function(name)
+    ui.Notify("You are now on " .. name, { title = "Map changed" })
+end)
+```
+
+When a signal happens we say it **fires**. `game.MapChanged` fires when the world changes, and it hands your
+function the new map's name.
+
+## Signals that Wax gives you
+
+| Signal | Fires when | Your function gets |
+| --- | --- | --- |
+| `game.MapChanged` | The world changes. | The new map's name. |
+| `ui.Opened` | The menu opens. | Nothing. |
+| `ui.Closed` | The menu closes. | Nothing. |
+| `ui.KeyChanged` | The menu key changes. | The new key. |
+| `ui.ThemeChanged` | The theme changes. | The theme's name. |
+| `window.Opened`, `window.Closed` | A window is shown or hidden. | Nothing. |
+| `window.PageChanged` | Another page of a window is chosen. | The page's name. |
+| `control.Changed` | The user changes a control. | The new value. |
+
+Controls have a few more. Each one is listed with its control on the [Controls](/docs/gui/controls) page.
+
+## Stop listening
+
+`Connect` gives back a **connection**. Call `Disconnect` on it to stop.
+
+```lua title="init.lua"
+local connection = ui.Opened:Connect(function()
+    print("The menu opened.")
+end)
+
+local window = ui.Window({ title = "Signals" })
+window:Button("Stop printing", function()
+    connection:Disconnect()
+    print("Still connected:", connection.Connected)   -- false
+end)
+```
+
+When your mod reloads, Wax disconnects everything it connected. You only need `Disconnect` to stop early.
+
+## Just once
+
+`Once` is like `Connect`, but your function runs for the next fire only.
+
+```lua title="init.lua"
+ui.Opened:Once(function()
+    ui.Notify("You opened the menu for the first time since this mod loaded.")
+end)
+```
+
+## Wait for a signal
+
+Inside a [task](/docs/tasks), `Wait` pauses until the signal fires. It gives back what the signal sent.
+
+```lua title="init.lua"
+task.spawn(function()
+    print("Waiting for a map change...")
+    local name = game.MapChanged:Wait()
+    print("The map is now", name)
+end)
+```
+
+## Make your own signal
+
+`Signal.new` makes a signal. `Fire` makes it happen. Whatever you pass to `Fire` reaches every connected
+function.
+
+```lua title="init.lua"
+local scored = Signal.new("scored")
+
+scored:Connect(function(points)
+    print("Scored", points)
+end)
+
+scored:Once(function()
+    print("First score!")
+end)
+
+scored:Fire(10)
+scored:Fire(5)
+```
+
+The log shows:
+
+```text
+First score!
+Scored 10
+Scored 5
+```
+
+The newest connection runs first. That is why `First score!` comes before `Scored 10`.
+
+Your own signals are handy for keeping the parts of a mod apart. One file fires `scored`. Another file
+listens and updates the window. Neither has to know how the other works.
+
+## The functions
+
+| Function | What it does |
+| --- | --- |
+| `Signal.new(name)` | Makes a signal. The name shows up in error messages. |
+| `signal:Connect(fn)` | Runs `fn` on every fire. Gives back a connection. |
+| `signal:Once(fn)` | Runs `fn` on the next fire only. |
+| `signal:Wait()` | Pauses the task until the next fire, and gives back what was fired. |
+| `signal:Fire(...)` | Runs every connected function with these values. |
+| `signal:FireDirect(...)` | The same, a little faster. The functions must not wait. |
+| `signal:DisconnectAll()` | Disconnects every function. |
+| `connection:Disconnect()` | Stops one function from being called again. |
+| `connection.Connected` | `false` once the connection was disconnected. |
+
+## Good to know
+
+- **A connected function is a task.** It may call `task.wait`. (With `FireDirect` it may not.)
+- **An error in one function does not stop the others.** It goes to the log.
+
+Every function is listed in the [signals reference](/docs/reference/tasks#waxsignal).

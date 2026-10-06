@@ -1,0 +1,128 @@
+---
+title: Tasks
+description: Wait, repeat and delay without freezing the game.
+icon: Timer
+---
+
+`init.lua` runs once, from top to bottom, and the game waits while it runs. So a mod cannot simply sit in a
+loop and wait: the game would freeze.
+
+A **task** is code that can pause. While it pauses, the game carries on.
+
+## Start a task
+
+`task.spawn` starts a task. Inside it, `task.wait` pauses for a number of seconds.
+
+```lua title="init.lua"
+task.spawn(function()
+    for count = 3, 1, -1 do
+        ui.Notify(count, { seconds = 1 })
+        task.wait(1)
+    end
+    ui.Notify("Go!", { kind = "good" })
+end)
+
+print("The task above is still counting.")
+```
+
+The task runs until its first `task.wait`. Then the rest of `init.lua` carries on, so the `print` happens
+while the countdown is still going.
+
+## Do something again and again
+
+Put a loop in a task, with a wait inside it.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Clock" })
+local shown = hud:Field("Seconds", 0)
+
+task.spawn(function()
+    local seconds = 0
+    while true do
+        task.wait(1)
+        seconds = seconds + 1
+        shown:Set(seconds)
+    end
+end)
+```
+
+<Callout type="warn" title="Always wait inside a loop">
+  A loop without a wait never gives the game its turn. Wax stops any Lua code that runs for more than five
+  seconds without pausing, and logs a `script timeout` error. The game still freezes for those five seconds.
+</Callout>
+
+## Do something later
+
+`task.delay` runs a function after some seconds. The rest of your code does not wait for it.
+
+```lua title="init.lua"
+task.delay(10, function()
+    ui.Notify("Ten seconds have passed.")
+end)
+```
+
+## Stop a task
+
+`task.spawn` and `task.delay` give back the task. Hand it to `task.cancel` to stop it for good.
+
+```lua title="init.lua"
+local reminder = task.delay(30, function()
+    ui.Notify("Time is up!", { kind = "warn" })
+end)
+
+local window = ui.Window({ title = "Reminder" })
+window:Label("A message comes in 30 seconds.")
+window:Button("Cancel it", function()
+    task.cancel(reminder)
+    ui.Notify("Cancelled.")
+end)
+```
+
+## The functions
+
+| Function | What it does |
+| --- | --- |
+| `task.spawn(f, ...)` | Runs `f` now, until it finishes or first pauses. Extra values are passed to `f`. |
+| `task.wait(seconds)` | Pauses the task it is called in. Gives back how long it really waited. |
+| `task.delay(seconds, f, ...)` | Runs `f` after that many seconds. |
+| `task.defer(f, ...)` | Runs `f` at the end of the current frame. |
+| `task.cancel(thread)` | Stops a task for good. |
+| `task.label(thread, name)` | Names a task. The name shows up in error messages. |
+
+### More about task.wait
+
+- `task.wait()` with no number waits for the next frame.
+- A wait is never shorter than one frame, even `task.wait(0)`.
+- It only works inside a task. Anywhere else it raises an error that tells you to wrap the code in `task.spawn`.
+- It gives back the time that really passed:
+
+```lua
+task.spawn(function()
+    local waited = task.wait(0.5)
+    print("Waited", waited, "seconds")
+end)
+```
+
+## Good to know
+
+- **Callbacks are tasks already.** The function you give to a button, a switch or a hotkey may call `task.wait`.
+- **Tasks end when the mod reloads.** You never have to stop them yourself.
+- **An error ends only that task.** The error goes to the log and shows as a notification. Your other tasks keep running.
+- **Tasks take turns.** Only one piece of Lua runs at a time, so two tasks never trip over each other in the
+  middle of a line. A task keeps its turn until it waits or finishes.
+
+## Name your tasks
+
+When a mod has many tasks, a name makes error messages easier to read.
+
+```lua title="init.lua"
+local clock = task.spawn(function()
+    while true do
+        task.wait(1)
+    end
+end)
+
+task.label(clock, "clock")
+```
+
+Every function is listed in the [tasks reference](/docs/reference/tasks#task).

@@ -1,0 +1,4 @@
+{
+  "title": "Interface",
+  "pages": ["windows", "controls", "grid", "notifications", "overlays", "hotkeys", "themes", "icons"]
+}

@@ -1,0 +1,220 @@
+---
+title: Themes
+description: Five built-in looks, an accent colour, and themes of your own.
+icon: Palette
+---
+
+A **theme** is the set of colours every window, overlay and notification uses. One theme styles all mods at
+once, so they look like they belong together.
+
+## The built-in themes
+
+<ShotRow>
+  <Shot
+    src="theme-midnight.png"
+    alt="A sample window in the Midnight theme: a very dark blue-black background with a bright blue switch, slider, progress bar and button."
+    caption="Midnight (the default)"
+  />
+  <Shot
+    src="theme-graphite.png"
+    alt="The same sample window in the Graphite theme: a dark grey background with soft violet-blue highlights."
+    caption="Graphite"
+  />
+  <Shot
+    src="theme-abyss.png"
+    alt="The same sample window in the Abyss theme: a near-black background with teal highlights."
+    caption="Abyss"
+  />
+  <Shot
+    src="theme-dune.png"
+    alt="The same sample window in the Dune theme: a dark brown background with warm amber highlights."
+    caption="Dune"
+  />
+  <Shot
+    src="theme-daylight.png"
+    alt="The same sample window in the Daylight theme: a light grey-white background with dark text and blue highlights."
+    caption="Daylight"
+  />
+</ShotRow>
+
+## The player picks
+
+The theme belongs to the player. They choose it on the **Settings** page of the Wax panel, together with:
+
+- an **accent colour**: From the theme, Blue, Green, Teal, Amber, Orange, Red, Pink or Purple,
+- whether **animations** play,
+- the **interface size**.
+
+Wax remembers these choices.
+
+Your controls follow the theme by themselves. You do not have to do anything.
+
+## Use the theme's colours
+
+When you colour something yourself, take the colour from the theme. Then it still looks right when the
+player picks another theme.
+
+```lua title="init.lua"
+local theme = ui.Theme()
+
+local window = ui.Window({ title = "Theme colours", width = 300, height = 230 })
+
+window:Label("All good.", { color = theme.good })
+window:Label("Be careful.", { color = theme.warn })
+window:Label("Something failed.", { color = theme.bad })
+window:Label("The accent colour.", { color = theme.accent })
+window:Progress("Health", 0.35, { color = theme.bad })
+```
+
+`ui.Theme()` gives the live theme. Pass its colours on as they are. They keep following the theme, even
+after it changes.
+
+The colours you will use most:
+
+| Name | What it is for |
+| --- | --- |
+| `text` | Normal text. |
+| `dim` | Quieter text. |
+| `accent` | The highlight colour. |
+| `good` | Success. Green in most themes. |
+| `warn` | Warnings. Yellow in most themes. |
+| `bad` | Errors and danger. Red in most themes. |
+
+The full list is in the [reference](/docs/reference/ui#waxtheme).
+
+## A colour of your own
+
+`ui.Color` makes a colour from the kind of code a paint program shows.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Colours", width = 300, height = 160 })
+
+window:Label("Orange text", { color = ui.Color("#FF8800") })
+window:Label("Half see-through", { color = ui.Color("#FF8800", 0.5) })
+window:Progress("Energy", 0.6, { color = ui.Color(0x22C3A6) })
+```
+
+- `ui.Color("#RRGGBB")` takes the colour as text.
+- `ui.Color(0xRRGGBB)` takes it as a number.
+- A second value from 0 to 1 makes it see-through. 0 is invisible and 1 is solid.
+
+## Switch theme from code
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Theme sample", icon = "palette", width = 320, height = 290 })
+
+window:Toggle("Enabled", true)
+window:Slider("Amount", { min = 0, max = 10, step = 1, value = 6 })
+window:Progress("Progress", 0.55)
+window:Button("Apply", function()
+    ui.Notify("Applied.")
+end, { primary = true })
+
+window:Dropdown("Theme", ui.Themes(), ui.ThemeName(), function(name)
+    ui.SetTheme(name)
+end)
+```
+
+Pick a theme from the list. Everything on screen takes the new colours where it stands. No window is rebuilt,
+and no mod is reloaded.
+
+| Function | What it does |
+| --- | --- |
+| `ui.SetTheme(name)` | Switches to a theme by name. |
+| `ui.Themes()` | The names of the built-in themes, then of the ones mods added. |
+| `ui.ThemeName()` | The name of the theme in use. |
+| `ui.ResetTheme()` | Puts every theme setting back to the Midnight defaults. |
+| `ui.ThemeChanged` | A [signal](/docs/signals) that fires with the theme's name after it changes. |
+
+<Callout title="Ask first">
+  `ui.SetTheme` changes the look of every mod, and Wax remembers the choice. Call it when the player asks for
+  it, for example from a dropdown as above. Do not call it just because your mod loaded.
+</Callout>
+
+## Change single settings
+
+`ui.SetTheme` also takes a table. Then it changes only the settings you name.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Accent", width = 300, height = 180 })
+
+window:Button("Amber accent", function()
+    ui.SetTheme({ accent = "#E0A030", accent_hover = "#F2BC57" })
+end, { primary = true })
+
+window:Button("Reset to Midnight", function()
+    ui.ResetTheme()
+end)
+```
+
+In such a table a colour may be written as `"#RRGGBB"` or `0xRRGGBB`.
+
+- Colours apply at once.
+- Sizes and shapes (`font_size`, `spacing`, `window_shape` and the like) apply to what is built afterwards.
+- Single settings are not remembered. They last until the theme changes or the game closes.
+- `ui.ResetTheme()` puts **everything** back to Midnight, including a theme the player picked.
+
+## Add a theme of your own
+
+`ui.AddTheme` adds a named theme. Give it the colours you want to change. Everything you leave out comes
+from Midnight.
+
+```lua title="init.lua"
+ui.AddTheme("Forest", {
+    window = "#0E1512",
+    outline = "#31453A",
+    panel = "#141E19",
+    card = "#121B17",
+    card_line = "#22332A",
+    raised = "#1B2A22",
+    hover = "#27392F",
+    press = "#35503F",
+    line = "#22332A",
+    text = "#E4EFE8",
+    dim = "#8AA394",
+    accent = "#3FB96B",
+    accent_hover = "#62D38A",
+})
+
+local window = ui.Window({ title = "Forest", width = 300, height = 140 })
+
+window:Button("Use the Forest theme", function()
+    ui.SetTheme("Forest")
+end, { primary = true })
+```
+
+After `ui.AddTheme`, the name is in `ui.Themes()`.
+
+## Interface size
+
+The player sets the size on the Settings page. From code:
+
+| Function | What it does |
+| --- | --- |
+| `ui.SetScale(scale)` | Sets the size. 1 is normal. It gives back the size that was really applied. |
+| `ui.GetScale()` | The size in use. |
+| `ui.MinScale()` | The smallest size that still draws readable text on this screen. |
+
+The size is always kept between `ui.MinScale()` and 2.
+
+```lua
+local applied = ui.SetScale(1.25)
+print("The interface is now at", applied)
+```
+
+## Put the settings in your own window
+
+`ui.AddSettings(container)` adds the menu's own settings to a container of yours: menu key, theme, accent,
+animations and size.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "My mod", nav = "side" })
+
+local main = window:Page("Main", { icon = "home" })
+main:Label("The mod's own controls go here.")
+
+local settings = window:Page("Settings", { icon = "settings", bottom = true })
+ui.AddSettings(settings)
+```
+
+Every function is listed in the [ui reference](/docs/reference/ui#ui-settheme).

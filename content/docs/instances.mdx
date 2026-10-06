@@ -1,0 +1,207 @@
+---
+title: Instances
+description: Read, change and call any object of the game.
+icon: Box
+---
+
+An **Instance** is one object of the game: your character, a tree, a component, the world itself.
+`game.Character` gives you an Instance. So does `game.World`, and so does every entry of a list such as
+`game.World:GetChildren()`.
+
+## What every Instance has
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    print(character.Name)        -- the object's name
+    print(character.ClassName)   -- the name of its class
+    print(character.FullName)    -- its class, then its full path
+    print(character.Parent)      -- what it sits under in the tree
+end
+```
+
+| Name | What it is |
+| --- | --- |
+| `Name` | The object's name. |
+| `ClassName` | The name of the object's class. |
+| `FullName` | The engine's full name for the object. |
+| `Parent` | The Instance it sits under. The same as `GetParent()`. |
+| `Raw` | The UE4SS object itself, with no safety checks. For experts. |
+
+## The object's own members
+
+Every other name is one of the object's **own** properties or functions. These are the ones the game gave it.
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    -- A function of the object: call it with a colon.
+    local position = character:K2_GetActorLocation()
+    print(position.X, position.Y, position.Z)
+
+    -- A property of the object: read it with a dot.
+    local state = character.ActorState
+    print(state.Health)
+end
+```
+
+- Read a property with a dot: `state.Health`.
+- Change a property by assigning to it: `state.Health = 100`.
+- Call a function with a colon: `character:K2_GetActorLocation()`.
+
+If the name does not exist, you get an error. The error suggests the closest name that does exist.
+
+### Find out what an object has
+
+`GetMembers()` lists every property and function name of an object.
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    local names = character:GetMembers()
+    print(#names, "members. The first ten:")
+    for i = 1, 10 do
+        print(names[i])
+    end
+end
+```
+
+A quicker way is the command bar of the [Wax panel](/docs/debug-panel). Type `game.Character.` and press
+**Tab**. Type a few letters and Tab completes the name.
+
+## Wax checks what you write
+
+When you set a property or call a function, Wax checks the value first. A value of the wrong kind raises a
+normal Lua error. It does not crash the game.
+
+```lua
+local state = game.Character.ActorState
+
+state.Health = state.MaxHealth   -- a whole number: fine
+state.Health = "full"            -- an error: Health expects a whole number
+```
+
+<Callout title="The game has the last word">
+  Writing a property changes the value the game holds. The game may change it again on its next update, and in
+  multiplayer the host decides what counts.
+</Callout>
+
+## What you get back
+
+| The game has | You get |
+| --- | --- |
+| An object | An Instance |
+| A name or a piece of text | A Lua string |
+| A number or a true/false value | A Lua number or boolean |
+| A list of things | A Lua table |
+| A structure, such as a position | The structure itself. Read its parts by name: `.X`, `.Y`, `.Z`. |
+
+## Get, Set and Call
+
+There are three functions that do the same as the dot and the colon, with the name given as text.
+
+```lua
+local state = game.Character.ActorState
+
+print(state:Get("Health"))                -- the same as state.Health
+state:Set("Health", state.MaxHealth)      -- the same as state.Health = state.MaxHealth
+print(state:Call("IsAlive"))              -- the same as state:IsAlive()
+```
+
+Use them in two cases:
+
+- The name is in a variable.
+- The object has a property whose name Wax also uses, such as `Name` or `Parent`. `instance.Name` gives Wax's
+  value. `instance:Get("Name")` gives the object's own.
+
+## Is it this kind of object?
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    print(character:IsA("Actor"))            -- true: a character is an actor
+    print(character:IsA("PlayerController")) -- false
+
+    for i, class_name in ipairs(character:GetClassChain()) do
+        print(i, class_name)
+    end
+end
+```
+
+- `IsA(class_name)` is `true` when the object's class is that class, or is built on it.
+- `GetClassChain()` lists the class names from the object's own class up to `Object`.
+
+## Is it still there?
+
+Objects come and go. `IsValid()` is `false` once an object was destroyed, or once the map changed.
+
+```lua
+local character = game.Character
+
+task.delay(60, function()
+    if character and character:IsValid() then
+        print(character.Name, "is still here.")
+    else
+        print("That character is gone.")
+    end
+end)
+```
+
+## Parents and children
+
+Objects form a tree.
+
+| An object of this kind | Has these children |
+| --- | --- |
+| The world | The actors in it. |
+| An actor | Its components, and the actors attached to it. |
+| A component | The components attached to it. |
+
+This prints the parts your character is made of:
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    for i, child in ipairs(character:GetChildren()) do
+        print(i, child)
+    end
+end
+```
+
+The output looks like this. Each line shows the class, then the name.
+
+```text
+1   CapsuleComponent CollisionCylinder
+2   IcarusPlayerMovementComponent CharMoveComp
+3   IcarusStatContainer Stat Container
+4   InventoryComponent InventoryComponent
+...
+10  PlayerCharacterState ActorState
+```
+
+| Function | What it gives |
+| --- | --- |
+| `GetParent()` | The Instance this one sits under. |
+| `GetChildren()` | A list of the Instances directly under this one. |
+| `FindFirstChild(name)` | The first child with that `Name`, or `nil`. |
+| `FindFirstChild(name, true)` | The same, but it looks at every level below. |
+| `FindFirstChildOfClass(class_name)` | The first child of exactly that class, or `nil`. |
+| `FindFirstChildWhichIsA(class_name)` | The first child of that class, or of a class built on it. |
+| `GetDescendants(limit)` | Everything below, nearest first. It stops at `limit`, which is 5000 when left out. |
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    local inventory = character:FindFirstChildOfClass("InventoryComponent")
+    print(inventory)
+end
+```
+
+## Raw objects
+
+`instance.Raw` is the UE4SS object behind an Instance. Nothing is checked when you use it, and a mistake can
+crash the game. Most mods never need it.
+
+If you have a UE4SS object and want the safe version, `game.wrap(object)` gives you its Instance.
+
+Every function is listed in the [game reference](/docs/reference/game#waxinstance).

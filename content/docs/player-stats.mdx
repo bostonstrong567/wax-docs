@@ -1,0 +1,119 @@
+---
+title: "Example: player stats"
+description: Read your health, stamina, food, water and oxygen, and show them on the screen.
+icon: HeartPulse
+---
+
+This page builds a small overlay that shows how your character is doing. It uses the game tree, an overlay
+and a task.
+
+## Where the numbers are
+
+Your character has a part called `ActorState`. It holds the numbers.
+
+```lua
+local state = game.Character.ActorState
+```
+
+| Read this | To get |
+| --- | --- |
+| `state.Health` | Your health right now. |
+| `state.MaxHealth` | Your health when it is full. |
+| `state:IsAlive()` | `true` while your character is alive. |
+| `state.Stamina` | Your stamina. |
+| `state.FoodLevel` | How well fed you are. |
+| `state.WaterLevel` | How much water you have had. |
+| `state.OxygenLevel` | How much oxygen you have. |
+
+All of them are whole numbers, except `IsAlive()`, which gives `true` or `false`.
+
+## Try it in the command bar
+
+Load into a prospect. Open the **Log** page of the [Wax panel](/docs/debug-panel) and type this into the
+command bar:
+
+```lua
+game.Character.ActorState.Health
+```
+
+The log answers with a number, for example `= 300`.
+
+## Show it on screen
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Vitals", anchor = "top-left", width = 260 })
+
+local health = hud:Progress("Health", 0, { color = ui.Theme().bad })
+local alive = hud:Field("Alive", "")
+local stamina = hud:Field("Stamina", "", { mono = true })
+local food = hud:Field("Food", "", { mono = true })
+local water = hud:Field("Water", "", { mono = true })
+local oxygen = hud:Field("Oxygen", "", { mono = true })
+
+local function refresh()
+    -- There is a character with these numbers only inside a prospect.
+    local character = game.InProspect and game.Character
+    if not character then
+        hud:SetVisible(false)
+        return
+    end
+    hud:SetVisible(true)
+
+    local state = character.ActorState
+    if state.MaxHealth > 0 then
+        health:Set(state.Health / state.MaxHealth)
+    end
+    alive:Set(state:IsAlive() and "yes" or "no")
+    stamina:Set(state.Stamina)
+    food:Set(state.FoodLevel)
+    water:Set(state.WaterLevel)
+    oxygen:Set(state.OxygenLevel)
+end
+
+task.spawn(function()
+    while true do
+        refresh()
+        task.wait(0.25)
+    end
+end)
+```
+
+## How it works
+
+1. `ui.Overlay` makes a panel that stays on screen while you play. See [Overlays](/docs/gui/overlays).
+2. `hud:Progress` adds a bar. `hud:Field` adds a name with a value. Each one gives back a control with a `Set` function.
+3. `refresh` reads the numbers and puts them into the controls.
+4. The task calls `refresh` four times a second. `task.wait(0.25)` pauses the task, not the game. See [Tasks](/docs/tasks).
+
+Two details are worth copying into your own mods:
+
+- **It asks for the character every time.** `game.Character` is `nil` at the main menu, and it is a new object
+  after every map change. Never keep it for long.
+- **The bar is a share, not a number.** A progress bar takes a value from 0 to 1, so health is divided by
+  the full health.
+
+## Warn when health is low
+
+Add this below the code above. It shows one warning each time your health drops under a quarter.
+
+```lua title="init.lua (continued)"
+local warned = false
+
+task.spawn(function()
+    while true do
+        local character = game.InProspect and game.Character
+        if character then
+            local state = character.ActorState
+            local low = state.MaxHealth > 0 and state.Health / state.MaxHealth < 0.25
+
+            if low and not warned then
+                ui.Notify("Your health is low.", { title = "Careful", kind = "warn" })
+            end
+            warned = low
+        end
+        task.wait(1)
+    end
+end)
+```
+
+`warned` remembers that the message was shown. Without it, the message would come back every second.

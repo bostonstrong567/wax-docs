@@ -1,0 +1,28 @@
+{
+  "title": "Wax",
+  "pages": [
+    "---Start here---",
+    "index",
+    "install",
+    "first-mod",
+    "mods",
+    "hot-reload",
+    "menu",
+    "debug-panel",
+    "editor",
+    "---The game---",
+    "game",
+    "instances",
+    "tags-and-attributes",
+    "player-stats",
+    "---Running code---",
+    "tasks",
+    "signals",
+    "storage",
+    "logging",
+    "---Interface---",
+    "...gui",
+    "---Reference---",
+    "...reference"
+  ]
+}

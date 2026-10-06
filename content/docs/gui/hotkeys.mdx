@@ -1,0 +1,115 @@
+---
+title: Hotkeys
+description: Run a function when a key is pressed during play.
+icon: Keyboard
+---
+
+A **hotkey** runs your function when the player presses a key.
+
+```lua title="init.lua"
+ui.Hotkey("F6", function()
+    ui.Notify("You pressed F6.", { kind = "good" })
+end)
+```
+
+Close the menu and press **F6**.
+
+## When a hotkey reacts
+
+- A hotkey reacts **during play**, while the menu is closed.
+- It does not react while the menu is open. That way, typing in a text box never sets it off.
+- It goes away when your mod reloads. `init.lua` then makes it again.
+
+The game still sees the key too. Pick a key that the game does not use for something else.
+
+To make a hotkey react while the menu is open as well, pass `in_menu = true`:
+
+```lua title="init.lua"
+ui.Hotkey("F7", function()
+    ui.Notify("F7 works with the menu open or closed.")
+end, { in_menu = true })
+```
+
+## Key names
+
+A key is given by its name, as text.
+
+| Keys | Names |
+| --- | --- |
+| Letters | `"A"` to `"Z"` |
+| Digits on the top row | `"Zero"`, `"One"`, `"Two"`, `"Three"`, `"Four"`, `"Five"`, `"Six"`, `"Seven"`, `"Eight"`, `"Nine"` |
+| Function keys | `"F1"` to `"F12"` |
+| Number pad | `"NumPadZero"` to `"NumPadNine"`, `"Multiply"`, `"Add"`, `"Subtract"`, `"Decimal"`, `"Divide"` |
+| Arrows | `"Up"`, `"Down"`, `"Left"`, `"Right"` |
+| Editing | `"Insert"`, `"Delete"`, `"Home"`, `"End"`, `"PageUp"`, `"PageDown"`, `"BackSpace"`, `"Enter"`, `"Tab"`, `"SpaceBar"`, `"CapsLock"` |
+| Modifiers | `"LeftShift"`, `"RightShift"`, `"LeftControl"`, `"RightControl"`, `"LeftAlt"`, `"RightAlt"` |
+| Punctuation | `"Tilde"`, `"Hyphen"`, `"Equals"`, `"LeftBracket"`, `"RightBracket"`, `"Backslash"`, `"Semicolon"`, `"Apostrophe"`, `"Comma"`, `"Period"`, `"Slash"` |
+| Mouse | `"MiddleMouseButton"`, `"ThumbMouseButton"`, `"ThumbMouseButton2"` |
+
+You rarely need to type these. A [Keybind](/docs/gui/controls#keybind) control lets the player press the key,
+and hands you its name.
+
+## Let the player choose the key
+
+This is the usual pattern: a hotkey, a `Keybind` control to change it, and `storage` to remember the choice.
+
+```lua title="init.lua"
+local settings = storage.Load("keys", { ping = "F6" })
+
+local hotkey = ui.Hotkey(settings.ping, function()
+    ui.Notify("Ping!", { kind = "good" })
+end)
+
+local window = ui.Window({ title = "Hotkeys", width = 300, height = 140 })
+
+window:Keybind("Ping", settings.ping, function(key)
+    hotkey:SetKey(key)
+    settings.ping = key
+    storage.Save("keys", settings)
+end)
+```
+
+Open the menu, click the button beside **Ping** and press a new key. Close the menu and try it. The choice is
+still there the next time you play.
+
+## Stop a hotkey
+
+`ui.Hotkey` gives back the hotkey.
+
+| Function | What it does |
+| --- | --- |
+| `hotkey:SetKey(key)` | Changes the key it reacts to. |
+| `hotkey.Disconnect()` | Stops the hotkey. |
+
+```lua title="init.lua"
+local hotkey = ui.Hotkey("F6", function()
+    ui.Notify("Ping!")
+end)
+
+local window = ui.Window({ title = "Hotkeys", width = 300, height = 140 })
+window:Button("Switch the hotkey off", function()
+    hotkey.Disconnect()
+    ui.Notify("F6 does nothing now.")
+end)
+```
+
+## A hotkey may wait
+
+Your function runs as a [task](/docs/tasks), so it may pause.
+
+```lua title="init.lua"
+ui.Hotkey("F6", function()
+    ui.Notify("Three...", { seconds = 1 })
+    task.wait(1)
+    ui.Notify("Two...", { seconds = 1 })
+    task.wait(1)
+    ui.Notify("One...", { seconds = 1 })
+end)
+```
+
+## The menu key
+
+The key that opens the menu is not a hotkey of yours. The player sets it on the **Settings** page of the
+Wax panel. From code, use `ui.SetToggleKey` and `ui.GetToggleKey`. See [The menu](/docs/menu#the-menu-from-code).
+
+Every function is listed in the [ui reference](/docs/reference/ui#ui-hotkey).

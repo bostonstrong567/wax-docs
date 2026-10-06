@@ -1,0 +1,136 @@
+---
+title: The game tree
+description: Start at game and walk to the world, the player and every object in it.
+icon: Globe
+---
+
+Everything in the game hangs off one name: `game`.
+
+```lua title="init.lua"
+print("Map:", game.MapName)
+print("In a prospect:", game.InProspect)
+
+local character = game.Character
+if character then
+    print("Your character is", character.Name)
+else
+    print("No character yet. You are at the main menu.")
+end
+```
+
+Open the **Log** page of the [Wax panel](/docs/debug-panel) to see what it printed.
+
+## What game has
+
+| Name | What it is |
+| --- | --- |
+| `game.World` | The current world. Its children are the actors in it. |
+| `game.LocalPlayer` | Your player controller. |
+| `game.Character` | The character you control. `nil` at the main menu. |
+| `game.Players` | The players in the session. See below. |
+| `game.GameState` | The game state. |
+| `game.GameMode` | The game mode. `nil` when you are a client in someone else's game. |
+| `game.GameInstance` | The game instance. |
+| `game.Engine` | The engine. |
+| `game.Viewport` | The game viewport. |
+| `game.MapName` | The name of the current world, as text. |
+| `game.InProspect` | `true` while you are in a prospect. |
+| `game.MapChanged` | A [signal](/docs/signals) that fires when the world changes. |
+
+Most of these are **Instances**: objects of the game that you can read, change and call. The next page,
+[Instances](/docs/instances), shows how.
+
+`game` is read-only. If you misspell a name, you get an error that suggests the right one.
+
+## Check for nil
+
+`game.Character` is `nil` when you have no character, for example at the main menu. Check before you use it.
+
+```lua
+local character = game.Character
+if not character then
+    return
+end
+
+print(character.ClassName)
+```
+
+## When the map changes
+
+Entering or leaving a prospect changes the world. `game.MapChanged` fires with the new map's name.
+
+```lua title="init.lua"
+game.MapChanged:Connect(function(name)
+    ui.Notify("You are now on " .. name, { title = "Map changed" })
+end)
+```
+
+<Callout type="warn" title="Objects do not survive a map change">
+  An Instance you got before the map changed is gone afterwards. Using it raises an error that tells you to
+  get it again. So ask `game` for a fresh one each time you need it, instead of keeping an old one for long.
+</Callout>
+
+## Players
+
+```lua title="init.lua"
+for i, player in ipairs(game.Players:GetPlayers()) do
+    print(i, player)
+end
+
+for i, character in ipairs(game.Players:GetCharacters()) do
+    print(i, character)
+end
+```
+
+| Name | What it gives |
+| --- | --- |
+| `game.Players:GetPlayers()` | A list with one Instance per player in the session (their player state). It works for the host and for clients. |
+| `game.Players:GetCharacters()` | A list of the characters those players control right now. |
+| `game.Players.LocalPlayer` | The same as `game.LocalPlayer`. |
+
+## Finding objects
+
+```lua title="init.lua"
+local controller = game:Find("PlayerController")
+print(controller)
+
+local everyone = game:FindAll("PlayerController")
+print("Controllers:", #everyone)
+```
+
+| Function | What it gives |
+| --- | --- |
+| `game:Find(class_name)` | The first live object of a class, or `nil`. |
+| `game:FindAll(class_name)` | A list of every live object of a class. |
+| `game:GetTagged(tag)` | Every Instance you marked with that [tag](/docs/tags-and-attributes). |
+| `game:GetChildren()` | The top of the tree: world, game instance, game state and so on. |
+| `game:GetService(name)` | The same as `game[name]`. |
+
+<Callout type="warn" title="FindAll is slow">
+  `game:FindAll` looks at every object in the game. Call it once and keep the answer for a while. Never call
+  it many times a second.
+</Callout>
+
+## Walking the world
+
+The children of `game.World` are the actors in the world. This counts them by class and prints the five most
+common ones.
+
+```lua title="init.lua"
+local counts = {}
+for _, actor in ipairs(game.World:GetChildren()) do
+    counts[actor.ClassName] = (counts[actor.ClassName] or 0) + 1
+end
+
+local names = {}
+for class_name in pairs(counts) do
+    names[#names + 1] = class_name
+end
+table.sort(names, function(a, b) return counts[a] > counts[b] end)
+
+for i = 1, math.min(5, #names) do
+    print(counts[names[i]], names[i])
+end
+```
+
+Every function is listed in the [game reference](/docs/reference/game).

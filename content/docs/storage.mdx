@@ -1,0 +1,107 @@
+---
+title: Saving settings
+description: Keep values when your mod reloads, and when the game restarts.
+icon: Save
+---
+
+A normal variable is lost every time your mod reloads. Wax gives you two ways to keep things.
+
+| Tool | Survives a reload of the mod | Survives closing the game |
+| --- | --- | --- |
+| `persist` | Yes | No |
+| `storage` | Yes | Yes |
+
+## storage: settings that stay
+
+`storage.Load` reads your settings. `storage.Save` writes them.
+
+```lua title="init.lua"
+local settings = storage.Load("settings", { enabled = true, volume = 65 })
+
+local window = ui.Window({ title = "Saved settings" })
+
+window:Toggle("Enabled", settings.enabled, function(on)
+    settings.enabled = on
+    storage.Save("settings", settings)
+end)
+
+window:Slider("Volume", { min = 0, max = 100, step = 1, value = settings.volume }, function(value)
+    settings.volume = value
+    storage.Save("settings", settings)
+end)
+```
+
+Flip the switch and move the slider. Close the game and start it again. Both are where you left them.
+
+### How Load works
+
+```lua
+local settings = storage.Load("settings", { enabled = true, volume = 65 })
+```
+
+- The first value is a name. Use letters, digits, `_` and `-` only.
+- The second value is a table of **defaults**.
+- You get a copy of the defaults, with whatever was saved before laid over it.
+
+So the first time, you get the defaults. Later, you get the saved values. If you add a new setting to the
+defaults in a later version of your mod, players get it too.
+
+Only the top level is combined. A table inside your settings is taken whole from what was saved.
+
+### How Save works
+
+```lua
+storage.Save("settings", settings)
+```
+
+- Give it the same name and the table to keep.
+- It is safe to call often. Wax waits a moment and writes once, even if you saved ten times while dragging a slider.
+
+### What can be saved
+
+Numbers, text, `true`, `false`, and tables made of those. Anything else in the table, such as a function or
+an Instance, is left out.
+
+### Where it goes
+
+Each name becomes one small file in Wax's `saved` folder, named after your mod and the name you chose:
+
+```text
+Wax\saved\MyMod.settings.lua
+```
+
+Every mod has its own names. Two mods can both save under `"settings"` without clashing.
+
+## persist: values that live through a reload
+
+`persist` keeps a table alive while the game runs. It is for state, not for settings.
+
+```lua title="init.lua"
+local state = persist("state", { clicks = 0 })
+
+local window = ui.Window({ title = "Click counter" })
+local shown = window:Field("Clicks", state.clicks)
+
+window:Button("Click me", function()
+    state.clicks = state.clicks + 1
+    shown:Set(state.clicks)
+end)
+```
+
+Click a few times, then save `init.lua` again. The mod reloads and the count is still there. Without
+`persist` it would start at zero after every save.
+
+- `persist("state", { clicks = 0 })` gives back the **same table** every time.
+- The second value is only used the first time.
+- Change what is inside the table. Do not replace the table.
+- Each mod has its own keys.
+
+## What Wax remembers by itself
+
+You do not have to save these. Wax does it:
+
+- Where each window is, and how big it is.
+- Where you dragged each overlay.
+- The menu key, the theme, the accent colour and the interface size.
+
+Every function is listed in the [mods reference](/docs/reference/mods#storage).

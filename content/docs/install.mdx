@@ -1,0 +1,81 @@
+---
+title: Installing
+description: Where Wax lives in the game folder, and where your mods go.
+icon: Download
+---
+
+<Callout type="warn" title="Not released yet">
+  Wax is still in development. There is no download yet, so there is nothing to install today. This page
+  shows where things live, so the rest of these pages make sense.
+</Callout>
+
+## What Wax needs
+
+- ICARUS on Steam, on Windows.
+- UE4SS, a script loader for Unreal Engine games. Wax runs on top of it.
+
+## Where Wax lives
+
+Wax sits in the UE4SS mods folder inside the game:
+
+```text
+...\steamapps\common\Icarus\Icarus\Binaries\Win64\ue4ss\Mods\Wax\
+```
+
+Two folders in there matter to you:
+
+| Folder | What is in it |
+| --- | --- |
+| `Wax\mods\` | Your mods. One folder for each mod. |
+| `Wax\saved\` | Settings that Wax and your mods save. You never need to edit these by hand. |
+
+## Where your mods go
+
+Each mod is a folder inside `Wax\mods\`. The folder holds a file called `init.lua`.
+
+```text
+...\ue4ss\Mods\Wax\mods\
+    MyFirstMod\
+        init.lua
+```
+
+The folder name is the mod's id. Use only letters, digits, `_` and `-` in it. A folder with another kind of
+name is skipped, and the log says so.
+
+## Check that it works
+
+<Steps>
+<Step>
+
+### Start the game
+
+Start ICARUS the way you always do. Nothing else has to run next to it.
+
+</Step>
+<Step>
+
+### Press F8
+
+The menu opens and you see the Wax panel. Its **Mods** page lists every mod Wax found.
+
+</Step>
+<Step>
+
+### Look at the status line
+
+The bottom of the panel says how many mods loaded, and whether there were errors.
+
+</Step>
+</Steps>
+
+<Shot
+  src="panel-mods.png"
+  alt="The Wax panel on its Mods page. One mod called Hello is listed as loaded, with an Enabled switch and a Reload button. The status line reads 1 of 1 mods loaded, no errors."
+/>
+
+## Switching a mod off, or removing it
+
+- To switch a mod off, use its **Enabled** switch on the Mods page. It stays off the next time you play.
+- To remove a mod, delete its folder from `Wax\mods\`.
+
+Next: [write your first mod](/docs/first-mod).

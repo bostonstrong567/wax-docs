@@ -1,0 +1,167 @@
+---
+title: How a mod is built
+description: The files in a mod, the manifest, splitting code into files and using another mod.
+icon: Package
+---
+
+A mod is a folder. The folder name is the mod's **id**.
+
+```text
+Wax\mods\
+    MyMod\
+        init.lua      the code that runs
+        mod.lua       optional: name, version, dependencies
+        helpers.lua   optional: more code, loaded with require
+```
+
+## init.lua
+
+Wax runs `init.lua` from top to bottom when the mod loads. It runs again, from the top, each time the mod
+reloads.
+
+```lua title="MyMod\init.lua"
+print("My mod is loading.")
+
+local window = ui.Window({ title = "My mod" })
+window:Label("Hello.")
+```
+
+## mod.lua
+
+`mod.lua` is the manifest. It is optional, and so is every field in it.
+
+```lua title="MyMod\mod.lua"
+return {
+    name = "My mod",
+    version = "1.2.0",
+    main = "init.lua",
+    dependencies = { "Greeter" },
+}
+```
+
+| Field | What it means | When left out |
+| --- | --- | --- |
+| `name` | The name shown on the Mods page. | The folder name. |
+| `version` | The version shown on the Mods page. | `"0.0.0"` |
+| `main` | The file Wax runs first. | `"init.lua"` |
+| `dependencies` | Ids of mods that must load before this one. | None. |
+
+`mod.lua` may only hold plain values like the ones above. It cannot call functions.
+
+## What every mod can use
+
+These names are ready in every file of your mod. You do not load them.
+
+| Name | What it is |
+| --- | --- |
+| `game` | The root of the game: the world, the player and everything else. See [The game tree](/docs/game). |
+| `ui` | Windows, overlays, notifications, hotkeys and themes. See [Windows](/docs/gui/windows). |
+| `task` | Run code alongside the game. See [Tasks](/docs/tasks). |
+| `Signal` | Make your own events. See [Signals](/docs/signals). |
+| `print`, `log` | Write to the log. See [Printing and the log](/docs/logging). |
+| `persist`, `storage` | Keep values across reloads and across game sessions. See [Saving settings](/docs/storage). |
+| `require` | Load another file of your mod, or another mod. |
+| `mod` | Facts about your own mod. |
+| `raw` | Everything UE4SS offers, with no safety checks. For experts. |
+
+Lua's own tools (`string`, `table`, `math`, `pairs`, `ipairs`, `tostring` and the rest) work as usual.
+
+### The mod table
+
+```lua
+print(mod.id)       -- the folder name, for example "MyMod"
+print(mod.name)     -- the name from mod.lua
+print(mod.version)  -- the version from mod.lua
+print(mod.dir)      -- the path of the mod's folder
+```
+
+### Each mod has its own globals
+
+A global variable you set in one mod is not seen by other mods. Two mods can both use the name `settings`
+and never clash.
+
+## More than one file
+
+Put shared code in its own file. Load it with `require`.
+
+```lua title="MyMod\helpers.lua"
+local helpers = {}
+
+function helpers.shout(text)
+    return text:upper() .. "!"
+end
+
+return helpers
+```
+
+```lua title="MyMod\init.lua"
+local helpers = require("helpers")
+
+print(helpers.shout("hello"))   -- HELLO!
+```
+
+- `require("helpers")` loads `helpers.lua`.
+- `require("tools.math")` loads `tools\math.lua`. If that file is not there, it loads `tools\math\init.lua`.
+- A file runs once. A second `require` of the same name gives back the same value.
+- What the file returns is what `require` gives you.
+
+Saving any `.lua` file of the mod reloads the whole mod.
+
+## Using another mod
+
+One mod can offer functions to others. What its `init.lua` returns is what other mods get.
+
+```lua title="Greeter\init.lua"
+local greeter = {}
+
+function greeter.hello(name)
+    return "Hello, " .. name .. "!"
+end
+
+return greeter
+```
+
+A mod that wants to use it does two things. It lists the id under `dependencies`:
+
+```lua title="MyMod\mod.lua"
+return {
+    name = "My mod",
+    dependencies = { "Greeter" },
+}
+```
+
+And it loads the other mod with `@` in front of the id:
+
+```lua title="MyMod\init.lua"
+local greeter = require("@Greeter")
+
+ui.Notify(greeter.hello("explorer"))
+```
+
+Good to know:
+
+- Dependencies load first.
+- When `Greeter` reloads, every mod that depends on it reloads too.
+- If `Greeter` is missing or switched off, your mod does not load. The Mods page says which mod it needs.
+- `require("@Greeter")` without listing `Greeter` under `dependencies` is an error. The message tells you what to add.
+
+## Wax cleans up after you
+
+Everything a mod sets up belongs to that mod: its windows, overlays, hotkeys, tasks and signal connections.
+When the mod reloads or is switched off, Wax removes all of it. You do not write clean-up code.
+
+## Functions that are blocked
+
+A few UE4SS functions are switched off inside Wax mods, because they break the game's Lua state. Calling
+one raises an error that says why.
+
+| Blocked | Use this instead |
+| --- | --- |
+| `LoopAsync`, `ExecuteAsync`, `ExecuteWithDelay` | [`task.spawn`](/docs/tasks), `task.delay` and `task.wait` |
+| `RegisterKeyBind`, `RegisterKeyBindAsync` | [`ui.Hotkey`](/docs/gui/hotkeys) |
+| `RestartMod`, `RestartCurrentMod`, `UninstallMod`, `UninstallCurrentMod`, `ClearAllDelayedActions` | Nothing. Wax reloads mods by itself. |
+
+The originals are still reachable through `raw`, for example `raw.LoopAsync`. Use them at your own risk: they
+can crash the game.
+
+The full list with reasons is in the [reference](/docs/reference/mods#blocked-functions).

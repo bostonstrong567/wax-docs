@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+@theme {
+  --color-fd-primary: hsl(30, 88%, 36%);
+  --color-fd-primary-foreground: hsl(0, 0%, 100%);
+  --color-fd-ring: hsl(32, 80%, 50%);
+}
+
+.dark {
+  --color-fd-background: hsl(30, 6%, 6%);
+  --color-fd-card: hsl(30, 5%, 9%);
+  --color-fd-popover: hsl(30, 5%, 10.5%);
+  --color-fd-muted: hsl(30, 4%, 12.5%);
+  --color-fd-secondary: hsl(30, 4%, 12.5%);
+  --color-fd-primary: hsl(38, 92%, 60%);
+  --color-fd-primary-foreground: hsl(30, 40%, 8%);
+  --color-fd-ring: hsl(38, 80%, 55%);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Function names in the "On this page" list read as plain text, not as code chips. */
+#nd-toc a code,
+[data-toc-popover-content] a code {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  color: inherit;
+}

@@ -1,0 +1,43 @@
+---
+title: Reference
+description: Every function Wax gives a mod, with its parameters and what it returns.
+icon: BookOpen
+---
+
+The guides explain one idea at a time. The reference is the complete list. Come here when you know what you
+are looking for.
+
+<Cards>
+  <Card title="ui" href="/docs/reference/ui" description="Windows, overlays, notifications, hotkeys, themes and icons." />
+  <Card title="Controls" href="/docs/reference/controls" description="Every control and every option it takes." />
+  <Card title="game" href="/docs/reference/game" description="The game tree and Instances." />
+  <Card title="Tasks and signals" href="/docs/reference/tasks" description="task, Signal and connections." />
+  <Card title="Mods" href="/docs/reference/mods" description="mod, log, print, persist, storage, require and raw." />
+</Cards>
+
+## How to read an entry
+
+Each function has a line like this:
+
+```lua
+ui.Notify(text: any, options?: WaxNotifyOptions): WaxNotification
+```
+
+- The names in brackets are what you pass in. After each name comes the kind of value it takes.
+- A `?` after a name means you may leave it out.
+- What comes after the last `:` is what the function gives back.
+
+Names that start with `Wax` are kinds of values that Wax defines. `WaxNotifyOptions` is a table of options,
+and `WaxNotification` is the notification you get back. Click one to see what is in it.
+
+## Dot or colon
+
+- A **dot** is used for functions that stand on their own: `ui.Notify(...)`, `task.wait(1)`, `storage.Save(...)`.
+- A **colon** is used for functions that act on one thing: `window:Button(...)`, `label:Set(...)`, `game:Find(...)`.
+
+The reference shows each function the way you write it.
+
+## These pages write themselves
+
+The reference pages are made by a script. It reads the same definition files that give your editor its
+completion list, so the reference always matches what Wax offers.

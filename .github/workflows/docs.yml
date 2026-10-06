@@ -1,0 +1,65 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Read the Pages settings
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install
+        run: npm ci
+
+      # base_path is /wax-docs for this project site, and empty for a site served from a domain root.
+      - name: Build
+        run: npm run build
+        env:
+          DOCS_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Check links
+        run: npm run check
+        env:
+          DOCS_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Make sure .nojekyll is in the output
+        run: touch out/.nojekyll
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

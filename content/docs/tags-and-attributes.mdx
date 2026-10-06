@@ -1,0 +1,99 @@
+---
+title: Tags and attributes
+description: Put your own labels and values on any object, and find the objects again later.
+icon: Tags
+---
+
+Sometimes you want to remember something **about an object**. Which trees did I already count? How often did
+I visit this place? Tags and attributes let you write that on the object itself.
+
+- A **tag** is a label. An object has it, or it does not.
+- An **attribute** is a named value: a number, some text, `true` or `false`, or a table.
+
+Both are kept by Wax. The game does not know about them.
+
+## Tags
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    character:AddTag("me")
+
+    print(character:HasTag("me"))        -- true
+    print(#game:GetTagged("me"))         -- 1
+
+    character:RemoveTag("me")
+    print(character:HasTag("me"))        -- false
+end
+```
+
+| Function | What it does |
+| --- | --- |
+| `instance:AddTag(tag)` | Marks the Instance with a tag. |
+| `instance:RemoveTag(tag)` | Takes the tag off. |
+| `instance:HasTag(tag)` | `true` when the Instance carries the tag. |
+| `instance:GetTags()` | The Instance's tags, as a sorted list. |
+| `game:GetTagged(tag)` | Every live Instance that carries the tag. |
+
+### Example: mark what you have seen
+
+This tags every player's character, then counts the tagged ones.
+
+```lua title="init.lua"
+for _, character in ipairs(game.Players:GetCharacters()) do
+    character:AddTag("seen")
+end
+
+print("Characters seen:", #game:GetTagged("seen"))
+```
+
+## Attributes
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    local visits = character:GetAttribute("visits") or 0
+    character:SetAttribute("visits", visits + 1)
+
+    print("Visits:", character:GetAttribute("visits"))
+end
+```
+
+Save the file a few times. The number goes up, because attributes live through a reload of your mod.
+
+| Function | What it does |
+| --- | --- |
+| `instance:SetAttribute(name, value)` | Stores a value under a name. `nil` removes it. |
+| `instance:GetAttribute(name)` | The stored value, or `nil`. |
+| `instance:GetAttributes()` | A copy of every attribute, as a table of name and value. |
+| `instance:GetAttributeChangedSignal(name)` | A [signal](/docs/signals) that fires when that attribute changes. |
+
+### React to a change
+
+The signal for one attribute fires with the new value and the one before.
+
+```lua title="init.lua"
+local character = game.Character
+if character then
+    character:GetAttributeChangedSignal("visits"):Connect(function(value, previous)
+        print("visits went from", previous, "to", value)
+    end)
+
+    character:SetAttribute("visits", 1)
+    character:SetAttribute("visits", 2)
+end
+```
+
+Call `GetAttributeChangedSignal()` with no name to hear about **every** attribute. That signal fires with the
+name, the new value and the one before.
+
+Setting an attribute to the value it already has does nothing, and the signal does not fire.
+
+## How long they last
+
+- They live through a **reload of your mod**.
+- All mods share them. Another mod can read a tag you set. Pick names that are your own, such as `mymod.seen`.
+- They are forgotten when **the map changes**, together with the objects they were on.
+- They are not saved. After a restart of the game they are gone.
+
+To keep something between game sessions, use [`storage`](/docs/storage).
