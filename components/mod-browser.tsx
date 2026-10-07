@@ -18,7 +18,7 @@ import {
   When,
 } from '@/components/mod-parts';
 import { type Draft, NO_DRAFT, SubmissionView, SubmitView } from '@/components/mod-submit';
-import { Score, VoteButtons } from '@/components/mod-votes';
+import { VoteButtons } from '@/components/mod-votes';
 import { ApiError, getJson, onMarket, repoName, sentence, UNREACHABLE, votesOf } from '@/lib/market';
 import { type ModPicture, picturesOf } from '@/lib/mod-pictures';
 import { appName, marketApi } from '@/lib/shared';
@@ -267,6 +267,7 @@ function ModCard(props: { mod: Mod; href: string; onOpen: (event: MouseEvent) =>
   const cover = picturesFor(mod)[0];
   // The words depend on the visitor's clock, so the date stands in until the clock has been read.
   const updated = props.now === null ? day(mod.updated_at) : ago(mod.updated_at, props.now);
+  const votes = votesOf(mod.votes);
   return (
     <article className="relative flex min-w-0 flex-col gap-2 rounded-xl border bg-fd-card p-5 transition-colors hover:bg-fd-accent/60">
       {cover ? (
@@ -303,8 +304,12 @@ function ModCard(props: { mod: Mod; href: string; onOpen: (event: MouseEvent) =>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fd-muted-foreground">
         {mod.category ? <span className="rounded-full border px-2 py-0.5">{mod.category}</span> : null}
         <span>{count(mod.downloads, 'download', 'downloads')}</span>
-        <Score votes={votesOf(mod.votes)} />
         {mod.reviewed ? <span>Reviewed</span> : null}
+        {votes ? (
+          <div className="relative z-10 ml-auto">
+            <VoteButtons compact key={mod.id} id={mod.id} first={votes} />
+          </div>
+        ) : null}
       </div>
       <div className="relative z-10 self-start pt-1">
         <Actions mod={mod} small />
