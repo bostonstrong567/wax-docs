@@ -20,6 +20,27 @@ For Visual Studio Code there is an extension called **Wax for Icarus**.
 | Problems | Lists your mod's errors in the Problems panel, each with its file and line. |
 | Mods view | Lists every mod with its state. Its buttons reload a mod, switch it off or on, and open it. |
 
+## Developer mode
+
+Four of those parts talk to the running game: **Run in game**, the log, Problems and the Mods view. They
+work by sending Lua to the game, and the game only takes Lua from outside in developer mode. In a normal
+install they stay empty.
+
+New Mod, completion, error checking and the game's classes need no developer mode. Neither does
+[hot reload](/docs/hot-reload).
+
+To switch developer mode on, make an empty text file named `dev.txt` in Wax's folder, beside `Scripts`:
+
+```text
+...\steamapps\common\Icarus\Icarus\Binaries\Win64\ue4ss\Mods\Wax\dev.txt
+```
+
+Then start the game, or start it again if it was running. To switch it off, delete the file.
+
+Read [The bridge and developer mode](/docs/security#the-bridge-and-developer-mode) first. With that file
+in place, any program that runs as you can run code inside the game, and Wax no longer updates itself in the
+game.
+
 ## How to get it
 
 Install Wax into the game first. See [Installing](/docs/install).

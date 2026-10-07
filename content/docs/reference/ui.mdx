@@ -29,6 +29,7 @@ Type name: `WaxUI`.
 | `Closed` | nothing | Fires when the menu closes. |
 | `KeyChanged` | `key`: `string?` | Fires with the new menu key. |
 | `ThemeChanged` | `name`: `string` | Fires with the theme's name after SetTheme or ResetTheme. |
+| `ScreenChanged` | `width`: `number`, `height`: `number` | Fires when ScreenSize gives another answer: a new resolution or interface scale. |
 
 ### `ui.Open(options?)` [#ui-open]
 
@@ -232,7 +233,7 @@ ui.IsTyping(): boolean
 
 ### `ui.ScreenSize()` [#ui-screensize]
 
-The size of the screen in the units windows and panels are laid out in.
+The size of the screen in the units windows and panels are laid out in. While the game is starting and has no screen yet, the answer is 1920 by 1080; ScreenChanged fires if the real one turns out different.
 
 ```lua
 ui.ScreenSize(): number, number

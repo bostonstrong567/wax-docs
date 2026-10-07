@@ -37,6 +37,13 @@ The catalogue fetches the repository and checks it. You see the result on the sa
 A mod that passed the checks waits for review. It is listed after a person has looked at it.
 
 </Step>
+<Step>
+
+### The version is signed
+
+When the reviewer accepts a version, it is signed with Wax's key and listed. You sign nothing yourself.
+
+</Step>
 </Steps>
 
 Every new version goes the same way and is looked at again.
@@ -308,6 +315,19 @@ A mod is turned down when:
 When a mod is not accepted, its status page shows a note from the reviewer. Fix what the note says and
 submit again. The version can stay the same, because it was never listed.
 
+### Signing
+
+Accepting a version signs it. The reviewer's tool fetches the zip that was checked, works out its checksum
+itself and signs two things with Wax's key: the zip, and the list of the files in it. The key is on the
+reviewer's PC and never on the server.
+
+- The catalogue hands out a version only when it has both signatures.
+- A player's PC checks the signature before the mod is put in, and again before every update.
+- So players get the files that were read, and nothing else can be put in their place, not even by someone
+  who took over the server.
+
+[What is signed](/docs/security#what-is-signed) has the key and the exact text that is signed.
+
 <Callout type="warn" title="Listed does not mean safe">
   A listed mod was read by a person once. That is not a promise that it is safe. It is also not a promise
   that it still works after the game is patched. ICARUS is patched often, and a patch can break a mod until
@@ -321,8 +341,8 @@ the checks counts too. After that it asks you to wait.
 
 ## Before you submit
 
-- Try the mod in the game. Copy the repository into `Wax\mods\` as a folder named after the id, start the
-  game and use every part of the mod.
+- Try the mod in the game. Copy the repository into `Wax\mods\` as a folder named after the id and start the
+  game. A new mod is listed switched off, so switch it on on the **Mods** page. Then use every part of it.
 - Look at the **Log** page of the Wax panel. It should show no errors from your mod.
 - `mod.lua` has every needed field, and `version` is one you have not published before.
 - The id is the one you want to keep.

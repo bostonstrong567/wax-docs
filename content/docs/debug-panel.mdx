@@ -29,7 +29,11 @@ Every mod in the mods folder has a card here.
 
 The search box filters the list. Type part of a name, or one of these words: `loaded`, `off`, `failed`, `new`.
 
-A mod you add while the game runs is listed as **new** and switched off. Flip **Enabled** to load it.
+A mod Wax has not seen before is listed as **new** and switched off. Flip **Enabled** to load it. This is so
+whether the mod was added while the game ran or while it was closed.
+
+**Auto Update** and **Check now**, above the cards, are for mods that came from the catalogue.
+[Get mods](/docs/get-mods#updates) says what they do.
 
 ## Log
 
@@ -97,6 +101,16 @@ The command bar has every name a mod has (`game`, `ui`, `task` and so on), plus 
 
 `require` does not work in the command bar. Reach a loaded mod through `mods` or `exports` instead.
 
+### Running Lua from outside the game
+
+The command bar is inside the game, so it always works. A line you type there runs with the same rights as a
+mod.
+
+A tool outside the game, such as the play button of the [VS Code extension](/docs/editor), can only run Lua
+in the game in developer mode. A normal install does not take Lua from outside.
+[The bridge and developer mode](/docs/security#the-bridge-and-developer-mode) says how to switch it on and
+what that allows.
+
 ## Performance
 
 <Shot
@@ -128,35 +142,69 @@ name. Use that name anywhere an icon is accepted. See [Icons](/docs/gui/icons).
 
 This page shows what is in the game while it runs, and lets you change it.
 
-The left side is a tree. Its first rows are the parts of `game`: your character, your controller, the game
-state and the others. Under **World** are the actors of the current world. A row with an arrow has things
-attached to it. Click a row to pick it.
+It has two sides. The left side lists what is in the game, and the right side shows what you picked. Both
+are laid out alike, from the top down: a heading with its buttons, one small line, a search box, two
+dropdowns side by side, one more row, and then the list.
 
-- Type in the search box to find something by its name or its class. With several words, all of them must match.
-- The first dropdown picks what is listed: actors, creatures, players, items, buildings, components or everything.
-- The second dropdown sorts the list: by name, by class, nearest first or newest first.
-- The line under the tree keeps only what is within a distance of you.
+### The left side
 
-The right side shows what you picked. The small line under its name is the Lua that reaches it, and the copy
-button beside the name copies that line. The button with the turned arrow goes back to what you had picked before.
+| From the top | What it does |
+| --- | --- |
+| **Explorer** and its button | The button closes every row that is open. |
+| The small line | Says how much is listed. |
+| The search box | Finds something by its name or its class. With several words, all of them must match. The cross in the box empties it. |
+| The first dropdown | Picks what is listed: actors, creatures, players, items, buildings, components or everything. |
+| The second dropdown | Sorts the list: by name, by class, nearest first or newest first. |
+| The wide dropdown | Keeps only what is within a distance of you, from 25 to 500 metres. **Any distance from you** shows everything. |
+| The list | The first rows are the parts of `game`: `Character`, `LocalPlayer`, `GameState`, `GameMode`, `GameInstance`, `Viewport` and `Engine`. Under **World** are the actors of the current world. |
 
-Each row is one member: its name, its value and its type. The values are read again while you look, and a
-value that changed is marked for a moment. That is how you find the property that goes with something you do
-in the game. Choose **Changed** in the first dropdown to see only those, or **Changed first** in the second.
+A row with a small arrow has things inside it. Click the arrow to open the row. Click the row itself to pick
+it.
 
-- A value that is an object is a link. Click it to go to that object.
-- A true-or-false member has a switch.
-- For a number or a text, click the row, type the new value in the box at the bottom and press Enter.
-- A vector, a rotator or a colour opens with its arrow, and each part is typed on its own.
-- The `<>` button copies the Lua that reads the picked member and the Lua that sets it.
+### The right side
 
-Choose **Functions** to see the object's functions with their parameters. They are not called from this page.
-The `<>` button copies the call.
+Until you pick something, the right side explains the page in four short lines.
 
-**Changes as Lua**, along the bottom, lists everything you changed here as lines of Lua that do the same.
-Copy them into a mod.
+| From the top | What it does |
+| --- | --- |
+| The name of what you picked | The button with the curved arrow goes back to what you had picked before. The copy button copies the Lua that reaches the object. |
+| The small line | Shows that Lua. |
+| The search box | Finds a member by its name or its type. |
+| The first dropdown | Picks what is listed: **Properties**, **Functions**, **All** or **Changed**. |
+| The second dropdown | Sorts the list: **By name** or **Changed first**. |
+| The value row | Belongs to the member you pick in the table. It is described below. |
+| The table | One row for each member: its name, its value and its type. The first row is the object's class, and its arrow shows what the class inherits from. |
 
-In a narrow window one side shows at a time, and an arrow at the top takes you back to the tree.
+The values are read again while you look, and a value that changed is marked for a moment. That is how you
+find the property that goes with something you do in the game. Choose **Changed** to see only those, or
+**Changed first** to put them at the top.
+
+In the table:
+
+- A value in colour is another object. Click it to go to that object.
+- A true-or-false member has a switch at the end of its row.
+- A vector, a rotator or a colour opens when you click it, and each part is a row of its own that you change
+  like a number. Its arrow closes it again.
+- A list opens with its arrow and shows what is in it. The places of a list are shown, not changed.
+- A value that could not be read says so, and Wax leaves it alone.
+
+### Change a value
+
+Click a member in the table. The value row, above the table, now shows its name.
+
+- For a value you can type, such as a number or a text, the row has a box. Type the new value and press
+  **Enter**, or press the button with the tick.
+- For anything else the row says in a few words why there is no box.
+- The `<>` button copies the Lua that reads the member and the Lua that sets it.
+
+Choose **Functions** to see the object's functions with their parameters. They are not called from this
+page. The `<>` button copies the call.
+
+**Changes as Lua** appears under both sides after your first change. It lists everything you changed here as
+lines of Lua that do the same. **Copy** takes them for a mod, and **Clear** empties the list.
+
+In a narrow window one side shows at a time, and a **List** button at the top of the right side takes you
+back.
 
 <Callout type="warn" title="A change here is a change in your game">
   Not every value is meant to be changed. Try things on a character you can afford to lose.

@@ -10,6 +10,7 @@
     "game.Creatures",
     "game.Highlight",
     "game.Crafting",
+    "game.Research",
     "WaxInstance",
     "WaxHighlightLook",
     "WaxHighlightMark",
@@ -19,6 +20,8 @@
     "WaxCreatureEnd",
     "WaxHighlightOptions",
     "WaxListedRecipe",
+    "WaxResearchStep",
+    "WaxResearchPlan",
     "WaxCreature",
     "WaxGameMember"
    ],
@@ -99,6 +102,7 @@
     "WaxSliderOptions",
     "WaxInputOptions",
     "WaxSectionOptions",
+    "WaxRowOptions",
     "WaxProgressOptions",
     "WaxFieldOptions",
     "WaxConsoleOptions",
@@ -281,6 +285,7 @@
   "Button:Spin": "WaxButton.Spin",
   "Button:SetCaption": "WaxButton.SetCaption",
   "Button:SetActive": "WaxButton.SetActive",
+  "Button:SetTip": "WaxButton.SetTip",
   "Icon:Set": "WaxIcon.Set",
   "Toggle:Get": "WaxToggle.Get",
   "Toggle:Set": "WaxToggle.Set",
@@ -296,6 +301,7 @@
   "Input:HasFocus": "WaxInput.HasFocus",
   "Input:SetGhost": "WaxInput.SetGhost",
   "Input:Set": "WaxInput.Set",
+  "Input:SetHint": "WaxInput.SetHint",
   "Dropdown:Get": "WaxDropdown.Get",
   "Dropdown:Set": "WaxDropdown.Set",
   "Section:SetOpen": "WaxSection.SetOpen",
@@ -407,6 +413,11 @@
   "game.Crafting:OpenTab": "game.Crafting.OpenTab",
   "game.Crafting:Select": "game.Crafting.Select",
   "game.Crafting:SetListHidden": "game.Crafting.SetListHidden",
+  "game.Research:IsReady": "game.Research.IsReady",
+  "game.Research:GetLevel": "game.Research.GetLevel",
+  "game.Research:GetPoints": "game.Research.GetPoints",
+  "game.Research:GetPlan": "game.Research.GetPlan",
+  "game.Research:Unlock": "game.Research.Unlock",
   "Connection:Disconnect": "WaxConnection.Disconnect",
   "Signal.new": "Signal.new",
   "task.spawn": "task.spawn",
@@ -2373,6 +2384,14 @@
      "receives": "name: string",
      "text": "Fires with the theme's name after SetTheme or ResetTheme.",
      "use": "ui.ThemeChanged:Connect(function(name)\n    print(name)\nend)"
+    },
+    {
+     "id": "ui.ScreenChanged",
+     "name": "ScreenChanged",
+     "type": "WaxSignal<fun(width: number, height: number)>",
+     "receives": "width: number, height: number",
+     "text": "Fires when ScreenSize gives another answer: a new resolution or interface scale.",
+     "use": "ui.ScreenChanged:Connect(function(width, height)\n    print(width, height)\nend)"
     }
    ],
    "funcs": [
@@ -2606,7 +2625,7 @@
        "name": "height"
       }
      ],
-     "text": "The size of the screen in the units windows and panels are laid out in.",
+     "text": "The size of the screen in the units windows and panels are laid out in. While the game is starting and has no screen yet, the answer is 1920 by 1080; ScreenChanged fires if the real one turns out different.",
      "ref": "/docs/reference/ui#ui-screensize",
      "use": "local width, height = ui.ScreenSize()"
     },
@@ -3708,6 +3727,14 @@
      "optional": true,
      "text": "Makes it one of a row of tabs: SetActive marks the chosen one.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { tab = true })"
+    },
+    {
+     "id": "WaxButtonOptions.tip",
+     "name": "tip",
+     "type": "string|table",
+     "optional": true,
+     "text": "A line of help shown beside the mouse once it has rested on the button. Give one to every button that is only an icon. A table is `{ title = \"...\", lines = { \"more\" } }`.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { tip = value })"
     }
    ]
   },
@@ -3796,6 +3823,20 @@
      "text": "Marks a button made with `tab = true` as the chosen tab, or as one of the others.",
      "ref": "/docs/reference/controls#button-setactive",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:SetActive(on)"
+    },
+    {
+     "id": "WaxButton.SetTip",
+     "name": "SetTip",
+     "call": "button:SetTip",
+     "params": [
+      {
+       "name": "tip",
+       "type": "string|table|nil"
+      }
+     ],
+     "text": "Changes the help shown while the mouse rests on the button, for a button whose meaning changes. nil takes it away.",
+     "ref": "/docs/reference/controls#button-settip",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:SetTip(tip)"
     }
    ]
   },
@@ -4263,6 +4304,14 @@
      "optional": true,
      "text": "A fixed-width font, for code.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, { mono = true }, function(text) end)"
+    },
+    {
+     "id": "WaxInputOptions.clear",
+     "name": "clear",
+     "type": "boolean",
+     "optional": true,
+     "text": "Puts a small cross at the right end of the box while it holds text. One press empties the box, fires Typed with \"\" and leaves the keyboard in the box. For a search box.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, { clear = true }, function(text) end)"
     }
    ]
   },
@@ -4374,6 +4423,20 @@
      "text": "Replaces the text without firing Changed.",
      "ref": "/docs/reference/controls#input-set",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, options, function(text) end)\ninput:Set(text)"
+    },
+    {
+     "id": "WaxInput.SetHint",
+     "name": "SetHint",
+     "call": "input:SetHint",
+     "params": [
+      {
+       "name": "hint",
+       "type": "string"
+      }
+     ],
+     "text": "Changes the greyed text shown while the box is empty.",
+     "ref": "/docs/reference/controls#input-sethint",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, options, function(text) end)\ninput:SetHint(hint)"
     }
    ]
   },
@@ -4383,7 +4446,7 @@
    "title": "WaxDropdown",
    "kind": "object",
    "group": "controls",
-   "text": "A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time.",
+   "text": "A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time. The header is always one line: a choice too long for it ends in \"...\" there and is whole in the list.",
    "parents": [
     "WaxControl"
    ],
@@ -4550,14 +4613,43 @@
     "WaxContainer.Row",
     "WaxContainer.Flow"
    ],
-   "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row()",
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row(options)",
    "props": [
     {
      "id": "WaxRow.control",
      "name": "control",
      "type": "WaxControl",
      "text": "The row itself, for Destroy, SetVisible and SetEnabled.",
-     "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row()\nprint(row.control)"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row(options)\nprint(row.control)"
+    }
+   ]
+  },
+  {
+   "id": "WaxRowOptions",
+   "name": "WaxRowOptions",
+   "title": "WaxRowOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "The options that container:Row takes.",
+   "parents": [
+    "WaxOptions"
+   ],
+   "ref": "/docs/reference/controls#waxrowoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Row"
+   ],
+   "props": [
+    {
+     "id": "WaxRowOptions.height",
+     "name": "height",
+     "type": "number",
+     "optional": true,
+     "text": "The least height of the row. Give two rows the same one and they are equally tall whatever is in them.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row({ height = 1 })"
     }
    ]
   },
@@ -5212,6 +5304,13 @@
      "id": "WaxContainer.Row",
      "name": "Row",
      "call": "container:Row",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxRowOptions",
+       "optional": true
+      }
+     ],
      "returns": [
       {
        "type": "WaxRow"
@@ -5219,7 +5318,7 @@
      ],
      "text": "Adds a row. Controls added to the returned container sit side by side and share the width.",
      "ref": "/docs/reference/controls#container-row",
-     "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row()"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal row = window:Row(options)"
     },
     {
      "id": "WaxContainer.Color",
@@ -5771,6 +5870,14 @@
      "optional": true,
      "text": "For a line made with columns: how wide the name is, so values line up from line to line.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal item = window:Item(options, function() end, function() end)\nlocal itemLook = item:Get()\nprint(itemLook.name_width)"
+    },
+    {
+     "id": "WaxItemLook.width",
+     "name": "width",
+     "type": "number",
+     "optional": true,
+     "text": "For a line made with fit that is narrower than its container: how wide it is.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal item = window:Item(options, function() end, function() end)\nlocal itemLook = item:Get()\nprint(itemLook.width)"
     }
    ]
   },
@@ -5816,6 +5923,14 @@
      "optional": true,
      "text": "Draws a thin line under it.",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal item = window:Item({ divider = true }, function() end, function() end)"
+    },
+    {
+     "id": "WaxItemOptions.fit",
+     "name": "fit",
+     "type": "boolean",
+     "optional": true,
+     "text": "Cuts a name, note or value that is too long for the line short with \"...\" and shows the whole of it as a tip while the mouse rests on the line.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal item = window:Item({ fit = true }, function() end, function() end)"
     }
    ]
   },
@@ -7835,6 +7950,13 @@
      "type": "WaxCrafting",
      "text": "The bench or crafting screen that is open.",
      "use": "print(game.Crafting)"
+    },
+    {
+     "id": "game.Research",
+     "name": "Research",
+     "type": "WaxResearch",
+     "text": "The tech tree: what a recipe still needs researched, and researching it.",
+     "use": "print(game.Research)"
     }
    ],
    "signals": [
@@ -8134,6 +8256,256 @@
      "text": "Hides the game's own recipe list on the open screen, or shows it again. Hidden, it keeps its place and takes no clicks. A screen opened later has its list again. It is shown again when the mod reloads.",
      "ref": "/docs/reference/game#game-crafting-setlisthidden",
      "use": "local result = game.Crafting:SetListHidden(on)"
+    }
+   ]
+  },
+  {
+   "id": "WaxResearchStep",
+   "name": "WaxResearchStep",
+   "title": "WaxResearchStep",
+   "kind": "data",
+   "group": "game",
+   "text": "One node of the tech tree that still has to be researched.",
+   "ref": "/docs/reference/game#waxresearchstep",
+   "props": [
+    {
+     "id": "WaxResearchStep.node",
+     "name": "node",
+     "type": "string",
+     "text": "The node's row name in D_Talents, in lower case."
+    },
+    {
+     "id": "WaxResearchStep.name",
+     "name": "name",
+     "type": "string",
+     "text": "The name the game shows for it."
+    },
+    {
+     "id": "WaxResearchStep.level",
+     "name": "level",
+     "type": "integer",
+     "text": "The level it asks of the player."
+    }
+   ]
+  },
+  {
+   "id": "WaxResearchPlan",
+   "name": "WaxResearchPlan",
+   "title": "WaxResearchPlan",
+   "kind": "data",
+   "group": "game",
+   "text": "What researching the node of one recipe takes.",
+   "ref": "/docs/reference/game#waxresearchplan",
+   "makers": [
+    "game.Research.GetPlan"
+   ],
+   "props": [
+    {
+     "id": "WaxResearchPlan.node",
+     "name": "node",
+     "type": "string",
+     "text": "The node's row name in D_Talents, in lower case.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.node)"
+    },
+    {
+     "id": "WaxResearchPlan.name",
+     "name": "name",
+     "type": "string",
+     "text": "The name the game shows for it.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.name)"
+    },
+    {
+     "id": "WaxResearchPlan.unlocked",
+     "name": "unlocked",
+     "type": "boolean",
+     "text": "True when it is researched already.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.unlocked)"
+    },
+    {
+     "id": "WaxResearchPlan.default",
+     "name": "default",
+     "type": "boolean",
+     "text": "True for a node every character has from the start.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.default)"
+    },
+    {
+     "id": "WaxResearchPlan.level",
+     "name": "level",
+     "type": "integer",
+     "text": "The level this node asks of the player.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.level)"
+    },
+    {
+     "id": "WaxResearchPlan.steps",
+     "name": "steps",
+     "type": "WaxResearchStep[]",
+     "text": "Every node that still has to be researched, in the order to do it, the node itself last.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.steps)"
+    },
+    {
+     "id": "WaxResearchPlan.points",
+     "name": "points",
+     "type": "integer",
+     "text": "How many points that takes: one for each step.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.points)"
+    },
+    {
+     "id": "WaxResearchPlan.available",
+     "name": "available",
+     "type": "integer",
+     "text": "The points the player has left.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.available)"
+    },
+    {
+     "id": "WaxResearchPlan.player_level",
+     "name": "player_level",
+     "type": "integer",
+     "text": "The player's level.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.player_level)"
+    },
+    {
+     "id": "WaxResearchPlan.needed_level",
+     "name": "needed_level",
+     "type": "integer",
+     "text": "The highest level any of the steps asks.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.needed_level)"
+    },
+    {
+     "id": "WaxResearchPlan.can",
+     "name": "can",
+     "type": "boolean",
+     "text": "True when level and points are enough and the game says the first step can be researched now.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.can)"
+    },
+    {
+     "id": "WaxResearchPlan.blocked",
+     "name": "blocked",
+     "type": "boolean",
+     "text": "True when level and points are enough and it still cannot be done: a step needs a mission finished or a DLC owned.",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)\nprint(researchPlan.blocked)"
+    }
+   ]
+  },
+  {
+   "id": "game.Research",
+   "name": "WaxResearch",
+   "title": "game.Research",
+   "kind": "namespace",
+   "group": "game",
+   "text": "The tech tree: what a recipe still needs researched, and researching it with the player's points.",
+   "ref": "/docs/reference/game#game-research",
+   "signals": [
+    {
+     "id": "game.Research.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun(level: integer?, points: integer?)>",
+     "receives": "level: integer?, points: integer?",
+     "text": "Fires when the player's level or points changed. It is looked at about twice a second.",
+     "use": "game.Research.Changed:Connect(function(level, points)\n    print(level, points)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "game.Research.IsReady",
+     "name": "IsReady",
+     "call": "game.Research:IsReady",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True while the player has a tech tree to ask, which is in a prospect.",
+     "ref": "/docs/reference/game#game-research-isready",
+     "use": "local result = game.Research:IsReady()"
+    },
+    {
+     "id": "game.Research.GetLevel",
+     "name": "GetLevel",
+     "call": "game.Research:GetLevel",
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "level"
+      }
+     ],
+     "text": "The player's level as the tech tree counts it. Nothing while there is no tech tree.",
+     "ref": "/docs/reference/game#game-research-getlevel",
+     "use": "local level = game.Research:GetLevel()"
+    },
+    {
+     "id": "game.Research.GetPoints",
+     "name": "GetPoints",
+     "call": "game.Research:GetPoints",
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "available",
+       "text": "The points left to spend."
+      },
+      {
+       "type": "integer?",
+       "name": "total"
+      },
+      {
+       "type": "integer?",
+       "name": "spent"
+      }
+     ],
+     "text": "The player's tech tree points. Nothing while there is no tech tree.",
+     "ref": "/docs/reference/game#game-research-getpoints",
+     "use": "local available, total, spent = game.Research:GetPoints()"
+    },
+    {
+     "id": "game.Research.GetPlan",
+     "name": "GetPlan",
+     "call": "game.Research:GetPlan",
+     "params": [
+      {
+       "name": "recipe",
+       "type": "string",
+       "text": "A row name of D_ProcessorRecipes."
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxResearchPlan?"
+      }
+     ],
+     "text": "What researching the node of a recipe takes. Nothing when the recipe needs no node, when the game has no such recipe, and while there is no tech tree. Letter case does not matter. The game is asked about each node, so call it when something is shown or pressed, not every frame.",
+     "ref": "/docs/reference/game#game-research-getplan",
+     "use": "local researchPlan = game.Research:GetPlan(recipe)"
+    },
+    {
+     "id": "game.Research.Unlock",
+     "name": "Unlock",
+     "call": "game.Research:Unlock",
+     "params": [
+      {
+       "name": "recipe",
+       "type": "string",
+       "text": "A row name of D_ProcessorRecipes."
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "ok",
+       "text": "True when the recipe's node is researched now."
+      },
+      {
+       "type": "integer",
+       "name": "bought",
+       "text": "How many nodes were researched by this call."
+      },
+      {
+       "type": "string?",
+       "name": "failed",
+       "text": "The name of the node the game did not research."
+      }
+     ],
+     "text": "Researches the node of a recipe, and first every node it still needs, with the player's own points. It does nothing unless the plan says `can`, and it stops at the first node the game does not research. It waits a few frames after each node, so call it inside a task.",
+     "ref": "/docs/reference/game#game-research-unlock",
+     "use": "local ok, bought, failed = game.Research:Unlock(recipe)"
     }
    ]
   },
@@ -8608,7 +8980,7 @@
    "title": "mod",
    "kind": "namespace",
    "group": "mod",
-   "text": "What a mod knows about itself. Every Lua file and folder of the mod is a field too: `mod.Utils` is Utils.lua and `mod.extras.Utils` is extras/Utils.lua. A file called id, name, version or dir has to be required by its name instead.",
+   "text": "What a mod knows about itself. Every Lua file and folder of the mod is a field too: `mod.Utils` is Utils.lua and `mod.extras.Utils` is extras/Utils.lua. A file called id, name, version, dir or Reload has to be required by its name instead.",
    "ref": "/docs/reference/mods#mod",
    "guide": {
     "href": "/docs/mods",
@@ -8640,6 +9012,13 @@
      "type": "string",
      "text": "Path of the mod's folder.",
      "use": "print(mod.dir)"
+    },
+    {
+     "id": "mod.Reload",
+     "name": "Reload",
+     "type": "fun()",
+     "text": "Loads the mod again at the start of the next frame, as a saved file does.",
+     "use": "print(mod.Reload)"
     }
    ]
   },

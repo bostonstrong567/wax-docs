@@ -1,0 +1,100 @@
+---
+title: Multiplayer and fair play
+description: Where using Wax in a game with other players stands, as far as it is known.
+icon: Users
+---
+
+This page says what is known about mods in ICARUS, what is not known, and where Wax stands. The sources were
+read on 7 October 2026 and are listed at the end.
+
+## What is known
+
+**ICARUS has no mode where players fight each other.** RocketWerkz describes it on its Steam page as "a solo
+or multiplayer PvE survival game", for up to eight players who work together. In August 2021 RocketWerkz
+wrote: "While we don't have a dedicated PVP feature, friendly fire does exist."
+
+**No anti-cheat program was found.** The Steam page of ICARUS names none, and the game's folder, as Steam
+installs it, holds no anti-cheat files. This says nothing about checks inside the game itself or on a
+server.
+
+**The game does have a notice about cheating in its own code.** Two of its functions are named
+`NotifyOfCheater` and `CheatingNotification`. What sets them off is not known, so the game may tell the other
+players in a session about some things a mod does.
+
+**RocketWerkz has written about mods, and kindly.** These are from its own announcements on Steam:
+
+- July 2022, under the heading "Modding Support Efforts": RocketWerkz had asked modders on Reddit what they
+  need. One answer was to ship the game's debug files with every build. RocketWerkz wrote that such files
+  are "useful to those making mods or cheats" and that "they will help a great deal with modding". The game
+  comes with that file today.
+- October 2022: a "special mention to the Icarus modding community", with a compliment on its work.
+- December 2022: dedicated servers and save files kept on the player's PC let the community "make mods and
+  conversions for the game".
+- September 2023: the game got a check that "shows a message on the title screen if you have mods installed
+  or your pak files from the patch are in a bad state". RocketWerkz described it as a help for finding the
+  cause of crashes, and gave two launch options that switch the message off.
+
+So RocketWerkz knows that players mod the game and has made some things easier for them. That is not the
+same as permission for everything a mod can do.
+
+## What is not confirmed
+
+- **No licence terms of RocketWerkz's own were found for ICARUS.** The Steam page links no licence agreement
+  for the game, and RocketWerkz's website links a privacy policy and no terms of use. There may be terms
+  that were not found.
+- **Nothing was found from RocketWerkz about script loaders such as UE4SS, or about Lua mods.** Its posts
+  speak of mods in general, and of mods that come as pak files.
+- **Nothing was found about mods that show what the game hides**, such as creatures or players behind walls.
+- **Nothing was found about what happens to a player who uses mods in a shared game.** No rule about it was
+  found.
+- **RocketWerkz's Discord was not read for this page.** Something may have been said there.
+
+One text does apply to every game on Steam, the Steam Subscriber Agreement. It calls a "Cheat" anything that
+"may give a player an unfair competitive advantage when playing multiplayer versions" of a game, and says:
+"You agree that you will not create Cheats or assist third parties in any way to create or use Cheats."
+Whether a mod in a game where players work together falls under that is for Valve and RocketWerkz to say.
+This page cannot settle it.
+
+## Where Wax stands
+
+- **Wax changes the game on the PC it is installed on.** Joining a game does not give Wax to the host or to
+  the other players, and it does not ask them.
+- **A mod can change the game, not only show things.** In a game you host, a mod can do what your own game
+  allows. Giving an item and spawning a creature were tried that way and worked. In a game someone else
+  hosts, their game decides, and most of that does nothing there.
+- **Some mods show what the game hides.** Entity ESP outlines creatures and the other players in your
+  session through walls, and puts a tag with a name over each. In a game you share, the others may not want
+  you to have that, even when nobody plays against anybody.
+- **Ask the people you play with.** On someone else's server the host decides. If they would rather you did
+  not use a mod, switch it off with its **Enabled** switch on the Mods page of the Wax menu.
+- **Alone, it is your game.** In a prospect of your own a mod affects nobody else.
+- **The catalogue does not list mods made to harm other players.** [Publish a mod](/docs/publish-a-mod#review)
+  has the rule.
+- **The cheat and console mods of UE4SS are switched off in the download.** UE4SS comes with three small
+  mods that open the game's developer console and its cheat commands: `CheatManagerEnablerMod`,
+  `ConsoleCommandsMod` and `ConsoleEnablerMod`. Wax does not need them. To switch one on, change the `0`
+  after its name to `1` in `ue4ss\Mods\mods.txt`. What this page says about playing with others goes for
+  them too.
+
+If RocketWerkz publishes rules about mods, those rules come first, and this page will be changed to say so.
+
+## Sources
+
+- The Steam page of ICARUS: [store.steampowered.com/app/1149460/ICARUS](https://store.steampowered.com/app/1149460/ICARUS/).
+  The description, the list of features, and the absence of an anti-cheat notice and of a licence agreement.
+- RocketWerkz, "Cooperative Team Dynamics", August 2021:
+  [the announcement](https://store.steampowered.com/news/app/1149460/view/4516534149057636855).
+- RocketWerkz, "Icarus Week Thirty-One Update", July 2022:
+  [the announcement](https://store.steampowered.com/news/app/1149460/view/4539082035561702012).
+- RocketWerkz, "Icarus Week Forty Five Update", October 2022:
+  [the announcement](https://store.steampowered.com/news/app/1149460/view/6402455182506923382).
+- RocketWerkz, "Icarus Week Fifty Three Update", December 2022:
+  [the announcement](https://store.steampowered.com/news/app/1149460/view/4980448574111223405).
+- RocketWerkz, "Icarus Week Ninety Four Update", September 2023:
+  [the announcement](https://store.steampowered.com/news/app/1149460/view/5219165352626016839).
+- The Steam Subscriber Agreement, the part on cheating:
+  [store.steampowered.com/subscriber_agreement](https://store.steampowered.com/subscriber_agreement/).
+- RocketWerkz's website: [rocketwerkz.com](https://rocketwerkz.com/).
+- All 361 announcements RocketWerkz has posted for ICARUS on Steam, from March 2021 to October 2026, were
+  searched for the words anti-cheat, ban, licence agreement and terms of service. None of them has any of
+  those words.

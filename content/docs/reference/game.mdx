@@ -33,6 +33,7 @@ Type name: `WaxGame`.
 | `Highlight` | [`WaxHighlight`](/docs/reference/game#game-highlight) | Outlines actors so they show through walls, using the outline the game itself draws. The game has room for four filled colours and three outline-only colours at a time. A colour counts once, however many actors use it. |
 | `Data` | [`WaxData`](/docs/reference/data#game-data) | The game's data tables as plain Lua values. |
 | `Crafting` | [`WaxCrafting`](/docs/reference/game#game-crafting) | The bench or crafting screen that is open. |
+| `Research` | [`WaxResearch`](/docs/reference/game#game-research) | The tech tree: what a recipe still needs researched, and researching it. |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
@@ -594,6 +595,94 @@ game.Crafting:SetListHidden(on: boolean): boolean
 
 <InExplorer id="game.Crafting.SetListHidden" />
 
+## `game.Research` [#game-research]
+
+The tech tree: what a recipe still needs researched, and researching it with the player's points.
+
+Type name: `WaxResearch`.
+
+<InExplorer id="game.Research" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Changed` | `level`: `integer?`, `points`: `integer?` | Fires when the player's level or points changed. It is looked at about twice a second. |
+
+### `game.Research:IsReady()` [#game-research-isready]
+
+True while the player has a tech tree to ask, which is in a prospect.
+
+```lua
+game.Research:IsReady(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="game.Research.IsReady" />
+
+### `game.Research:GetLevel()` [#game-research-getlevel]
+
+The player's level as the tech tree counts it. Nothing while there is no tech tree.
+
+```lua
+game.Research:GetLevel(): integer?
+```
+
+**Returns** `integer?` (`level`)
+
+<InExplorer id="game.Research.GetLevel" />
+
+### `game.Research:GetPoints()` [#game-research-getpoints]
+
+The player's tech tree points. Nothing while there is no tech tree.
+
+```lua
+game.Research:GetPoints(): integer?, integer?, integer?
+```
+
+**Returns**
+
+- `integer?` (`available`) The points left to spend.
+- `integer?` (`total`)
+- `integer?` (`spent`)
+
+<InExplorer id="game.Research.GetPoints" />
+
+### `game.Research:GetPlan(recipe)` [#game-research-getplan]
+
+What researching the node of a recipe takes. Nothing when the recipe needs no node, when the game has no such recipe, and while there is no tech tree. Letter case does not matter. The game is asked about each node, so call it when something is shown or pressed, not every frame.
+
+```lua
+game.Research:GetPlan(recipe: string): WaxResearchPlan?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `recipe` | `string` | A row name of D_ProcessorRecipes. |
+
+**Returns** [`WaxResearchPlan?`](/docs/reference/game#waxresearchplan)
+
+<InExplorer id="game.Research.GetPlan" />
+
+### `game.Research:Unlock(recipe)` [#game-research-unlock]
+
+Researches the node of a recipe, and first every node it still needs, with the player's own points. It does nothing unless the plan says `can`, and it stops at the first node the game does not research. It waits a few frames after each node, so call it inside a task.
+
+```lua
+game.Research:Unlock(recipe: string): boolean, integer, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `recipe` | `string` | A row name of D_ProcessorRecipes. |
+
+**Returns**
+
+- `boolean` (`ok`) True when the recipe's node is researched now.
+- `integer` (`bought`) How many nodes were researched by this call.
+- `string?` (`failed`) The name of the node the game did not research.
+
+<InExplorer id="game.Research.Unlock" />
+
 ## WaxInstance [#waxinstance]
 
 An engine object. Every class of the game ([`Actor`](/explorer?game=Actor), [`Pawn`](/explorer?game=Pawn), [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) ...) is an Instance: it has what is listed here, and adds the properties and functions of its own class and of the classes that one is built on. A member the editor does not know is still read from the object, so nothing here stops you using it.
@@ -1082,6 +1171,41 @@ Returned by [`game.Crafting:GetRecipes`](/docs/reference/game#game-crafting-getr
 | --- | --- | --- |
 | `row` | `string` | The recipe's row name in D_ProcessorRecipes. |
 | `valid` | `boolean` | The game's own answer to "can this be made right now". |
+
+## WaxResearchStep [#waxresearchstep]
+
+One node of the tech tree that still has to be researched.
+
+<InExplorer id="WaxResearchStep" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `node` | `string` | The node's row name in D_Talents, in lower case. |
+| `name` | `string` | The name the game shows for it. |
+| `level` | `integer` | The level it asks of the player. |
+
+## WaxResearchPlan [#waxresearchplan]
+
+What researching the node of one recipe takes.
+
+Returned by [`game.Research:GetPlan`](/docs/reference/game#game-research-getplan).
+
+<InExplorer id="WaxResearchPlan" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `node` | `string` | The node's row name in D_Talents, in lower case. |
+| `name` | `string` | The name the game shows for it. |
+| `unlocked` | `boolean` | True when it is researched already. |
+| `default` | `boolean` | True for a node every character has from the start. |
+| `level` | `integer` | The level this node asks of the player. |
+| `steps` | [`WaxResearchStep[]`](/docs/reference/game#waxresearchstep) | Every node that still has to be researched, in the order to do it, the node itself last. |
+| `points` | `integer` | How many points that takes: one for each step. |
+| `available` | `integer` | The points the player has left. |
+| `player_level` | `integer` | The player's level. |
+| `needed_level` | `integer` | The highest level any of the steps asks. |
+| `can` | `boolean` | True when level and points are enough and the game says the first step can be researched now. |
+| `blocked` | `boolean` | True when level and points are enough and it still cannot be done: a step needs a mission finished or a DLC owned. |
 
 ## Named values [#named-values]
 

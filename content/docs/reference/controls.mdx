@@ -219,13 +219,17 @@ container:Title(content: string, description?: string): WaxTitle
 
 <InExplorer id="WaxContainer.Title" />
 
-### `container:Row()` [#container-row]
+### `container:Row(options?)` [#container-row]
 
 Adds a row. Controls added to the returned container sit side by side and share the width.
 
 ```lua
-container:Row(): WaxRow
+container:Row(options?: WaxRowOptions): WaxRow
 ```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxRowOptions`](/docs/reference/controls#waxrowoptions) |
 
 **Returns** [`WaxRow`](/docs/reference/controls#waxrow)
 
@@ -588,6 +592,22 @@ button:SetActive(on: boolean)
 
 <InExplorer id="WaxButton.SetActive" />
 
+### `button:SetTip(tip)` [#button-settip]
+
+Changes the help shown while the mouse rests on the button, for a button whose meaning changes. nil takes it away.
+
+```lua
+button:SetTip(tip: string|table|nil)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `tip` | `string` \| `table` \| `nil` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxButton.SetTip" />
+
 ## WaxIcon [#waxicon]
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Icon`](/docs/reference/controls#container-icon). Below, `icon` stands for one of these.
@@ -867,9 +887,25 @@ input:Set(text: any)
 
 <InExplorer id="WaxInput.Set" />
 
+### `input:SetHint(hint)` [#input-sethint]
+
+Changes the greyed text shown while the box is empty.
+
+```lua
+input:SetHint(hint: string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `hint` | `string` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxInput.SetHint" />
+
 ## WaxDropdown [#waxdropdown]
 
-A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time.
+A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time. The header is always one line: a choice too long for it ends in "..." there and is whole in the list.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Dropdown`](/docs/reference/controls#container-dropdown). Below, `dropdown` stands for one of these.
 
@@ -1435,6 +1471,7 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 | `icon` | `string` | Icon name shown before the caption. The menu's Icons page lists the names. |
 | `spin` | `boolean` | The icon turns round once on every click, to show that something has started. |
 | `tab` | `boolean` | Makes it one of a row of tabs: SetActive marks the chosen one. |
+| `tip` | `string` \| `table` | A line of help shown beside the mouse once it has rested on the button. Give one to every button that is only an icon. A table is `{ title = "...", lines = { "more" } }`. |
 
 ## WaxIconOptions [#waxiconoptions]
 
@@ -1475,6 +1512,7 @@ Used by [`container:Input`](/docs/reference/controls#container-input).
 | `hint` | `string` | Greyed text shown while the box is empty. |
 | `stacked` | `boolean` | True puts the caption above the box, false beside it. When omitted, the room available decides. |
 | `mono` | `boolean` | A fixed-width font, for code. |
+| `clear` | `boolean` | Puts a small cross at the right end of the box while it holds text. One press empties the box, fires Typed with "" and leaves the keyboard in the box. For a search box. |
 
 ## WaxSectionOptions [#waxsectionoptions]
 
@@ -1486,6 +1524,16 @@ Used by [`container:Section`](/docs/reference/controls#container-section).
 | --- | --- | --- |
 | `open` | `boolean` | False starts the section collapsed. |
 | `collapsible` | `boolean` | False makes a plain titled group that is always open. |
+
+## WaxRowOptions [#waxrowoptions]
+
+Used by [`container:Row`](/docs/reference/controls#container-row).
+
+<InExplorer id="WaxRowOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `height` | `number` | The least height of the row. Give two rows the same one and they are equally tall whatever is in them. |
 
 ## WaxProgressOptions [#waxprogressoptions]
 
@@ -1568,6 +1616,7 @@ Returned by [`item:Get`](/docs/reference/controls#item-get). Used by [`item:Set`
 | `tone` (optional) | `"text"` \| `"dim"` \| `"accent"` \| `"accent_hover"` \| `"good"` \| `"warn"` \| `"bad"` | The colour of the value. |
 | `faint` (optional) | `boolean` | Draws the name dimmer. |
 | `name_width` (optional) | `number` | For a line made with columns: how wide the name is, so values line up from line to line. |
+| `width` (optional) | `number` | For a line made with fit that is narrower than its container: how wide it is. |
 
 ## WaxItemOptions [#waxitemoptions]
 
@@ -1580,6 +1629,7 @@ Extends [`WaxItemLook`](/docs/reference/controls#waxitemlook). Used by [`contain
 | `weight` | `number` | In a row, its share of the width. |
 | `columns` | `boolean` | Makes it a line of a table: the name, then the value where the name ends, then the note at the right edge. |
 | `divider` | `boolean` | Draws a thin line under it. |
+| `fit` | `boolean` | Cuts a name, note or value that is too long for the line short with "..." and shows the whole of it as a tip while the mouse rests on the line. |
 
 ## WaxSplitOptions [#waxsplitoptions]
 

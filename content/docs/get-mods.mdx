@@ -1,24 +1,52 @@
 ---
 title: Get mods
-description: Find a mod on the Mods page and add it to your game with one click, or by hand.
+description: Find a mod on the Mods page and add it to your game with the button, or by hand.
 icon: Download
 ---
 
 The [Mods page](/mods) lists the mods made for Wax. You can search it, filter it by category and tag, and open
 a mod to read what it does. Each card shows the mod's version and when it was last updated.
 
+A mod is code that runs in your game. Once it is switched on it can do what any program on your PC can do.
+[A mod is code](/docs/security#a-mod-is-code) says what is checked for you and what is not.
+
 ## Add to game
+
+<Steps>
+<Step>
+
+### Press the button
 
 Press **Add to game** on a mod. Your browser asks if it may open Wax. Say yes.
 
-Wax then downloads the mod, checks it and puts it in your game's mods folder.
+</Step>
+<Step>
 
-- If ICARUS is running, the mod loads at once and a notice appears in the game.
-- If ICARUS is not running, a small window tells you the mod was added. It is there the next time you start
-  the game.
+### Answer the question
 
-The button works on a PC where Wax was installed with `Install Wax.cmd`. If nothing happens when you press it,
-use the download below.
+A window of Wax opens on your PC. It shows the mod's name, version and author and asks whether to add it.
+Nothing has been downloaded yet. If you say no, nothing happens.
+
+</Step>
+<Step>
+
+### Switch the mod on
+
+Wax downloads the mod from the catalogue, checks its signature and puts it in your game's mods folder. The
+mod is **switched off**. Open the Wax menu (F8), go to **Mods** and flip its **Enabled** switch.
+
+</Step>
+</Steps>
+
+- If ICARUS is running, a notice in the game tells you the mod was added.
+- If ICARUS is not running, the mod is on the Mods page the next time you start the game, still switched
+  off.
+- A mod you already had keeps the state it had. The copy from before is kept, as described under
+  [Manage your mods](#manage-your-mods).
+
+The button works on a PC where you said yes when `Install Wax.cmd` asked about it. If nothing happens when you
+press it, use the download below. [The registry key](/docs/security#the-registry-key) says how to switch the
+button on later, and how to switch it off.
 
 ## Download a zip
 
@@ -28,8 +56,13 @@ Press **Download zip** on a mod. Extract the zip into the mods folder of Wax:
 ...\steamapps\common\Icarus\Icarus\Binaries\Win64\ue4ss\Mods\Wax\mods\
 ```
 
-The zip holds one folder, named after the mod. That folder goes straight into `mods`. When the game is running,
-the mod shows up on the **Mods** page of the Wax menu, switched off. Switch it on there.
+The zip holds one folder, named after the mod. That folder goes straight into `mods`.
+
+The mod shows up on the **Mods** page of the Wax menu, switched off. Switch it on there. It is the same
+whether you put the folder in while the game ran or while it was closed.
+
+Nothing checks a zip you put in by hand. [Check a download by hand](/docs/security#check-a-download-by-hand)
+says how to check it yourself.
 
 ## Manage your mods
 
@@ -49,8 +82,9 @@ with such names alone. To get the mod back, rename the folder to the mod's name 
 
 Mods you add with the **Add to game** button keep themselves up to date, and so does Recipe Browser, which comes
 with Wax. About 20 seconds after the game starts, and every six hours after that, Wax asks the catalogue whether a
-newer version is out. If one is, Wax downloads it, checks every file against its checksum and puts it in. A
-notification tells you, for example "Recipe Browser was updated to 0.9.2."
+newer version is out. If one is, Wax downloads it and checks it: the list of its files must carry the
+signature of Wax's author, and every file must match that list. Only then is the mod replaced. A notification
+tells you, for example "Recipe Browser was updated to 0.9.2."
 
 - The mod's settings stay, and so does whether it is switched on or off.
 - The version before is kept in the mods folder under a `.removed-` name. To go back, take the newer folder out
@@ -64,7 +98,7 @@ Wax then only shows that a newer version is out: the mod's card has an **Update 
 the catalogue at once.
 
 Wax asks one address, `wax-icarus.duckdns.org`. It sends the name and version of the mod it fetches and its own
-version, and nothing else.
+version. [What Wax asks the network for](/docs/security#what-wax-asks-the-network-for) has every request.
 
 This needs Wax 0.2.0 or newer, and a mod added with a Wax older than that has to be added once more. A mod you
 installed from a zip is updated by extracting the new zip over the old folder.

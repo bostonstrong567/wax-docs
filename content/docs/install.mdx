@@ -13,17 +13,21 @@ download.
 
 ## Download
 
-Download `Wax-0.1.1.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
+Download `Wax-0.2.1.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
 The number in the file name is the version. Extract the whole zip before you run anything in it.
 
 The same page has the VS Code extension as a `.vsix` file. The [editor page](/docs/editor) says what it is for.
+
+It also has `Wax-0.2.1.manifest` and `Wax-0.2.1.manifest.sig`. They are the signed list of the release's
+files. You don't need them to install. [Check a download by hand](/docs/security#check-a-download-by-hand)
+says how to use them.
 
 | In the zip | What it is |
 | --- | --- |
 | `Install Wax.cmd` | Copies Wax into your game. |
 | `Update Wax.cmd` | Looks for a newer Wax and installs it. |
 | `Uninstall Wax.cmd` | Removes Wax from your game. |
-| `Wax-Setup.ps1` | The script those three files run. You don't need to open it. |
+| `Wax-Setup.ps1` | The script those three files run. It is plain text, so you can read what it does. |
 | `README.txt` | The steps on this page, as a text file. |
 | `licenses` | The licences of UE4SS and of the Lucide icons. |
 | `game` | The files that go into the game folder. |
@@ -36,6 +40,8 @@ Inside `game`:
 | `ue4ss\Mods\Wax` | Wax. |
 | `ue4ss\Mods\Wax\mods\RecipeBrowser` | Recipe Browser, the mod that comes with Wax. |
 
+[Security](/docs/security) says what each part does on your PC and how to remove it.
+
 ## Install
 
 Close ICARUS first. Then install in one of two ways.
@@ -45,9 +51,26 @@ Close ICARUS first. Then install in one of two ways.
 Double-click `Install Wax.cmd`. It finds the game through Steam and copies the files. If it can't find the
 game, it asks you for the folder.
 
-The installer also sets up the **Add to game** button of the [Mods page](/mods) for this PC.
-
 Windows may ask you to confirm first, because the file came from the internet.
+
+The installer asks one question: whether the **Add to game** button of the [Mods page](/mods) may open Wax
+on this PC.
+
+- Type `y` and press **Enter** for yes. Windows then hands links that start with `wax://` to Wax. That takes
+  one entry in your own part of the registry.
+- Press **Enter** alone for no. Everything else works without it. You download a mod as a zip.
+
+Such a link can be on any web page, not only on the Wax site. So Wax shows you the mod and asks before it
+downloads anything, and a mod it adds stays switched off until you switch it on.
+[The registry key](/docs/security#the-registry-key) says what the entry holds, how to remove it and how to
+make it later.
+
+The installer also closes Wax's folder to the other Windows accounts on the PC. Your account and
+administrators can change it, and other accounts can only read it.
+[Who can change Wax's folder](/docs/security#who-can-change-waxs-folder) has the reason.
+
+Run the installer from the Windows account you play on. Under another account Wax could not save its
+settings.
 
 ### Install by hand
 
@@ -62,11 +85,23 @@ then `Binaries`, then `Win64`.
 
 When you are done, `dwmapi.dll` and the `ue4ss` folder sit next to `Icarus-Win64-Shipping.exe`.
 
+Copying by hand sets up no button and changes no permissions.
+
 ### If you already use UE4SS
 
 Wax is tested on the UE4SS build in the zip, so the installer puts that build in. If it finds a different
 one, it first copies the old files to a folder inside `Win64`. The folder's name is `ue4ss-backup-` followed
 by the date and time. Your other UE4SS mods in `ue4ss\Mods` are left alone.
+
+UE4SS comes with three small mods that open the game's developer console and its cheat commands:
+`CheatManagerEnablerMod`, `ConsoleCommandsMod` and `ConsoleEnablerMod`. Wax does not need them, so they are
+switched off in the download. Wax 0.2.0 and older left them on.
+
+- If you install over one of those versions and never changed `ue4ss\Mods\mods.txt`, the installer switches
+  the three off and says so.
+- If you changed that file, the installer keeps it and tells you which of the three are on in it.
+
+To switch one on, open `mods.txt` in Notepad and change the `0` after its name to `1`.
 
 ## Check that it works
 
@@ -128,18 +163,32 @@ Each mod is a folder inside `Wax\mods\`. The folder holds a file called `init.lu
 The folder name is the mod's id. Use only letters, digits, `_` and `-` in it. A folder with another kind of
 name is skipped, and the log says so.
 
+A mod that Wax has not seen before is listed switched off. Open the **Mods** page of the Wax menu and flip
+its **Enabled** switch. This is so whether the folder was put there while the game ran or while it was
+closed.
+
 ## Updating
 
 Close ICARUS first.
 
 ### Update with the installer
 
-Double-click `Update Wax.cmd`. It asks GitHub for the newest release and installs it if it is newer than
-yours.
+Double-click `Update Wax.cmd`. It asks GitHub for the newest release of Wax. If that is newer than yours:
+
+1. It downloads the release's list of files and checks that the list carries the signature of Wax's author.
+2. It downloads the zip and compares it with the list.
+3. Only then does it install.
+
+If any of that fails it changes nothing, and tells you to get Wax from the site instead.
+[What is signed](/docs/security#what-is-signed) has the key and its fingerprint.
+
+Use the `Update Wax.cmd` of version 0.2.1 or newer. The one that came with Wax 0.2.0 and older installs what
+it downloads without that check, so delete the folders of those older downloads.
 
 You can also download the newest zip and run its `Install Wax.cmd`. Installing over an old copy updates Wax.
 
-Both ways keep your mods (`Wax\mods`), your settings (`Wax\saved`) and your UE4SS settings.
+Both ways keep your mods (`Wax\mods`), your settings (`Wax\saved`) and your UE4SS settings. They also leave
+the **Add to game** button the way you set it.
 
 ### Update by hand
 
@@ -152,14 +201,26 @@ the zip:
 - the mod that comes with Wax, `mods\RecipeBrowser`
 - the UE4SS settings files `UE4SS-settings.ini`, `mods.txt` and `mods.json`
 
+### Updates in the game
+
+While the game runs, Wax asks the catalogue whether a newer Wax is out. When one is, Wax downloads it,
+checks it against the same signature and puts it in the next time the game starts. If the new version does
+not start, the version before is put back.
+
+Some versions need the installer. Wax then shows a notification that asks you to run `Update Wax.cmd`.
+
+[What Wax asks the network for](/docs/security#what-wax-asks-the-network-for) says what is sent and how to
+switch this off.
+
 ## Removing Wax
 
 Close ICARUS first.
 
 ### Remove with the installer
 
-Double-click `Uninstall Wax.cmd`. It removes Wax. It asks before it removes your mods and settings, and
-before it removes UE4SS. Press **Enter** at a question to keep them.
+Double-click `Uninstall Wax.cmd`. It removes Wax and the registry entry of the **Add to game** button. It
+asks before it removes your mods and settings, and before it removes UE4SS. Press **Enter** at a question to
+keep them.
 
 ### Remove by hand
 
@@ -172,6 +233,13 @@ Delete this folder:
 Your mods and settings are in it. Copy `mods` and `saved` somewhere else first if you want to keep them.
 
 To remove UE4SS too, delete `dwmapi.dll` and the `ue4ss` folder from `Win64`.
+
+If you said yes to the **Add to game** button, remove its registry entry as well. Open a Command Prompt and
+type:
+
+```text
+reg delete HKCU\Software\Classes\wax /f
+```
 
 ## Switching a mod off, or removing it
 
