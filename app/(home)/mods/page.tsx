@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { ModBrowser } from '@/components/mod-browser';
 
 export const metadata: Metadata = {
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 export default function ModsPage() {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-10 md:py-14">
-      <ModBrowser />
+      <Suspense fallback={null}>
+        <ModBrowser />
+      </Suspense>
     </div>
   );
 }

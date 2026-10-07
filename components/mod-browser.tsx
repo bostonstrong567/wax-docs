@@ -1,6 +1,7 @@
 'use client';
 import { Download, Plus, Upload } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { type MouseEvent, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FilterInput } from '@/components/filter-input';
 import {
@@ -539,18 +540,22 @@ export function ModBrowser() {
   const [likedSort, setLikedSort] = useState(true);
   const listScroll = useRef(0);
   const mounted = useRef(false);
+  // Changes when the address does, also when a link of the site (Mods in the top bar) leads back to this page.
+  const address = useSearchParams().toString();
 
   useEffect(() => {
     const read = () => {
       const next = readQuery(window.location.search);
       setQuery(next);
-      setText(next.q);
+      // what is being typed stays as typed while it means the same search
+      setText((typed) => (typed.trim() === next.q ? typed : next.q));
     };
     read();
-    setNow(Date.now());
     window.addEventListener('popstate', read);
     return () => window.removeEventListener('popstate', read);
-  }, []);
+  }, [address]);
+
+  useEffect(() => setNow(Date.now()), []);
 
   const change: Change = useCallback((next, how = 'replace') => {
     setQuery(next);
