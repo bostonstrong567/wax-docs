@@ -45,10 +45,29 @@ Open the Wax menu (F8) and go to **Mods**. Each mod has a card:
 A removed mod is not erased. Its folder is renamed so that it starts with `.removed-`, and Wax leaves folders
 with such names alone. To get the mod back, rename the folder to the mod's name again.
 
-## Updating a mod
+## Updates
 
-Press **Add to game** again, or extract the new zip over the old folder. With the button, the old copy is kept
-under a `.removed-` name.
+Mods you add with the **Add to game** button keep themselves up to date, and so does Recipe Browser, which comes
+with Wax. About 20 seconds after the game starts, and every six hours after that, Wax asks the catalogue whether a
+newer version is out. If one is, Wax downloads it, checks every file against its checksum and puts it in. A
+notification tells you, for example "Recipe Browser was updated to 0.9.2."
+
+- The mod's settings stay, and so does whether it is switched on or off.
+- The version before is kept in the mods folder under a `.removed-` name. To go back, take the newer folder out
+  and rename the kept one to the mod's name.
+- A mod you wrote or copied into the mods folder yourself is never changed, even when the catalogue has a mod with
+  the same name. Wax only updates a folder that holds a `wax.origin` file, which **Add to game** writes.
+- A version that needs a newer Wax than yours is left out until you update Wax.
+
+To decide yourself when a mod is updated, open the Wax menu (F8), go to **Mods** and switch off **Auto Update**.
+Wax then only shows that a newer version is out: the mod's card has an **Update to** button. **Check now** asks
+the catalogue at once.
+
+Wax asks one address, `wax-icarus.duckdns.org`. It sends the name and version of the mod it fetches and its own
+version, and nothing else.
+
+This needs Wax 0.2.0 or newer, and a mod added with a Wax older than that has to be added once more. A mod you
+installed from a zip is updated by extracting the new zip over the old folder.
 
 ## Vote on a mod
 
