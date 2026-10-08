@@ -1,3 +1,0 @@
-{"chunk":"script.WmfMediaFactory","types":[
-{"name":"WmfMediaSettings","kind":"class","from":"/Script/WmfMediaFactory.WmfMediaSettings","parent":"Object","origin":"native","props":[["AllowNonStandardCodecs","boolean","print(obj.AllowNonStandardCodecs)"],["HardwareAcceleratedVideoDecoding","boolean","print(obj.HardwareAcceleratedVideoDecoding)"],["LowLatency","boolean","print(obj.LowLatency)"],["NativeAudioOut","boolean","print(obj.NativeAudioOut)"]],"funcs":[]}
-]}
