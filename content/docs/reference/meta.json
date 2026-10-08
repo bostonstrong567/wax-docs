@@ -2,9 +2,8 @@
   "title": "Reference",
   "pages": [
     "index",
-    "mods",
-    "tasks",
-    "watch",
+    "ui",
+    "controls",
     "game",
     "character",
     "stats",
@@ -17,8 +16,9 @@
     "workshop",
     "assets",
     "blueprints",
-    "ui",
-    "controls",
+    "tasks",
+    "watch",
+    "mods",
     "..."
   ]
 }

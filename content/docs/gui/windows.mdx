@@ -7,7 +7,9 @@ icon: AppWindow
 A window is a box in [the menu](/docs/menu) that holds your controls.
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "My first mod", icon = "sparkles", width = 300, height = 170 })
+local window = ui.Window({
+    title = "My first mod", icon = "sparkles", width = 300, height = 170,
+})
 
 window:Label("Hello from my first mod.")
 window:Toggle("Show the overlay", true)
@@ -115,7 +117,9 @@ one with tabs along the top never lower than 200 or narrower than its tabs need.
 corners do nothing, and a size remembered from before is not used. `window:SetSize` still works.
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "Fixed", width = 280, height = 120, resizable = false })
+local window = ui.Window({
+    title = "Fixed", width = 280, height = 120, resizable = false,
+})
 window:Label("This window keeps its size.")
 ```
 
@@ -218,7 +222,9 @@ A page has a signal called `NearEnd`. It fires when the user scrolls close to th
 more as the user scrolls.
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "Endless", nav = "top", width = 360, height = 300 })
+local window = ui.Window({
+    title = "Endless", nav = "top", width = 360, height = 300,
+})
 local page = window:Page("Numbers")
 
 local count = 0

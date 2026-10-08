@@ -148,7 +148,9 @@ A look is a table, and you can write one yourself for any skeletal mesh of the g
 
 ```lua
 local window = ui.Window({ title = "Deer", width = 300, height = 300 })
-window:Model({ size = 200, mesh = "/Game/ASS/CRE/Deer/SK_CRE_PAS_Deer", animation = false })
+window:Model({
+    size = 200, mesh = "/Game/ASS/CRE/Deer/SK_CRE_PAS_Deer", animation = false,
+})
 ```
 
 Finding the paths is on [Assets](/docs/assets#load-by-path).

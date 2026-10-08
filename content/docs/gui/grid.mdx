@@ -107,7 +107,9 @@ On a page made with `scroll = false`, a grid without a `height` takes all the ro
 puts a search box above it.
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "Icon finder", nav = "top", width = 420, height = 360 })
+local window = ui.Window({
+    title = "Icon finder", nav = "top", width = 420, height = 360,
+})
 local page = window:Page("Icons", { scroll = false })
 
 local search = page:Input(nil, { hint = "Search icons: arrow, map, user ..." })

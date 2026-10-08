@@ -8,6 +8,8 @@ icon: Globe
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
+<NextLegend />
+
 ## `game` [#game]
 
 The root every mod starts from. It is read-only, and reading a member it does not have raises an error.
@@ -28,23 +30,23 @@ Type name: `WaxGame`.
 | `Viewport` | [`IcarusGameViewportClient`](/explorer?game=IcarusGameViewportClient) | The game viewport. |
 | `MapName` | `string?` | The name of the current world. |
 | `InProspect` | `boolean` | True while you are in a prospect. |
-| `IsHost` | `boolean` | True when this game runs the session's rules: you play alone or you are the host. False when you are a client in someone else's game, and while there is no world. |
+| `IsHost` <NextMark /> | `boolean` | True when this game runs the session's rules: you play alone or you are the host. False when you are a client in someone else's game, and while there is no world. |
 | `Players` | [`WaxPlayers`](/docs/reference/game#game-players) | The players in the session and the characters they control, with signals for when they come and go. |
 | `Creatures` | [`WaxCreatures`](/docs/reference/game#game-creatures) | The animals and enemies in the world, kept as a live list. A kind is named the way the game names it: "Wolf", "Conifer_Wolf", "Cave Worm". Letter case, spaces and underscores do not matter. A wrong name raises an error that suggests the right one. |
 | `Highlight` | [`WaxHighlight`](/docs/reference/game#game-highlight) | Outlines actors so they show through walls, using the outline the game itself draws. The game has room for four filled colours and three outline-only colours at a time. A colour counts once, however many actors use it. |
 | `Data` | [`WaxData`](/docs/reference/data#game-data) | The game's data tables as plain Lua values. |
 | `Crafting` | [`WaxCrafting`](/docs/reference/game#game-crafting) | The bench or crafting screen that is open. |
 | `Research` | [`WaxResearch`](/docs/reference/game#game-research) | The tech tree: what a recipe still needs researched, and researching it. |
-| `Workshop` | [`WaxWorkshop`](/docs/reference/workshop#game-workshop) | The store on the station: its categories, nodes and prices, and where the player stands with them. |
-| `Frame` | [`WaxFrameSignal`](/docs/reference/watch#game-frame) | Fires once every frame with the seconds since the frame before. For work that has to run every frame. |
-| `Me` | [`WaxMe`](/docs/reference/character#game-me) | The local player's character, whichever one that is: its fields and functions, and signals for its health, food, level and the like. It is there with no character too, and says so. |
-| `Items` | [`WaxItems`](/docs/reference/items#game-items) | The kinds of item the game has, and the facts of each: its shown name, weight, stack size, durability and picture. |
-| `Recipes` | [`WaxRecipes`](/docs/reference/recipes#game-recipes) | The game's crafting recipes: finding them, and changing what they take, what they give, how long they take and where they are made. |
-| `Assets` | [`WaxAssets`](/docs/reference/assets#game-assets) | The game's assets by path, pictures from a mod's own files, materials made from the game's, and shapes made of numbers, each kept in memory for the mod that asked. |
-| `Blueprints` | [`WaxBlueprints`](/docs/reference/blueprints#game-blueprints) | Things described in Lua and spawned by the host: an actor of a class the game has, with parts, assets and functions of your own. The game does not save them. |
-| `Time` | [`WaxTime`](/docs/reference/session#game-time) | The time of day in the prospect: the hour, the clock as text, the part of the day, and a signal for a new hour. |
-| `Weather` | [`WaxWeather`](/docs/reference/session#game-weather) | The weather on your character, and for the host every weather event that is running on the map. |
-| `Prospect` | [`WaxProspect`](/docs/reference/session#game-prospect) | The prospect you are in: which one it is, its mission, and how long it has run. |
+| `Workshop` <NextMark /> | [`WaxWorkshop`](/docs/reference/workshop#game-workshop) | The store on the station: its categories, nodes and prices, and where the player stands with them. |
+| `Frame` <NextMark /> | [`WaxFrameSignal`](/docs/reference/watch#game-frame) | Fires once every frame with the seconds since the frame before. For work that has to run every frame. |
+| `Me` <NextMark /> | [`WaxMe`](/docs/reference/character#game-me) | The local player's character, whichever one that is: its fields and functions, and signals for its health, food, level and the like. It is there with no character too, and says so. |
+| `Items` <NextMark /> | [`WaxItems`](/docs/reference/items#game-items) | The kinds of item the game has, and the facts of each: its shown name, weight, stack size, durability and picture. |
+| `Recipes` <NextMark /> | [`WaxRecipes`](/docs/reference/recipes#game-recipes) | The game's crafting recipes: finding them, and changing what they take, what they give, how long they take and where they are made. |
+| `Assets` <NextMark /> | [`WaxAssets`](/docs/reference/assets#game-assets) | The game's assets by path, pictures from a mod's own files, materials made from the game's, and shapes made of numbers, each kept in memory for the mod that asked. |
+| `Blueprints` <NextMark /> | [`WaxBlueprints`](/docs/reference/blueprints#game-blueprints) | Things described in Lua and spawned by the host: an actor of a class the game has, with parts, assets and functions of your own. The game does not save them. |
+| `Time` <NextMark /> | [`WaxTime`](/docs/reference/session#game-time) | The time of day in the prospect: the hour, the clock as text, the part of the day, and a signal for a new hour. |
+| `Weather` <NextMark /> | [`WaxWeather`](/docs/reference/session#game-weather) | The weather on your character, and for the host every weather event that is running on the map. |
+| `Prospect` <NextMark /> | [`WaxProspect`](/docs/reference/session#game-prospect) | The prospect you are in: which one it is, its mission, and how long it has run. |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
@@ -174,8 +176,8 @@ Type name: `WaxPlayers`.
 | --- | --- | --- |
 | `CharacterAdded` | `character`: [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) | Fires when a player's character appears. |
 | `CharacterRemoved` | `character`: [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) | Fires when a player's character leaves the world. |
-| `Joined` | `player`: [`IcarusPlayerState`](/explorer?game=IcarusPlayerState) | Fires when a player is in the session who was not there at the last look. The players are looked at once a second, and only while a handler is connected to Joined or Left. It does not fire for the players who are there when you connect, nor for those who are there on another map when the map changes. |
-| `Left` | `player`: [`IcarusPlayerState`](/explorer?game=IcarusPlayerState), `name`: `string?` | Fires when a player who was in the session is gone at the next look, with the name that was last seen. The Instance can no longer be used, only compared. It is looked at with Joined, and does not fire for the players a map change takes away. |
+| `Joined` <NextMark /> | `player`: [`IcarusPlayerState`](/explorer?game=IcarusPlayerState) | Fires when a player is in the session who was not there at the last look. The players are looked at once a second, and only while a handler is connected to Joined or Left. It does not fire for the players who are there when you connect, nor for those who are there on another map when the map changes. |
+| `Left` <NextMark /> | `player`: [`IcarusPlayerState`](/explorer?game=IcarusPlayerState), `name`: `string?` | Fires when a player who was in the session is gone at the next look, with the name that was last seen. The Instance can no longer be used, only compared. It is looked at with Joined, and does not fire for the players a map change takes away. |
 
 ### `game.Players:GetPlayers()` [#game-players-getplayers]
 
@@ -263,7 +265,7 @@ Type name: `WaxCreatures`.
 | `Removed` | `creature`: [`WaxCreature`](/docs/reference/game#waxcreature), `info`: [`WaxCreatureEnd`](/docs/reference/game#waxcreatureend) | Fires when a creature leaves the world. The Instance can no longer be used, only compared. |
 | `Died` | `creature`: [`WaxCreature`](/docs/reference/game#waxcreature), `info`: [`WaxCreatureEnd`](/docs/reference/game#waxcreatureend) | Fires when a creature is killed, a few seconds before it is removed. |
 | `Cleared` | nothing | Fires once when the map changes, in place of one Removed per creature. |
-| `Damaged` | `creature`: [`WaxCreature`](/docs/reference/game#waxcreature), `amount`: `integer`, `info`: [`WaxDamageInfo`](/docs/reference/character#waxdamageinfo) | Fires when the game says a creature took damage: the creature, the damage of the hit, and what the game knows of it, as Damaged of a character hands it over. The game's own damage call is listened to from the first handler on, and nothing is looked at meanwhile. It tells of the creatures that are an [`IcarusNPCCharacter`](/explorer?game=IcarusNPCCharacter), which nearly all are. Seen on the host of a session. |
+| `Damaged` <NextMark /> | `creature`: [`WaxCreature`](/docs/reference/game#waxcreature), `amount`: `integer`, `info`: [`WaxDamageInfo`](/docs/reference/character#waxdamageinfo) | Fires when the game says a creature took damage: the creature, the damage of the hit, and what the game knows of it, as Damaged of a character hands it over. The game's own damage call is listened to from the first handler on, and nothing is looked at meanwhile. It tells of the creatures that are an [`IcarusNPCCharacter`](/explorer?game=IcarusNPCCharacter), which nearly all are. Seen on the host of a session. |
 
 ### `game.Creatures:GetAll(kind?, options?)` [#game-creatures-getall]
 
@@ -381,6 +383,8 @@ game.Creatures:Describe(creature: WaxCreature): WaxCreatureFacts
 
 ### `game.Creatures:GetInfo(kind)` [#game-creatures-getinfo]
 
+<NextMark block />
+
 What the game's tables say about one variant of a kind: its team, diet, carcass and loot, the taming rule that names it, and what it is like as a tamed animal. Give a variant such as "Conifer_Wolf", or a creature, for that variant. Give a kind such as "Wolf" for the variant that is named like the kind, or else the kind's first variant. Variants lists them all. The first call reads the game's tables of taming rules, tamed animals and saddles. What it read is kept until one of those tables changes or the map does. A wrong name raises an error that suggests the right one.
 
 ```lua
@@ -396,6 +400,8 @@ game.Creatures:GetInfo(kind: string|WaxCreature): WaxCreatureInfo
 <InExplorer id="game.Creatures.GetInfo" />
 
 ### `game.Creatures:GetTamed(kind?, options?)` [#game-creatures-gettamed]
+
+<NextMark block />
 
 The tamed animals among the creatures in the world: mounts, pets and livestock, whoever they belong to. Dead ones are left out unless asked for.
 
@@ -448,23 +454,52 @@ game.Creatures:Highlight(kind?: string, options?: WaxHighlightOptions|WaxHighlig
 
 <InExplorer id="game.Creatures.Highlight" />
 
-### `game.Creatures:GetModel(name)` [#game-creatures-getmodel]
+### `game.Creatures:GetModel(name, options?)` [#game-creatures-getmodel]
 
-What a Model control needs to show a creature, by its set-up row ("Bear", "Conifer_Wolf") or its kind ("Wolf"). The creature does not have to be in the world. Gives nil and the reason when Wax has no model for it; a name that is no creature raises an error.
+<NextMark block />
+
+What a Model control needs to show a creature, by its set-up row ("Bear", "Conifer_Wolf") or its kind ("Wolf"). The creature does not have to be in the world. With options.saddle a mount wears that saddle in the picture, such as GetModel("Mount_Horse", \{ saddle = "Saddle_Standard" \}). Gives nil and the reason when Wax has no model for it, or no such saddle for that mount; a name that is no creature raises an error.
 
 ```lua
-game.Creatures:GetModel(name: string): WaxCreatureModel?
+game.Creatures:GetModel(name: string, options?: WaxCreatureModelOptions): WaxCreatureModel?, string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `name` | `string` |
+| `options` (optional) | [`WaxCreatureModelOptions`](/docs/reference/creature-models#waxcreaturemodeloptions) |
+
+**Returns**
+
+- [`WaxCreatureModel?`](/docs/reference/creature-models#waxcreaturemodel)
+- `string?`
+
+<InExplorer id="game.Creatures.GetModel" />
+
+### `game.Creatures:GetSaddles(name)` [#game-creatures-getsaddles]
+
+<NextMark block />
+
+What Wax can put on a creature's model through GetModel's saddle option, in the order of the game's saddle table: saddles, carts, a pack harness and the like, for the set-up row of a tamed mount such as "Mount_Horse". An empty list for a creature that wears nothing, and for one Wax has no model for, with the reason as a second value. A name that is no creature raises an error.
+
+```lua
+game.Creatures:GetSaddles(name: string): WaxSaddle[], string?
 ```
 
 | Parameter | Type |
 | --- | --- |
 | `name` | `string` |
 
-**Returns** [`WaxCreatureModel?`](/docs/reference/creature-models#waxcreaturemodel)
+**Returns**
 
-<InExplorer id="game.Creatures.GetModel" />
+- [`WaxSaddle[]`](/docs/reference/creature-models#waxsaddle)
+- `string?`
+
+<InExplorer id="game.Creatures.GetSaddles" />
 
 ### `game.Creatures:Spawn(kind, place?, options?)` [#game-creatures-spawn]
+
+<NextMark block />
 
 Puts a new wild creature into the world with the game's own spawn, for the host only: in someone else's game it raises an error that says so. kind is a variant such as "Conifer_Wolf" or "Deer", or a kind that has one variant. A kind with several raises an error that lists them. place is a position, an actor or game.Me. When it is omitted the creature goes six metres in front of your character, and the options may stand in its place. Wax asks the game for ground a creature can walk on near the place, within 5 metres to the sides and at any height, and puts the creature a little above it. Where the game has none it raises an error and nothing is spawned. Inside a task Spawn waits until the game has given the creature its level, two seconds at most, and then answers the creature. Outside a task it answers at once, and Level and Health are right a few frames later. It answers nil and the reason when the creature left the world before it was finished. A tamed variant is refused in this version of Wax. The game's call took 3 to 4 ms when it was timed, and 18 ms once: a kind that is not in memory is loaded by the game inside the call. What is spawned stays when the mod unloads, unless the option keep is false.
 
@@ -642,6 +677,8 @@ game.Crafting:GetHovered(): "item"|"recipe"|"talent"?, string?
 
 ### `game.Crafting:IsTyping()` [#game-crafting-istyping]
 
+<NextMark block />
+
 True while one of the game's own text boxes has the keyboard, such as the search box of the crafting screen or of the tech tree. It asks its way down the widgets the keyboard is in, so ask when a key is pressed and not every frame.
 
 ```lua
@@ -698,7 +735,9 @@ game.Crafting:SetListHidden(on: boolean): boolean
 
 ### `game.Crafting:Refresh(options?)` [#game-crafting-refresh]
 
-Asks the crafting tab to show what the recipe table holds now. However often it is asked in a frame, one refresh is made when the frame ends, and only when the crafting tab is the screen that shows. On another tab of the menu the game builds the list itself when the crafting tab is opened, and a bench that is open is left as it is in this version. Without options the tab's list is built again and the recipe that was chosen is chosen again, which took 47 ms for 24 recipes when it was measured. game.Recipes asks for this itself whenever a recipe was written, so a mod that changes recipes through it has nothing to do.
+<NextMark block />
+
+Asks the crafting tab to show what the recipe table holds now. However often it is asked in a frame, one refresh is made when the frame ends, and only when the crafting tab is the screen that shows. On another tab of the menu the game builds the list itself when the crafting tab is opened, and a bench that is open is left as it is in this version. Without options the tab's list is built again and the recipe that was chosen is chosen again, which took 33 to 41 ms for 25 recipes when it was measured. game.Recipes asks for this itself whenever a recipe was written, so a mod that changes recipes through it has nothing to do.
 
 ```lua
 game.Crafting:Refresh(options?: WaxCraftingRefreshOptions)
@@ -1072,6 +1111,8 @@ instance:GetAttributeChangedSignal(): WaxSignal<fun(name: string, value: any, pr
 
 ### `instance:GetPropertyChangedSignal(name, seconds?)` [#instance-getpropertychangedsignal]
 
+<NextMark block />
+
 A signal for one value of the object: a property of the game's that holds a number, true or false, text or an object, or a field Wax gives the class. It fires with (value, previous) when the value is found changed. The value is read ten times a second, and only while a handler is connected. An object arrives as an Instance, or nil when the property holds none. A table a field returns is compared by what it holds. `seconds` sets another time between reads, up to 3600. It is rounded to the nearest 0.05, and anything under 0.05 counts as 0.05. When one value is asked for at two paces, the faster is used. It works on an actor in the world and on a component that a property of its actor holds. Anything else raises an error that says why. When the object is gone, reading stops and every handler is disconnected. A task that waits on the signal is then not woken. A wrong name raises an error that suggests the right one.
 
 ```lua
@@ -1282,7 +1323,7 @@ Returned by [`game.Creatures:Describe`](/docs/reference/game#game-creatures-desc
 
 ## WaxCreatureEnd [#waxcreatureend]
 
-What Removed and Died give beside the creature: what it was, as plain values that can still be read when the creature cannot.
+What Removed and Died give beside the creature: what it was, as plain values that can still be read when the creature cannot. Reason and Position come with Removed only. Killer, Instigator and Damage come with Died only.
 
 <InExplorer id="WaxCreatureEnd" />
 
@@ -1292,11 +1333,11 @@ What Removed and Died give beside the creature: what it was, as plain values tha
 | `Variant` | `string` |  |
 | `ClassName` | `string` |  |
 | `Name` | `string` |  |
-| `Reason` | `"Destroyed"` \| `"Unloaded"` |  |
-| `Position` (optional) | `{ X: number, Y: number, Z: number }` |  |
-| `Killer` (optional) | [`WaxInstance`](/docs/reference/game#waxinstance) | Only with Died: the actor the game named as what did the hit that left the creature no health. nil for a death with no hit that Wax heard, such as one by Kill(). A death that is seen by looking waits up to 0.4 seconds for the game's word of the hit, so Died comes that much later. |
-| `Instigator` (optional) | [`WaxInstance`](/docs/reference/game#waxinstance) | Only with Died: the controller the game named as who did that hit. |
-| `Damage` (optional) | `integer` | Only with Died: the damage of that hit. |
+| `Reason` (optional) | `"Destroyed"` \| `"Unloaded"` | Only with Removed: "Destroyed" when the game took the creature out of the world, "Unloaded" when its part of the map or the whole map went. |
+| `Position` (optional) | `{ X: number, Y: number, Z: number }` | Only with Removed: where it was, when the game could still say. |
+| `Killer` (optional) <NextMark /> | [`WaxInstance`](/docs/reference/game#waxinstance) | Only with Died: the actor the game named as what did the hit that left the creature no health. nil for a death with no hit that Wax heard, such as one by Kill(). A death that is seen by looking waits up to 0.4 seconds for the game's word of the hit, so Died comes that much later. |
+| `Instigator` (optional) <NextMark /> | [`WaxInstance`](/docs/reference/game#waxinstance) | Only with Died: the controller the game named as who did that hit. |
+| `Damage` (optional) <NextMark /> | `integer` | Only with Died: the damage of that hit. |
 
 ## WaxHighlightOptions [#waxhighlightoptions]
 
@@ -1372,6 +1413,6 @@ One of [`IcarusNPCCharacter`](/explorer?game=IcarusNPCCharacter) or [`IcarusPawn
 
 ### WaxGameMember [#waxgamemember]
 
-One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"Creatures"`, `"Highlight"`, `"Data"`, `"MapChanged"`, `"IsHost"`, `"Me"`, `"Items"`, `"Time"`, `"Weather"`, `"Prospect"`.
+One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"Creatures"`, `"Highlight"`, `"Data"`, `"MapChanged"`, `"IsHost"` <NextMark />, `"Me"` <NextMark />, `"Items"` <NextMark />, `"Time"` <NextMark />, `"Weather"` <NextMark />, `"Prospect"` <NextMark />.
 
 <InExplorer id="WaxGameMember" />

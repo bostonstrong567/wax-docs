@@ -1,7 +1,8 @@
 // What the Explorer page knows and how it searches. No React here, so the logic can be run on its own.
 
 export type Guide = { href: string; title: string };
-export type WaxParam = { name: string; type: string; optional?: boolean; text?: string };
+// `next` on a type or one of its parts: it is newer than the released Wax (scripts/generate-api.mjs works it out).
+export type WaxParam = { name: string; type: string; optional?: boolean; text?: string; next?: boolean };
 export type WaxReturn = { type: string; name?: string; text?: string };
 export type WaxProp = {
   id: string;
@@ -12,8 +13,9 @@ export type WaxProp = {
   use?: string;
   ref?: string;
   guide?: Guide;
+  next?: boolean;
 };
-export type WaxSignal = { id: string; name: string; type: string; receives?: string; open?: boolean; text?: string; use?: string };
+export type WaxSignal = { id: string; name: string; type: string; receives?: string; open?: boolean; text?: string; use?: string; next?: boolean };
 export type WaxFunc = {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ export type WaxFunc = {
   guide?: Guide;
   use?: string;
   blocked?: boolean;
+  next?: boolean;
 };
 export type WaxKind = 'namespace' | 'object' | 'data' | 'alias' | 'globals' | 'blocked';
 export type WaxType = {
@@ -47,7 +50,8 @@ export type WaxType = {
   signals?: WaxSignal[];
   funcs?: WaxFunc[];
   type?: string;
-  values?: { value: string; text?: string }[];
+  values?: { value: string; text?: string; next?: boolean }[];
+  next?: boolean;
 };
 export type WaxGroup = { id: string; title: string; text: string; types: string[]; members: string[] };
 export type WaxData = { groups: WaxGroup[]; spoken: Record<string, string>; types: WaxType[] };
@@ -218,6 +222,14 @@ export class GameIndex {
   place(index: number) {
     return index - this.starts[this.chunk(index)];
   }
+  // True when a chunk's file holds the types this list says it holds, each in its place.
+  holds(chunk: number, types: unknown): types is GameType[] {
+    const start = this.starts[chunk];
+    if (!Array.isArray(types) || start === undefined) return false;
+    let count = 0;
+    while (start + count < this.size && this.chunk(start + count) === chunk) count++;
+    return types.length === count && types.every((type, place) => type?.name === this.name(start + place));
+  }
   // The name in an address. It is the type's own name unless two types share that name.
   key(index: number) {
     return Object.hasOwn(this.tree.keys, index) ? this.tree.keys[index] : this.name(index);
@@ -345,7 +357,7 @@ export function reach(receiver: Receiver | null, className: string): { name: str
 export const isLibrary = (game: GameIndex, index: number) =>
   game.kind(index) === 'c' && game.ancestors(index).some((at) => game.name(at) === 'BlueprintFunctionLibrary');
 
-export function libraryLine(type: GameType) {
+export function libraryLine(type: { name: string }) {
   return `local library = game:Library(${JSON.stringify(type.name)})`;
 }
 
@@ -370,6 +382,7 @@ export type Hit = {
   // For a game entry: the type it belongs to or is built on, said as "In Actor." or "Built on Actor."
   link?: { lead: string; id: string; label: string };
   tag: string;
+  next?: boolean;
 };
 
 type Candidate = { rank: number; source: 0 | 1; order: number; sort: string; size: number; hits: () => Hit[] };
@@ -425,9 +438,10 @@ export class Searcher {
         label: type.title,
         detail: firstSentence(type.text ?? ''),
         tag: waxTag(type),
+        next: type.next,
       });
       const member = (kind: Kind, tag: string, row: WaxProp | WaxSignal | WaxFunc, said: string, label = said) =>
-        item([row.name, said, row.id], { source: 'wax', kind, id: row.id, label, detail: firstSentence(row.text ?? ''), tag });
+        item([row.name, said, row.id], { source: 'wax', kind, id: row.id, label, detail: firstSentence(row.text ?? ''), tag, next: row.next });
       const owner = type.kind === 'globals' ? '' : `${type.title}.`;
       for (const row of type.props ?? []) if (!wax.types.has(row.id) && !row.name.startsWith('[')) member('property', 'property', row, `${owner}${row.name}`);
       for (const row of type.signals ?? []) member('event', 'signal', row, `${owner}${row.name}`);

@@ -52,3 +52,8 @@ html > body[data-scroll-locked] {
   font-size: 0.8125rem;
   color: inherit;
 }
+
+/* A heading that is one long function name breaks where it has to, so a narrow screen does not scroll sideways. */
+.prose :is(h1, h2, h3, h4) {
+  overflow-wrap: anywhere;
+}

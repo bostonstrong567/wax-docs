@@ -101,7 +101,9 @@ window:Progress("Energy", 0.6, { color = ui.Color(0x22C3A6) })
 ## Switch theme from code
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "Theme sample", icon = "palette", width = 320, height = 290 })
+local window = ui.Window({
+    title = "Theme sample", icon = "palette", width = 320, height = 290,
+})
 
 window:Toggle("Enabled", true)
 window:Slider("Amount", { min = 0, max = 10, step = 1, value = 6 })

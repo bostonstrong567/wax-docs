@@ -92,17 +92,20 @@ or pressed, not every frame.
 `game.Workshop:Node(id)` gives a node to change. `Set` takes a table with what should be different.
 
 ```lua title="init.lua"
-local axe = game.Workshop:Node("Workshop_Axe_Printed")
+local suit = game.Workshop:Node("Workshop_Envirosuit_1")
 
-local warnings = axe:Set({
+local warnings = suit:Set({
     research = { Credits = 50 },
-    replicate = { Credits = 10 },
 })
 
 for _, warning in ipairs(warnings) do
     print(warning.Text)
 end
 ```
+
+This node and this key are what was tried in the game: its research price was changed, and the store's screen
+showed the new price a moment later. `at`, `needs`, `line` and `level` were tried there too. `replicate` is
+written the same way and has not been looked at in the game yet.
 
 | In the table | What it changes |
 | --- | --- |
@@ -117,7 +120,7 @@ end
   met, raise an error, and nothing is written.
 - `Set` gives back a list of warnings: a node it now lies on, a place outside the heights that fit the
   screen, and the like. An empty list when there is nothing.
-- The change belongs to your mod. It goes back when your mod unloads, or with `axe:Reset()`.
+- The change belongs to your mod. It goes back when your mod unloads, or with `suit:Reset()`.
   `game.Workshop:Reset()` takes back everything your mod changed in the store.
 
 ### Lay a category out
@@ -126,7 +129,8 @@ end
 `"line"`, `"grid"`, `"ring"`, `"arc"`, `"spiral"`, `"tree"` or `"path"`.
 
 ```lua title="init.lua"
-local warnings = game.Workshop:Category("Workshop_Farming"):Arrange("grid", { columns = 6 })
+local farming = game.Workshop:Category("Workshop_Farming")
+local warnings = farming:Arrange("grid", { columns = 6 })
 print(#warnings, "warnings")
 ```
 

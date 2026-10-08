@@ -1,0 +1,5 @@
+{"chunk":"script.ImageWriteQueue","types":[
+{"name":"EDesiredImageFormat","kind":"enum","from":"/Script/ImageWriteQueue.EDesiredImageFormat","values":[["PNG",0],["JPG",1],["BMP",2],["EXR",3]]},
+{"name":"ImageWriteBlueprintLibrary","kind":"class","from":"/Script/ImageWriteQueue.ImageWriteBlueprintLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["ExportToDisk",[["Texture","Texture"],["Filename","string"],["Options","ImageWriteOptions"]],"","obj:ExportToDisk(texture, \"text\", {})",["static"]]]},
+{"name":"ImageWriteOptions","kind":"struct","from":"/Script/ImageWriteQueue.ImageWriteOptions","props":[["CompressionQuality","integer","print(value.CompressionQuality)"],["Format","EDesiredImageFormat","print(value.Format)"],["OnComplete","delegate(bSuccess: boolean)","print(value.OnComplete)"],["bAsync","boolean","print(value.bAsync)"],["bOverwriteFile","boolean","print(value.bOverwriteFile)"]]}
+]}

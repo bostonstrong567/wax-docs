@@ -32,7 +32,9 @@ local hud = ui.Overlay({ title = "My first mod", anchor = "top-left" })
 hud:Field("Map", game.MapName or "none")
 
 -- A window lives in the menu. Your mod's own key shows and hides it.
-local window = ui.Window({ title = "My first mod", icon = "sparkles", width = 300, height = 170 })
+local window = ui.Window({
+    title = "My first mod", icon = "sparkles", width = 300, height = 170,
+})
 
 window:Label("Hello from my first mod.")
 

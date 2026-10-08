@@ -1,0 +1,4 @@
+{"chunk":"script.MoviePlayer","types":[
+{"name":"EMoviePlaybackType","kind":"enum","from":"/Script/MoviePlayer.EMoviePlaybackType","values":[["MT_Normal",0],["MT_Looped",1],["MT_LoadingLoop",2],["MT_MAX",3]]},
+{"name":"MoviePlayerSettings","kind":"class","from":"/Script/MoviePlayer.MoviePlayerSettings","parent":"Object","origin":"native","props":[["StartupMovies","string[]","print(obj.StartupMovies)"],["bMoviesAreSkippable","boolean","print(obj.bMoviesAreSkippable)"],["bWaitForMoviesToComplete","boolean","print(obj.bWaitForMoviesToComplete)"]],"funcs":[]}
+]}

@@ -10,7 +10,9 @@ Wax comes with the Lucide icon set: more than 1,500 line icons. You use an icon 
 ## Where icons go
 
 ```lua title="init.lua"
-local window = ui.Window({ title = "Icons", icon = "shapes", width = 300, height = 230 })
+local window = ui.Window({
+    title = "Icons", icon = "shapes", width = 300, height = 230,
+})
 
 window:Button("Reload", function()
     ui.Notify("Reloading.", { icon = "refresh-cw" })
@@ -71,7 +73,9 @@ Put a PNG file in your mod's folder and register it under a name.
 ```lua title="init.lua"
 ui.Icons.Register("my-logo", mod.dir .. "/logo.png")
 
-local window = ui.Window({ title = "My mod", icon = "my-logo", width = 300, height = 140 })
+local window = ui.Window({
+    title = "My mod", icon = "my-logo", width = 300, height = 140,
+})
 window:Icon("my-logo", { size = 48 })
 ```
 

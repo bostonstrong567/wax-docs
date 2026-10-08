@@ -11,7 +11,8 @@ goes. Wax hands them to you as [signals](/docs/signals).
 
 ```lua title="init.lua"
 game.Me.Damaged:Connect(function(_, amount, info)
-    ui.Notify(("You lost %d health. %s left."):format(amount, tostring(info.Health)), { kind = "warn" })
+    local text = ("You lost %d health. %s left."):format(amount, tostring(info.Health))
+    ui.Notify(text, { kind = "warn" })
 end)
 
 game.Creatures.Died:Connect(function(creature, info)

@@ -230,7 +230,9 @@ says which of the game's screens is showing, and `ui.GameScreenChanged` fires wh
 signal, and do not ask every frame.
 
 ```lua title="init.lua"
-local panel = ui.Panel({ anchor = "right", width = 220, when = "always", visible = false })
+local panel = ui.Panel({
+    anchor = "right", width = 220, when = "always", visible = false,
+})
 panel:Label("Beside the inventory.")
 
 local fit = ui.FitGame({ scale = 0.85, enabled = false })

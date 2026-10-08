@@ -18,6 +18,7 @@ import {
   useState,
 } from 'react';
 import { FilterInput } from '@/components/filter-input';
+import { NEXT_IS_OUT, NEXT_SENTENCE, NextMark } from '@/components/next-version';
 import { copy } from '@/lib/copy';
 import {
   cutNames,
@@ -59,7 +60,7 @@ import {
   waxTag,
 } from '@/lib/explorer';
 import waxData from '@/lib/explorer-wax.json';
-import { appName, explorerDataUrl } from '@/lib/shared';
+import { appName, explorerBuildsUrl, explorerDataUrl, explorerStamp } from '@/lib/shared';
 
 const wax = new WaxIndex(waxData as unknown as WaxData);
 
@@ -107,10 +108,52 @@ function searchOf(query: Query, open: Open | null = query.open) {
   return text ? `?${text}` : '';
 }
 
-async function getData<T>(file: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${explorerDataUrl}/${file}`, { signal });
-  if (!response.ok) throw new Error(`${file}: ${response.status}`);
-  return (await response.json()) as T;
+// Why a file of the data did not come, as a sentence for the page.
+class DataProblem extends Error {}
+const whyOf = (problem: unknown) => (problem instanceof DataProblem ? problem.message : 'Something went wrong while reading the data.');
+
+// One fetch of one data file. `fresh` goes around the browser's own copy. `fits` says whether the file is the one meant.
+async function fetchData<T>(file: string, fits: (data: unknown) => data is T, fresh: boolean, signal?: AbortSignal): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${explorerDataUrl}/${file}`, { signal, cache: fresh ? 'reload' : 'default' });
+  } catch (problem) {
+    if (signal?.aborted) throw problem;
+    throw new DataProblem(`The connection failed while fetching ${file}.`);
+  }
+  if (!response.ok) throw new DataProblem(`The site answered ${response.status} for ${file}.`);
+  const data: unknown = await response.json().catch(() => undefined);
+  if (!fits(data)) throw new DataProblem(`${file} came, and it does not hold what this page expects.`);
+  return data;
+}
+
+// A file that fails, or is not the one meant, is asked for once more around the browser's own copy before anything is said.
+async function getData<T>(file: string, fits: (data: unknown) => data is T, fresh: boolean, signal?: AbortSignal): Promise<T> {
+  if (!fresh) {
+    try {
+      return await fetchData(file, fits, false, signal);
+    } catch (problem) {
+      if (signal?.aborted) throw problem;
+    }
+  }
+  return fetchData(file, fits, true, signal);
+}
+
+const isSearch = (data: unknown): data is GameSearch =>
+  typeof data === 'object' && data !== null && Array.isArray((data as GameSearch).types) && Array.isArray((data as GameSearch).chunks);
+const isTree = (data: unknown): data is GameTree => typeof data === 'object' && data !== null && Array.isArray((data as GameTree).parents);
+const isMembers = (data: unknown): data is GameMembers =>
+  typeof data === 'object' && data !== null && ['p', 'f', 'e'].every((group) => typeof (data as GameMembers)[group as 'p'] === 'object');
+
+// True when the site now has other data than this page was built with: the page is older than the site.
+async function siteMovedOn(): Promise<boolean> {
+  try {
+    const response = await fetch(explorerBuildsUrl, { cache: 'no-store' });
+    const builds = response.ok ? ((await response.json()) as { current?: string; kept?: string[] }) : null;
+    return typeof builds?.current === 'string' && builds.current !== explorerStamp && !(builds.kept ?? []).includes(explorerStamp);
+  } catch {
+    return false;
+  }
 }
 
 // A click with a modifier key, or with another button, is left to the browser.
@@ -129,7 +172,13 @@ type Shared = {
   hrefOf: (open: Open | null) => string;
   go: (open: Open | null, how?: 'push' | 'replace', scroll?: boolean) => void;
   typeAt: (index: number) => Loaded;
-  want: (index: number, again?: boolean) => void;
+  // Why typeAt said 'failed'.
+  whyAt: (index: number) => string;
+  want: (index: number) => void;
+  // Fetches the list again around the browser's own copy, and after it whatever the page shows.
+  startOver: () => void;
+  // The site has other data now than this page was built with, and no longer has this page's.
+  movedOn: boolean;
   scrollTo: RefObject<string>;
 };
 const SharedContext = createContext<Shared | null>(null);
@@ -265,6 +314,59 @@ function Notice({ text, action, onAction }: { text: string; action?: string; onA
   );
 }
 
+// Something of the game's data did not come, after a second try. `what` names it, `why` is the reason found.
+function LoadProblem({ what, why, rest }: { what: string; why: string; rest?: string }) {
+  const { startOver, movedOn } = useShared();
+  if (movedOn) {
+    return (
+      <Notice
+        text={`${what} could not be loaded: the site was updated after this page was opened, and it no longer has the data this page reads. Reload the page to get the new one.`}
+        action="Reload the page"
+        onAction={() => window.location.reload()}
+      />
+    );
+  }
+  return (
+    <Notice
+      text={`${what} could not be loaded. ${why}${rest ? ` ${rest}` : ''}`}
+      action="Try again"
+      onAction={startOver}
+    />
+  );
+}
+
+// Stands where the members of a type will be while they are fetched, shaped like what comes: on a type's own page
+// a box where the filter will be, then a heading and a few lines. So nothing above the list moves when it arrives.
+function MembersLoading({ name, filter }: { name: string; filter?: boolean }) {
+  const widths = ['w-40', 'w-56', 'w-32', 'w-48', 'w-36', 'w-52'];
+  const says = `Loading the members of ${name}`;
+  return (
+    <>
+      {filter ? (
+        <p role="status" className="flex h-10 max-w-sm items-center truncate rounded-lg border bg-fd-card px-3 text-sm text-fd-muted-foreground">
+          {says}
+        </p>
+      ) : null}
+      <section className="flex flex-col gap-3">
+        {filter ? (
+          <span aria-hidden="true" className="my-1 block h-5 w-28 animate-pulse rounded bg-fd-muted" />
+        ) : (
+          <h2 role="status" className="text-lg font-medium text-fd-muted-foreground">
+            {says}
+          </h2>
+        )}
+        <ul aria-hidden="true" className={LIST}>
+          {widths.map((width) => (
+            <li key={width} className="border-t py-2.5 pl-[2.125rem] pr-3 first:border-t-0 sm:pl-[2.375rem] sm:pr-4">
+              <span className={`my-[0.0625rem] block h-[1.125rem] ${width} max-w-full animate-pulse rounded bg-fd-muted`} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+}
+
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
@@ -353,7 +455,7 @@ function Shape({ lines }: { lines: string[] }) {
   );
 }
 
-type Part = { name: string; type: string; optional?: boolean; text?: string };
+type Part = { name: string; type: string; optional?: boolean; text?: string; next?: boolean };
 
 function Parts({ title, parts }: { title: string; parts: Part[] }) {
   // Values without a name, such as what a function returns, need no column for names.
@@ -370,6 +472,11 @@ function Parts({ title, parts }: { title: string; parts: Part[] }) {
             <dt className={`font-mono text-[13px] [overflow-wrap:anywhere] ${named ? '' : 'sr-only'}`}>
               {part.name || `Value ${index + 1}`}
               {part.optional ? <span className="ml-2 font-sans text-xs text-fd-muted-foreground">optional</span> : null}
+              {part.next ? (
+                <span className="ml-2">
+                  <NextMark />
+                </span>
+              ) : null}
             </dt>
             <dd className="flex min-w-0 flex-col gap-0.5 text-sm">
               <span className="font-mono text-[13px] [overflow-wrap:anywhere]">
@@ -413,6 +520,7 @@ function Row(props: {
   head: ReactNode;
   side?: ReactNode;
   tags?: string[];
+  next?: boolean;
   summary?: string;
   open: boolean;
   marked: boolean;
@@ -450,13 +558,19 @@ function Row(props: {
         {props.tags?.map((tag) => (
           <Tag key={tag}>{tag}</Tag>
         ))}
+        {props.next ? <NextMark /> : null}
       </div>
       {!props.open && props.summary ? (
         <p className="-mt-1.5 line-clamp-1 px-3 pb-2.5 pl-[2.125rem] text-sm text-fd-muted-foreground sm:px-4 sm:pl-[2.375rem]">
           <Prose text={props.summary} />
         </p>
       ) : null}
-      {props.open ? <div className="flex flex-col gap-4 px-3 pb-4 pl-[2.125rem] sm:px-4 sm:pl-[2.375rem]">{props.children}</div> : null}
+      {props.open ? (
+        <div className="flex flex-col gap-4 px-3 pb-4 pl-[2.125rem] sm:px-4 sm:pl-[2.375rem]">
+          {props.next && !NEXT_IS_OUT ? <p className="text-sm text-fd-muted-foreground">{NEXT_SENTENCE}</p> : null}
+          {props.children}
+        </div>
+      ) : null}
     </li>
   );
 }
@@ -524,6 +638,7 @@ function WaxFunctionRow({ row, type, rows }: { row: WaxFunc; type: WaxType; rows
       head={`${row.name}(${params.map((param) => `${param.name}${param.optional ? '?' : ''}`).join(', ')})`}
       side={returns.length ? <TypeText text={returns.map((value) => value.type).join(', ')} /> : null}
       tags={row.blocked ? ['blocked'] : undefined}
+      next={row.next}
       summary={firstSentence(row.text ?? '')}
       open={rows.opened.has(row.id)}
       marked={rows.focus === row.id}
@@ -555,6 +670,7 @@ function WaxSignalRow({ row, type, rows }: { row: WaxSignal; type: WaxType; rows
       source="wax"
       head={row.name}
       side={row.receives ? <TypeText text={`(${row.receives})`} /> : null}
+      next={row.next}
       summary={firstSentence(row.text ?? '')}
       open={rows.opened.has(row.id)}
       marked={rows.focus === row.id}
@@ -586,6 +702,7 @@ function WaxPropRow({ row, type, rows }: { row: WaxProp; type: WaxType; rows: Ro
       source="wax"
       head={other ? `any other key ${row.name}` : `${row.name}${row.optional ? '?' : ''}`}
       side={<TypeText text={row.type} />}
+      next={row.next}
       summary={firstSentence(row.text ?? '')}
       open={rows.opened.has(row.id)}
       marked={rows.focus === row.id}
@@ -683,8 +800,10 @@ function Back() {
   );
 }
 
-function MemberFilter({ value, onChange, total }: { value: string; onChange: (value: string) => void; total: number }) {
-  if (total <= 15) return null;
+// `always`: also for a short list, so the box that stood there while the list was fetched does not go away.
+function MemberFilter(props: { value: string; onChange: (value: string) => void; total: number; always?: boolean }) {
+  const { value, onChange, total } = props;
+  if (total <= (props.always ? 0 : 15)) return null;
   return (
     <div className="flex max-w-sm">
       <FilterInput value={value} onChange={onChange} label="Filter the members" placeholder={`Filter ${total.toLocaleString('en-US')} members`} />
@@ -719,6 +838,7 @@ function WaxEntry({ type, focus }: { type: WaxType; focus: string }) {
         <div className="flex flex-wrap items-center gap-2">
           <Tag strong>Wax</Tag>
           <Tag>{waxTag(type)}</Tag>
+          {type.next ? <NextMark /> : null}
         </div>
         <h1 className="font-mono text-2xl font-semibold tracking-tight [overflow-wrap:anywhere] md:text-3xl">{type.title}</h1>
         {type.text || WAX_KIND[type.kind] ? (
@@ -726,6 +846,7 @@ function WaxEntry({ type, focus }: { type: WaxType; focus: string }) {
             <Prose text={type.text || WAX_KIND[type.kind]} />
           </p>
         ) : null}
+        {type.next && !NEXT_IS_OUT ? <p className="max-w-3xl text-sm text-fd-muted-foreground">{NEXT_SENTENCE}</p> : null}
         <dl className="flex flex-col gap-3">
           {type.kind === 'namespace' ? (
             <Fact label="Type name">
@@ -768,6 +889,11 @@ function WaxEntry({ type, focus }: { type: WaxType; focus: string }) {
                 <li key={value.value} className="flex flex-col gap-0.5 border-t px-4 py-2.5 first:border-t-0 sm:flex-row sm:items-baseline sm:gap-4">
                   <span className="font-mono text-[13px] [overflow-wrap:anywhere]">
                     <TypeText text={value.value} />
+                    {value.next ? (
+                      <span className="ml-2">
+                        <NextMark />
+                      </span>
+                    ) : null}
                   </span>
                   {value.text ? <span className="text-sm text-fd-muted-foreground">{value.text}</span> : null}
                 </li>
@@ -936,14 +1062,12 @@ function GameMemberLists({ index, type, view, rows }: { index: number; type: Gam
 }
 
 function GameLoaded({ index, view, rows }: { index: number; view: number; rows: Rows }) {
-  const { game, typeAt, want } = useShared();
+  const { game, typeAt, whyAt, want } = useShared();
   useEffect(() => want(index), [want, index]);
   const type = typeAt(index);
   if (!game) return null;
-  if (type === 'loading') return <p className="text-sm text-fd-muted-foreground">Loading the members of {game.name(index)}.</p>;
-  if (type === 'failed') {
-    return <Notice text={`The members of ${game.name(index)} could not be loaded.`} action="Try again" onAction={() => want(index, true)} />;
-  }
+  if (type === 'loading') return <MembersLoading name={game.name(index)} />;
+  if (type === 'failed') return <LoadProblem what={`The members of ${game.name(index)}`} why={whyAt(index)} />;
   return <GameMemberLists index={index} type={type} view={view} rows={rows} />;
 }
 
@@ -954,7 +1078,7 @@ const GAME_KIND = {
 };
 
 function GameEntry({ index, member }: { index: number; member: string }) {
-  const { game, entries, typeAt, want } = useShared();
+  const { game, entries, typeAt, whyAt, want } = useShared();
   const key = game?.key(index) ?? '';
   const focus = member ? `${key}.${member}` : '';
   const { opened, toggle } = useOpened('game', key, focus);
@@ -1023,9 +1147,14 @@ function GameEntry({ index, member }: { index: number; member: string }) {
               <Links items={game.children[index].map(link)} />
             </Fact>
           ) : null}
-          {loaded ? (
+          {/* The line is there from the start, so nothing below it moves when the path arrives. */}
+          {type !== 'failed' ? (
             <Fact label="Path in the game">
-              <span className="font-mono text-[13px]">{loaded.from}</span>
+              {loaded ? (
+                <span className="font-mono text-[13px]">{loaded.from}</span>
+              ) : (
+                <span aria-hidden="true" className="my-[0.1875rem] block h-3.5 w-64 max-w-full animate-pulse rounded bg-fd-muted" />
+              )}
             </Fact>
           ) : null}
         </dl>
@@ -1036,8 +1165,8 @@ function GameEntry({ index, member }: { index: number; member: string }) {
           code={`local ${got.name} = ${got.source}`}
           note={got.source.startsWith('game:Find') ? 'game:Find gives the first one that exists now, or nil when there is none.' : undefined}
         />
-      ) : library && loaded ? (
-        <InScript code={libraryLine(loaded)} note="A library has no objects of its own. Its functions are called on the library itself." />
+      ) : library ? (
+        <InScript code={libraryLine({ name })} note="A library has no objects of its own. Its functions are called on the library itself." />
       ) : null}
 
       {missing ? (
@@ -1045,12 +1174,16 @@ function GameEntry({ index, member }: { index: number; member: string }) {
       ) : null}
 
       {type === 'loading' ? (
-        <p className="text-sm text-fd-muted-foreground">Loading the members of {name}.</p>
+        <MembersLoading name={name} filter={letter !== 'e'} />
       ) : type === 'failed' ? (
-        <Notice text={`The members of ${name} could not be loaded.`} action="Try again" onAction={() => want(index, true)} />
+        <LoadProblem
+          what={`The members of ${name}`}
+          why={whyAt(index)}
+          rest="What it is built on and what is built on it are shown above, and the links still work."
+        />
       ) : (
         <>
-          <MemberFilter value={filter} onChange={setFilter} total={type.kind === 'enum' ? 0 : total} />
+          <MemberFilter value={filter} onChange={setFilter} total={type.kind === 'enum' ? 0 : total} always />
           <GameMemberLists index={index} type={type} view={index} rows={rows} />
         </>
       )}
@@ -1088,7 +1221,7 @@ function Missing({ name, inGame }: { name: string; inGame: boolean }) {
   );
 }
 
-function Entry({ open, failed, retry }: { open: Open; failed: boolean; retry: () => void }) {
+function Entry({ open, failed, why }: { open: Open; failed: boolean; why: string }) {
   const { game } = useShared();
   if (open.source === 'wax') {
     const found = wax.open(open.id);
@@ -1099,10 +1232,11 @@ function Entry({ open, failed, retry }: { open: Open; failed: boolean; retry: ()
     return (
       <div className="flex flex-col gap-8">
         <Back />
+        <h1 className="font-mono text-2xl font-semibold tracking-tight [overflow-wrap:anywhere] md:text-3xl">{cut(open.id)[0].slice(0, 80)}</h1>
         {failed ? (
-          <Notice text="The list of the game's classes could not be loaded." action="Try again" onAction={retry} />
+          <LoadProblem what="The list of the game's classes" why={why} rest="What Wax itself gives a mod is still in the Explorer." />
         ) : (
-          <p className="text-sm text-fd-muted-foreground">Loading {cut(open.id)[0].slice(0, 80)}.</p>
+          <MembersLoading name={cut(open.id)[0].slice(0, 80)} filter />
         )}
       </div>
     );
@@ -1211,13 +1345,19 @@ function WaxBrowse({ nodes }: { nodes: Nodes }) {
                     ...group.members.map((id) => ({ id, title: id, type: undefined })),
                   ].map((item) => {
                     const text = firstSentence((item.type ? item.type.text : wax.members.get(item.id)?.row.text) ?? '');
+                    const next = item.type ? item.type.next : wax.members.get(item.id)?.row.next;
                     return (
                       <ListRow
                         key={item.id}
                         indent
                         open={{ source: 'wax', id: item.id }}
                         label={item.title}
-                        side={<Tag>{item.type ? waxTag(item.type) : 'function'}</Tag>}
+                        side={
+                          <span className="flex shrink-0 items-center gap-1.5">
+                            {next ? <NextMark /> : null}
+                            <Tag>{item.type ? waxTag(item.type) : 'function'}</Tag>
+                          </span>
+                        }
                       >
                         {text ? <Prose text={text} /> : null}
                       </ListRow>
@@ -1233,7 +1373,7 @@ function WaxBrowse({ nodes }: { nodes: Nodes }) {
   );
 }
 
-function GameBrowse(props: { nodes: Nodes; failed: boolean; retry: () => void; list: (kind: Kind) => void }) {
+function GameBrowse(props: { nodes: Nodes; failed: boolean; why: string; list: (kind: Kind) => void }) {
   const { game } = useShared();
   const shown = props.nodes.open.has('game');
   const counts = game?.tree.counts;
@@ -1248,9 +1388,11 @@ function GameBrowse(props: { nodes: Nodes; failed: boolean; retry: () => void; l
         has, and adds the properties and functions of its own class and of the classes that one is built on. {SOURCE}
       </p>
       {props.failed ? (
-        <Notice text="The list of the game's classes could not be loaded." action="Try again" onAction={props.retry} />
+        <LoadProblem what="The list of the game's classes" why={props.why} />
       ) : !game ? (
-        <p className="text-sm text-fd-muted-foreground">Loading the game&apos;s classes.</p>
+        <div role="status" className="rounded-xl border bg-fd-card p-2 sm:p-3">
+          <p className="flex h-7 items-center pl-8 text-sm text-fd-muted-foreground">Loading the game&apos;s classes.</p>
+        </div>
       ) : (
         <>
           <ul className="rounded-xl border bg-fd-card p-2 sm:p-3">
@@ -1298,6 +1440,7 @@ function Results({ hits }: { hits: Hit[] }) {
           label={hit.label}
           side={
             <span className="flex shrink-0 items-center gap-1.5">
+              {hit.next ? <NextMark /> : null}
               <Tag>{hit.tag}</Tag>
               <Tag strong={hit.source === 'wax'}>{hit.source === 'wax' ? 'Wax' : 'Game'}</Tag>
             </span>
@@ -1325,13 +1468,17 @@ export function Explorer() {
   const [text, setText] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [game, setGame] = useState<GameIndex | null>(null);
-  const [gameFailed, setGameFailed] = useState(false);
+  const [gameWhy, setGameWhy] = useState('');
   const [members, setMembers] = useState<GameMembers | null>(null);
-  const [membersFailed, setMembersFailed] = useState(false);
+  const [membersWhy, setMembersWhy] = useState('');
+  const [movedOn, setMovedOn] = useState(false);
+  const gameFailed = gameWhy !== '';
+  const membersFailed = membersWhy !== '';
   const [limit, setLimit] = useState(PAGE);
   const [openNodes, setOpenNodes] = useState<Set<string>>(() => new Set(['game']));
   const [version, setVersion] = useState(0);
   const chunks = useRef(new Map<number, GameType[] | 'loading' | 'failed'>());
+  const chunkWhy = useRef(new Map<number, string>());
   const listScroll = useRef(0);
   const mounted = useRef(false);
   const scrollTo = useRef('');
@@ -1370,22 +1517,41 @@ export function Explorer() {
     return () => clearTimeout(wait);
   }, [text, query, change]);
 
+  // After a failure the page looks once at what data the site has now, to tell an old page from a bad connection.
+  const failed = useCallback(() => {
+    siteMovedOn().then((moved) => {
+      if (moved) setMovedOn(true);
+    });
+  }, []);
+
   // The names of the game's types and what each is built on. The members of a type are fetched when it is opened.
+  // After "Try again" (attempt above 0) every file is fetched around the browser's own copy.
+  const fresh = attempt > 0;
   useEffect(() => {
     const controller = new AbortController();
-    Promise.all([getData<GameSearch>('search.json', controller.signal), getData<GameTree>('tree.json', controller.signal)]).then(
+    Promise.all([
+      getData('search.json', isSearch, fresh, controller.signal),
+      getData('tree.json', isTree, fresh, controller.signal),
+    ]).then(
       ([search, tree]) => {
         if (controller.signal.aborted) return;
-        const fits = Array.isArray(search.types) && Array.isArray(tree.parents) && search.types.length === tree.parents.length;
-        if (fits) setGame(new GameIndex(search, tree));
-        setGameFailed(!fits);
+        if (search.types.length !== tree.parents.length) {
+          setGameWhy('search.json and tree.json came, and they do not list the same classes.');
+          return failed();
+        }
+        chunks.current = new Map();
+        chunkWhy.current = new Map();
+        setGame(new GameIndex(search, tree));
+        setGameWhy('');
       },
-      () => {
-        if (!controller.signal.aborted) setGameFailed(true);
+      (problem) => {
+        if (controller.signal.aborted) return;
+        setGameWhy(whyOf(problem));
+        failed();
       },
     );
     return () => controller.abort();
-  }, [attempt]);
+  }, [attempt, fresh, failed]);
 
   // Member names are a large list. It is fetched when a search first needs it.
   const needMembers =
@@ -1396,47 +1562,73 @@ export function Explorer() {
   useEffect(() => {
     if (!needMembers || members) return;
     const controller = new AbortController();
-    getData<GameMembers>('members.json', controller.signal).then(
+    getData('members.json', isMembers, fresh, controller.signal).then(
       (data) => {
         if (controller.signal.aborted) return;
-        if (data.p && data.f && data.e) setMembers(data);
-        setMembersFailed(!(data.p && data.f && data.e));
+        setMembers(data);
+        setMembersWhy('');
       },
-      () => {
-        if (!controller.signal.aborted) setMembersFailed(true);
+      (problem) => {
+        if (controller.signal.aborted) return;
+        setMembersWhy(whyOf(problem));
+        failed();
       },
     );
     return () => controller.abort();
-  }, [needMembers, members, attempt]);
+  }, [needMembers, members, attempt, fresh, failed]);
 
+  // A chunk is fetched once. It counts as loaded only when it holds the types the list says it holds, each in its place.
   const want = useCallback(
-    (index: number, again = false) => {
+    (index: number) => {
       if (!game) return;
       const number = game.chunk(index);
-      const state = chunks.current.get(number);
-      if (state !== undefined && !(again && state === 'failed')) return;
-      chunks.current.set(number, 'loading');
-      if (again) setVersion((n) => n + 1);
-      getData<{ types: GameType[] }>(`chunks/${encodeURIComponent(game.search.chunks[number])}.json`)
+      // An answer that comes after the list was fetched again goes to the maps that were dropped.
+      const [states, reasons] = [chunks.current, chunkWhy.current];
+      if (states.get(number) !== undefined) return;
+      states.set(number, 'loading');
+      const file = `chunks/${encodeURIComponent(game.search.chunks[number])}.json`;
+      const fits = (data: unknown): data is { types: GameType[] } =>
+        typeof data === 'object' && data !== null && game.holds(number, (data as { types?: unknown }).types);
+      getData(file, fits, fresh)
         .then(
-          (data) => chunks.current.set(number, Array.isArray(data.types) ? data.types : 'failed'),
-          () => chunks.current.set(number, 'failed'),
+          (data) => {
+            states.set(number, data.types);
+          },
+          (problem) => {
+            states.set(number, 'failed');
+            reasons.set(number, whyOf(problem));
+            failed();
+          },
         )
         .then(() => setVersion((n) => n + 1));
     },
-    [game],
+    [game, fresh, failed],
   );
 
+  // While the list is being fetched again nothing of it is trusted: the members wait for it, and fail with it.
   const typeAt = useCallback(
     (index: number): Loaded => {
+      if (gameFailed) return 'failed';
       const state = game ? chunks.current.get(game.chunk(index)) : undefined;
       if (!game || state === undefined || state === 'loading') return 'loading';
-      if (state === 'failed') return 'failed';
-      const type = state[game.place(index)];
-      return type && type.name === game.name(index) ? type : 'failed';
+      return state === 'failed' ? 'failed' : state[game.place(index)];
     },
-    [game],
+    [game, gameFailed],
   );
+  const whyAt = useCallback(
+    (index: number) => gameWhy || (game ? chunkWhy.current.get(game.chunk(index)) : undefined) || 'Something went wrong while reading the data.',
+    [game, gameWhy],
+  );
+
+  // "Try again": the list first, around the browser's own copy, then what the page shows. The old list stays on
+  // screen until the new one is here, so the page keeps its head and its links.
+  const startOver = useCallback(() => {
+    chunks.current = new Map();
+    chunkWhy.current = new Map();
+    setGameWhy('');
+    setMembersWhy('');
+    setAttempt((n) => n + 1);
+  }, []);
 
   const go = useCallback(
     (open: Open | null, how: 'push' | 'replace' = 'push', scroll = true) => {
@@ -1456,11 +1648,14 @@ export function Explorer() {
       hrefOf: (open) => (query ? searchOf(query, open) || './' : './'),
       go,
       typeAt,
+      whyAt,
       want,
+      startOver,
+      movedOn,
       scrollTo,
     }),
     // `version` is here so that everything is drawn again when a chunk arrives.
-    [game, entries, query, go, typeAt, want, version],
+    [game, entries, query, go, typeAt, whyAt, want, startOver, movedOn, version],
   );
 
   // Opening an entry starts at the top. Going back returns to the place in the list.
@@ -1509,11 +1704,6 @@ export function Explorer() {
       setOpenNodes(next);
     },
   };
-  const retry = () => {
-    setGameFailed(false);
-    setMembersFailed(false);
-    setAttempt((n) => n + 1);
-  };
   const set = (patch: Partial<Query>) => {
     if (!query) return;
     setLimit(PAGE);
@@ -1533,7 +1723,7 @@ export function Explorer() {
     return (
       <SharedContext.Provider value={shared}>
         {watcher}
-        <Entry open={query.open} failed={gameFailed} retry={retry} />
+        <Entry open={query.open} failed={gameFailed} why={gameWhy} />
       </SharedContext.Provider>
     );
   }
@@ -1596,13 +1786,9 @@ export function Explorer() {
                   ) : null}
                 </div>
                 {inGame && gameFailed ? (
-                  <Notice text="The list of the game's classes could not be loaded. Only Wax is searched." action="Try again" onAction={retry} />
+                  <LoadProblem what="The list of the game's classes" why={gameWhy} rest="Only Wax is searched." />
                 ) : inGame && membersFailed && !members ? (
-                  <Notice
-                    text="The member names of the game could not be loaded. Its classes are still searched."
-                    action="Try again"
-                    onAction={retry}
-                  />
+                  <LoadProblem what="The member names of the game" why={membersWhy} rest="Its classes are still searched." />
                 ) : null}
                 {result.total > 0 ? (
                   <Results hits={result.hits} />
@@ -1623,7 +1809,7 @@ export function Explorer() {
             ) : (
               <>
                 {query.source !== 'game' ? <WaxBrowse nodes={nodes} /> : null}
-                {inGame ? <GameBrowse nodes={nodes} failed={gameFailed} retry={retry} list={(kind) => set({ kind, source: 'game' })} /> : null}
+                {inGame ? <GameBrowse nodes={nodes} failed={gameFailed} why={gameWhy} list={(kind) => set({ kind, source: 'game' })} /> : null}
               </>
             )}
           </>

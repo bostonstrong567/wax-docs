@@ -1,0 +1,4 @@
+{"chunk":"script.OodleNetworkHandlerComponent","types":[
+{"name":"EOodleEnableMode","kind":"enum","from":"/Script/OodleNetworkHandlerComponent.EOodleEnableMode","values":[["AlwaysEnabled",0],["WhenCompressedPacketReceived",1]]},
+{"name":"OodleNetworkTrainerCommandlet","kind":"class","from":"/Script/OodleNetworkHandlerComponent.OodleNetworkTrainerCommandlet","parent":"Commandlet","origin":"native","props":[["DictionarySize","integer","print(obj.DictionarySize)"],["DictionaryTrials","integer","print(obj.DictionaryTrials)"],["HashTableSize","integer","print(obj.HashTableSize)"],["TrialGenerations","integer","print(obj.TrialGenerations)"],["TrialRandomness","integer","print(obj.TrialRandomness)"],["bCompressionTest","boolean","print(obj.bCompressionTest)"],["bNoTrials","boolean","print(obj.bNoTrials)"]],"funcs":[]}
+]}

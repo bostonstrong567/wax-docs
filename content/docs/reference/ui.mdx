@@ -8,6 +8,8 @@ icon: PanelTop
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
+<NextLegend />
+
 ## `ui` [#ui]
 
 The GUI library: the menu (windows you click), overlays (panels you only read) and notifications.
@@ -22,7 +24,7 @@ Type name: `WaxUI`.
 | `Notifications` | [`WaxNotifications`](/docs/reference/ui#ui-notifications) | What all notifications share: the corner they show in and how many show at once. It also counts them and closes them all. |
 | `Debug` | [`WaxDebugPanel`](/docs/reference/ui#ui-debug) | The in-game debug panel. |
 | `Pictures` | [`WaxPictures`](/docs/reference/ui#ui-pictures) | The game's own pictures, such as item icons, which a cell of a Slots control shows by their path. Loading them is given a few milliseconds a frame, so a picture can show a moment after it was asked for. |
-| `Keys` | [`WaxKeys`](/docs/reference/ui#ui-keys) | The keys that show and hide windows. Wax's own panel has one, and so has every mod that made a window: a key shows and hides its owner's windows and nobody else's. A mod's key is the one the player chose on the mod's card of the Mods page, else the one the mod asked for with ui.Window(\{ key = "F6" \}), else a key Wax gives it once and remembers: one that no window and no hotkey of any mod uses. A press that your mod's own [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes is not also taken as the key of its windows. |
+| `Keys` <NextMark /> | [`WaxKeys`](/docs/reference/ui#ui-keys) | The keys that show and hide windows. Wax's own panel has one, and so has every mod that made a window: a key shows and hides its owner's windows and nobody else's. A mod's key is the one the player chose on the mod's card of the Mods page, else the one the mod asked for with ui.Window(\{ key = "F6" \}), else a key Wax gives it once and remembers: one that no window and no hotkey of any mod uses. A press that your mod's own [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes is not also taken as the key of its windows. |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
@@ -31,7 +33,7 @@ Type name: `WaxUI`.
 | `KeyChanged` | `key`: `string?` | Fires with the new key of Wax's own panel. For any owner's key, use ui.Keys.Changed. |
 | `ThemeChanged` | `name`: `string` | Fires with the theme's name after SetTheme or ResetTheme. |
 | `ScreenChanged` | `width`: `number`, `height`: `number` | Fires once with the new size when ScreenSize gives another answer: after the game's window or the interface size has stopped changing for a moment, never while it is still being resized. |
-| `GameScreenChanged` | `name`: `string?`, `tab`: `integer?` | Fires with what GameScreen answers, in the frame the game shows another of its menu screens, another tab of its main menu, or none any more (nil). Connect to it in place of asking GameScreen every frame: the game is only looked at while somebody listens. |
+| `GameScreenChanged` <NextMark /> | `name`: `string?`, `tab`: `integer?` | Fires with what GameScreen answers, in the frame the game shows another of its menu screens, another tab of its main menu, or none any more (nil). Connect to it in place of asking GameScreen every frame: the game is only looked at while somebody listens. |
 
 ### `ui.Open(options?)` [#ui-open]
 
@@ -91,6 +93,8 @@ ui.Copy(text: any)
 
 ### `ui.TextWidth(text, options?)` [#ui-textwidth]
 
+<NextMark block />
+
 How wide a line of text is drawn, in the units controls and panels are sized in. It is worked out from the letters, to within a few percent.
 
 ```lua
@@ -107,6 +111,8 @@ ui.TextWidth(text: any, options?: WaxTextOptions): number
 <InExplorer id="ui.TextWidth" />
 
 ### `ui.Shorten(text, width, options?)` [#ui-shorten]
+
+<NextMark block />
 
 The text if it fits in a width, else its start with "..." after it. A little room is kept spare, as the library does for its own text.
 
@@ -385,6 +391,8 @@ ui.Hotkey(key: string, callback: fun(), options?: WaxHotkeyOptions): WaxHotkey
 <InExplorer id="ui.Hotkey" />
 
 ### `ui.IsKeyDown(key)` [#ui-iskeydown]
+
+<NextMark block />
 
 True while the key is held down, as the game's own input reports it for the local player. It takes the key names [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes. A name with Ctrl, Shift or Alt ("Ctrl+K") is true only while the key is down with exactly those held; a plain name is true whatever else is held. It is false while the game has no local player, and for a name the game does not know. It does not look at whether the menu is open or a text box has the keyboard (see [`ui.IsTyping`](/docs/reference/ui#ui-istyping)). Every call asks the game, so use it in a loop that runs while something is held, such as one a [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) started, and not in every frame of the game. It raises an error for a key that is not text, for empty text, and for a word before the key that is not Ctrl, Shift or Alt.
 
@@ -775,6 +783,8 @@ ui.Debug.Show()
 
 ## `ui.Keys` [#ui-keys]
 
+<NextMark block />
+
 The keys that show and hide windows. Wax's own panel has one, and so has every mod that made a window: a key shows and hides its owner's windows and nobody else's. A mod's key is the one the player chose on the mod's card of the Mods page, else the one the mod asked for with ui.Window(\{ key = "F6" \}), else a key Wax gives it once and remembers: one that no window and no hotkey of any mod uses. A press that your mod's own [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes is not also taken as the key of its windows.
 
 Type name: `WaxKeys`.
@@ -978,6 +988,8 @@ window:IsVisible(): boolean
 <InExplorer id="WaxWindow.IsVisible" />
 
 ### `window:IsShowing()` [#window-isshowing]
+
+<NextMark block />
 
 True while the window is really on screen: it is shown, and its mod's windows are up (or every window is, in preview).
 
@@ -1190,7 +1202,7 @@ It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Scrolled` | `steps`: `integer` | On a panel made with [`ui.Panel`](/docs/reference/ui#ui-panel): the wheel was turned over it, 1 for down and -1 for up. The game does not see the wheel while the mouse is over a panel. |
-| `Resized` | `width`: `number`, `height`: `number?` | On a panel made with a place function: it was given another size, in its own units. Fires in the frame the screen changed. |
+| `Resized` <NextMark /> | `width`: `number`, `height`: `number?` | On a panel made with a place function: it was given another size, in its own units. Fires in the frame the screen changed. |
 
 ### `overlay:SetVisible(shown)` [#overlay-setvisible]
 
@@ -1511,6 +1523,8 @@ hotkey:SetKey(key: string)
 
 ## WaxModel [#waxmodel]
 
+<NextMark block />
+
 A creature or any other skeletal mesh of the game, drawn in 3D. It turns slowly by itself until the player touches it. The model follows the mouse when dragged: to the right its near side goes right, and down it is seen more from above. The wheel moves the camera nearer and further while the mouse is over the view, and the page does not scroll then. Two presses in a row put the view back. Nothing is drawn while the view is not on screen.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Model`](/docs/reference/controls#container-model). Below, `model` stands for one of these.
@@ -1526,7 +1540,7 @@ It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) ca
 
 ### `model:Show(look)` [#model-show]
 
-Shows another model in the same box. The view goes back to where it starts.
+Shows another model in the same box. The view goes back to where it starts, unless the first mesh is the one that shows already: the same body with other parts or other fur is seen from where the player left it.
 
 ```lua
 model:Show(look: WaxModelLook)
@@ -1753,12 +1767,12 @@ Used by [`ui.Window`](/docs/reference/ui#ui-window).
 | `x` | `number` |  |
 | `y` | `number` |  |
 | `closable` | `boolean` | False leaves out the close button. |
-| `resizable` | `boolean` | False makes a window the player cannot resize: it has no grip, its edges and corners do nothing, and it is always the size your mod gives it. SetSize still works. |
+| `resizable` <NextMark /> | `boolean` | False makes a window the player cannot resize: it has no grip, its edges and corners do nothing, and it is always the size your mod gives it. SetSize still works. |
 | `visible` | `boolean` | False creates the window hidden. |
 | `nav` | [`WaxNav`](/docs/reference/ui#waxnav) | Gives the window pages, listed down the side or along the top. |
 | `nav_width` | `number` | Width of the side navigation column. |
 | `remember` | `boolean` | False stops Wax remembering the window's position and size between sessions. |
-| `key` | `string` | The key that shows and hides your mod's windows, such as "F6" or "Ctrl+K". The first window a mod makes decides. Without it Wax gives the mod a key, and the player can choose another on the mod's card of the Mods page. |
+| `key` <NextMark /> | `string` | The key that shows and hides your mod's windows, such as "F6" or "Ctrl+K". The first window a mod makes decides. Without it Wax gives the mod a key, and the player can choose another on the mod's card of the Mods page. |
 
 ## WaxPageOptions [#waxpageoptions]
 
@@ -1814,9 +1828,11 @@ Extends [`WaxOverlayOptions`](/docs/reference/ui#waxoverlayoptions). Used by [`u
 | `opacity` | `number` | How solid its background is, 0 to 1. 0.96 when omitted. |
 | `visible` | `boolean` | False makes it hidden until SetVisible(true). |
 | `on_press` | `fun()` | Runs when the panel is pressed where it has no control. |
-| `place` | `fun(screen_width: number, screen_height: number): WaxPanelPlace` | Where the panel goes on a screen of this size. It is asked when the panel is made and again, in the same frame, whenever the game's window changes size: the panel that exists is moved, sized and zoomed, and nothing is built again. The size is the real screen in the units the game lays its own menus out in, and the zoom is used as it is, so such a panel keeps its size beside the game's menus whatever the interface size is. |
+| `place` <NextMark /> | `fun(screen_width: number, screen_height: number): WaxPanelPlace` | Where the panel goes on a screen of this size. It is asked when the panel is made and again, in the same frame, whenever the game's window changes size: the panel that exists is moved, sized and zoomed, and nothing is built again. The size is the real screen in the units the game lays its own menus out in, and the zoom is used as it is, so such a panel keeps its size beside the game's menus whatever the interface size is. |
 
 ## WaxPanelPlace [#waxpanelplace]
+
+<NextMark block />
 
 What a panel's place function answers. What is left out stays as it is.
 
@@ -1860,6 +1876,8 @@ Used by [`ui.Notify`](/docs/reference/ui#ui-notify).
 
 ## WaxKeyOwner [#waxkeyowner]
 
+<NextMark block />
+
 One owner of windows, as [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners) lists it.
 
 Returned by [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners).
@@ -1874,6 +1892,8 @@ Returned by [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners).
 | `open` | `boolean` | True while its windows are up. |
 
 ## WaxTextOptions [#waxtextoptions]
+
+<NextMark block />
 
 Used by [`ui.TextWidth`](/docs/reference/ui#ui-textwidth), [`ui.Shorten`](/docs/reference/ui#ui-shorten).
 
@@ -1913,6 +1933,8 @@ Used by [`ui.Hotkey`](/docs/reference/ui#ui-hotkey).
 
 ## WaxModelFur [#waxmodelfur]
 
+<NextMark block />
+
 The fur of a model: a second mesh that hair grows from. [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) fills it in from the creature's own data.
 
 <InExplorer id="WaxModelFur" />
@@ -1930,10 +1952,13 @@ The fur of a model: a second mesh that hair grows from. [`game.Creatures:GetMode
 | `uniformity` (optional) | `number` |  |
 | `bare` (optional) | `boolean` | True leaves out the faces that have no splines. |
 | `materials` (optional) | `table<integer, string>` | Game paths of materials by slot, 1 first. |
+| `mask` (optional) | `string` | The game path of a texture that says where no fur grows, as the game puts one on a mount's fur under some saddles. It goes on a copy of the fur's first material, so it only works when materials names that one. |
 
 ## WaxModelPart [#waxmodelpart]
 
-One more mesh of a model on the same skeleton, such as a piece of armour. It takes the pose of the first mesh.
+<NextMark block />
+
+One more mesh of a model, such as a piece of armour or a saddle. With nothing but a mesh it takes the pose of the first mesh, bone by bone. With a blueprint or a socket it is put on as the game puts a saddle on its mount: attached to the first mesh, and posed by its own blueprint.
 
 <InExplorer id="WaxModelPart" />
 
@@ -1941,8 +1966,12 @@ One more mesh of a model on the same skeleton, such as a piece of armour. It tak
 | --- | --- | --- |
 | `mesh` | `string` | The game path of a skeletal mesh. |
 | `materials` (optional) | `table<integer, string>` | Game paths of materials by slot, 1 first. |
+| `blueprint` (optional) | `string` | The game path of the part's own animation blueprint, one that copies the pose of another mesh, as every saddle of the game has. The part is attached to the first mesh and the blueprint is given that mesh to copy. When it cannot be loaded the part takes the first mesh's pose bone by bone instead. |
+| `socket` (optional) | `string` | A socket or a bone of the first mesh the part sits on, such as "RaptorSaddle". Left out, it sits on the mesh itself. A part on a socket is not counted when the model is fitted to its box. |
 
 ## WaxModelLook [#waxmodellook]
+
+<NextMark block />
 
 What a Model control shows. Every path is a game path such as "/Game/ASS/CRE/Deer/SK_CRE_PAS_Deer"; a path with no dot gets its last part again. [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) gives one of these for a creature.
 
@@ -1954,7 +1983,7 @@ Used by [`model:Show`](/docs/reference/ui#model-show).
 | --- | --- | --- |
 | `mesh` | `string` | The game path of a skeletal mesh. |
 | `materials` (optional) | `table<integer, string>` | Game paths of materials to put on the mesh, by slot, 1 first. |
-| `parts` (optional) | [`WaxModelPart[]`](/docs/reference/ui#waxmodelpart) | More meshes on the same skeleton. |
+| `parts` (optional) | [`WaxModelPart[]`](/docs/reference/ui#waxmodelpart) | More meshes that move with the first: pieces on the same skeleton, or what the model wears. |
 | `fur` (optional) | [`WaxModelFur`](/docs/reference/ui#waxmodelfur) \| [`WaxModelFur[]`](/docs/reference/ui#waxmodelfur) |  |
 | `walk` (optional) | `string` | The game path of the animation "walk" plays. |
 | `idle` (optional) | `string` | The game path of the animation "idle" plays. |
@@ -1968,6 +1997,8 @@ Used by [`model:Show`](/docs/reference/ui#model-show).
 | `against` (optional) | [`WaxModelLook`](/docs/reference/ui#waxmodellook) | Another model to be seen beside, such as a young animal's adult. This one is then as much smaller in its box as it is smaller than that one in the game, by the two meshes' sizes and their scale. It never fills less than four tenths of the box, and a model larger than the other fills the box as it would alone. Only mesh and scale of the other are read. |
 
 ## WaxModelOptions [#waxmodeloptions]
+
+<NextMark block />
 
 Extends [`WaxModelLook`](/docs/reference/ui#waxmodellook). Used by [`container:Model`](/docs/reference/controls#container-model).
 

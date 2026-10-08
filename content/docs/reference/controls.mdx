@@ -8,6 +8,8 @@ icon: SlidersHorizontal
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
+<NextLegend />
+
 ## WaxContainer [#waxcontainer]
 
 Something controls can be added to: a window, a page, a section, a row or an overlay.
@@ -18,7 +20,7 @@ Below, `container` stands for one of these.
 
 ### `container:Label(content, options?)` [#container-label]
 
-Adds text that wraps to the container's width.
+Adds text. It wraps to the container's width. In a row it does not wrap: each line of the text is one line in the label's share of the row, cut short with "..." when it is too long, and shown whole as a tip.
 
 ```lua
 container:Label(content: any, options?: WaxLabelOptions): WaxLabel
@@ -336,6 +338,8 @@ container:Slots(options?: WaxSlotsOptions): WaxSlots
 <InExplorer id="WaxContainer.Slots" />
 
 ### `container:Model(options?)` [#container-model]
+
+<NextMark block />
 
 Adds a box that shows a creature or any other skeletal mesh of the game in 3D. Give it what [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) gives, or a mesh by its path.
 
@@ -1476,6 +1480,8 @@ slots:Capacity(): integer
 
 ### `slots:SetLayout(columns, size?)` [#slots-setlayout]
 
+<NextMark block />
+
 Changes how many cells stand in a row and how large a cell is. The cells that exist are kept and put in their new rows, and missing ones are made over the next frames. What a cell shows stays; set the looks again if fewer fit.
 
 ```lua
@@ -1533,7 +1539,7 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 | `spin` | `boolean` | The icon turns round once on every click, to show that something has started. |
 | `tab` | `boolean` | Makes it one of a row of tabs: SetActive marks the chosen one. |
 | `tip` | `string` \| `table` | A line of help shown beside the mouse once it has rested on the button. Give one to every button that is only an icon. A table is `{ title = "...", lines = { "more" } }`. |
-| `size` | `number` | For a button that is an icon only: the side of the square it is drawn as. Left out, it is as tall as the other buttons. |
+| `size` <NextMark /> | `number` | For a button that is an icon only: the side of the square it is drawn as. Left out, it is as tall as the other buttons. |
 
 ## WaxIconOptions [#waxiconoptions]
 
@@ -1586,7 +1592,7 @@ Used by [`container:Section`](/docs/reference/controls#container-section).
 | --- | --- | --- |
 | `open` | `boolean` | False starts the section collapsed. |
 | `collapsible` | `boolean` | False makes a plain titled group that is always open. |
-| `fit` | `boolean` | Keeps the title on one line. A title too long for the card is cut short with "..." and shown whole as a tip while the mouse rests on it, and it is cut again when the card gets another width. Without it a long title wraps. |
+| `fit` <NextMark /> | `boolean` | Keeps the title on one line. A title too long for the card is cut short with "..." and shown whole as a tip while the mouse rests on it, and it is cut again when the card gets another width. Without it a long title wraps. |
 
 ## WaxRowOptions [#waxrowoptions]
 

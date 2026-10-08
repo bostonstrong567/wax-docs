@@ -75,7 +75,10 @@ Give `material` a table and the blueprint makes the material itself from one of 
 ```lua
 local part = {
     mesh = "/Engine/BasicShapes/Cube.Cube",
-    material = { from = "/Engine/EngineMaterials/EmissiveMeshMaterial", colors = { Color = "Cyan" } },
+    material = {
+        from = "/Engine/EngineMaterials/EmissiveMeshMaterial",
+        colors = { Color = "Cyan" },
+    },
 }
 print(part.material.from)
 ```
@@ -100,8 +103,9 @@ local platform = game.Blueprints:Define("Platform", {
 print(platform.Name)
 ```
 
-A shape as a blueprint's part has run in tests outside the game. In the game, shapes were put on with
-`mesh:Apply`.
+This has not been tried in the game yet. It runs in Wax's tests outside the game. What was seen in the game
+is the call the blueprint makes for such a part, [`mesh:Apply`](/docs/assets#a-shape-made-of-numbers), on a
+part that a script made itself.
 
 ## Spawn
 

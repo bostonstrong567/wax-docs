@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Writes lib/icon-names.json and public/lucide/ from the Wax runtime. Without the runtime it keeps the committed copies.
+// Writes lib/icon-names.json, lib/icon-sheet.json and public/lucide/ from the Wax runtime. Without the runtime it keeps the committed copies.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +15,7 @@ const LUCIDE = path.join(RUNTIME, 'assets', 'lucide');
 const SHEET = path.join(LUCIDE, 'sheet32.png');
 const LICENSE = path.join(LUCIDE, 'LICENSE.txt');
 const NAMES_OUT = path.join(DOCS, 'lib', 'icon-names.json');
+const SHEET_OUT = path.join(DOCS, 'lib', 'icon-sheet.json');
 const PUBLIC_OUT = path.join(DOCS, 'public', 'lucide');
 // The sheet has 40 icons per row, each 32 pixels square.
 const COLUMNS = 40;
@@ -25,6 +27,8 @@ function fail(message) {
 }
 
 if (![LIST, SHEET, LICENSE].every((file) => fs.existsSync(file))) {
+  const kept = fs.existsSync(SHEET_OUT) ? JSON.parse(fs.readFileSync(SHEET_OUT, 'utf8')).sheet : '';
+  if (!kept || !fs.existsSync(path.join(PUBLIC_OUT, kept))) fail(`lib/icon-sheet.json names "${kept}", and public/lucide has no such file.`);
   console.log(`[generate-icons] ${path.relative(DOCS, RUNTIME)} has no icon list or sheet: keeping the copies that are already here.`);
   process.exit(0);
 }
@@ -53,11 +57,23 @@ function put(file, content) {
   return true;
 }
 
+// The page places each icon by its number in the list, so the list and the sheet belong together. The sheet's name
+// holds a hash of both: a browser that kept an older sheet asks for this one by another name.
 const data = { columns: COLUMNS, cell: CELL, width, height, names };
+const namesText = Buffer.from(`${JSON.stringify(data, null, 2)}\n`);
+const stamp = crypto.createHash('sha256').update(namesText).update(sheet).digest('hex').slice(0, 12);
+const sheetName = `sheet32.${stamp}.png`;
+const before = fs.existsSync(SHEET_OUT) ? JSON.parse(fs.readFileSync(SHEET_OUT, 'utf8')).sheet : '';
 const written = [
-  put(NAMES_OUT, Buffer.from(`${JSON.stringify(data, null, 2)}\n`)) && 'lib/icon-names.json',
-  put(path.join(PUBLIC_OUT, 'sheet32.png'), sheet) && 'public/lucide/sheet32.png',
+  put(NAMES_OUT, namesText) && 'lib/icon-names.json',
+  put(SHEET_OUT, Buffer.from(`${JSON.stringify({ sheet: sheetName })}\n`)) && 'lib/icon-sheet.json',
+  put(path.join(PUBLIC_OUT, sheetName), sheet) && `public/lucide/${sheetName}`,
   put(path.join(PUBLIC_OUT, 'LICENSE.txt'), fs.readFileSync(LICENSE)) && 'public/lucide/LICENSE.txt',
 ].filter(Boolean);
+// The sheet of the build before stays for pages that are still open, and so does sheet32.png, which pages
+// published before the sheets had such names ask for. Older ones go.
+for (const name of fs.readdirSync(PUBLIC_OUT)) {
+  if (/^sheet32\.[0-9a-f]{12}\.png$/.test(name) && name !== sheetName && name !== before) fs.rmSync(path.join(PUBLIC_OUT, name));
+}
 
 console.log(`[generate-icons] ${names.length} icons on a ${width}x${height} sheet. ${written.length ? `Wrote ${written.join(', ')}.` : 'Nothing changed.'}`);

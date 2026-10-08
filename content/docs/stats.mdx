@@ -61,7 +61,8 @@ local list = window:Console({ height = 150 })
 window:Button("Show my modifiers", function()
     local lines = {}
     for _, modifier in ipairs(game.Me:GetModifiers()) do
-        local left = modifier.Remaining and ("%.0f s left"):format(modifier.Remaining) or "no time limit"
+        local left = "no time limit"
+        if modifier.Remaining then left = ("%.0f s left"):format(modifier.Remaining) end
         lines[#lines + 1] = { modifier.DisplayName .. " (" .. left .. ")" }
     end
     list:SetLines(lines)

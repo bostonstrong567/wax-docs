@@ -22,3 +22,29 @@ Extends [`WaxModelLook`](/docs/reference/ui#waxmodellook). Returned by [`game.Cr
 | --- | --- | --- |
 | `walks` | `boolean` | True when the creature has a walk to play. Without one "walk" plays its idle, or what it does in the air. |
 | `facing` | `number` | The way the mesh faces as the creature's class turns it, in degrees. |
+
+## WaxCreatureModelOptions [#waxcreaturemodeloptions]
+
+What GetModel can add to a creature's model.
+
+Used by [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel).
+
+<InExplorer id="WaxCreatureModelOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `saddle` | `string` | A saddle the mount wears in the picture: the row of its item ("Saddle_Standard"), its tag ("Item.Mount.Saddle.Standard") or its own row in the game's saddle table ("Saddle_Horse_Standard"). The saddle is added to the model's parts as the game's table describes it for that mount: its mesh, its other material, the blueprint it follows the mount by and the socket it sits on. Where the game hides the mount's fur under that saddle, the fur gets the same mask. The second saddle the game shows under a cart is not added. |
+
+## WaxSaddle [#waxsaddle]
+
+One thing a mount can wear in its saddle slot, as [`game.Creatures:GetSaddles`](/docs/reference/game#game-creatures-getsaddles) lists it.
+
+Returned by [`game.Creatures:GetSaddles`](/docs/reference/game#game-creatures-getsaddles).
+
+<InExplorer id="WaxSaddle" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Row` | `string` | The saddle's row in the game's saddle table, such as "Saddle_Horse_Standard". Each mount has its own row for a saddle. |
+| `Tag` (optional) | `string` | The tag an item carries to be this saddle, such as "Item.Mount.Saddle.Standard". |
+| `Items` | `string[]` | The rows of the items that carry the tag, such as "Saddle_Standard". Empty when the game has no such item. |

@@ -1,0 +1,3 @@
+{"chunk":"script.SignificanceManager","types":[
+{"name":"SignificanceManager","kind":"class","from":"/Script/SignificanceManager.SignificanceManager","parent":"Object","origin":"native","props":[["SignificanceManagerClassName","SoftClassPath","print(obj.SignificanceManagerClassName)"]],"funcs":[]}
+]}

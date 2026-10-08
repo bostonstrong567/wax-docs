@@ -58,7 +58,7 @@ game.Assets:IsLoaded(path: string): boolean, string?
 
 ### `game.Assets:Texture(file)` [#game-assets-texture]
 
-A picture file as a texture, kept for your mod. The file is a .png or .jpg in your mod's folder, named from that folder ("logo.png", "pictures/logo.png"), or a whole path. Asked again, the same texture comes back and no file is read. A small picture took half a millisecond, and six the first time one was read in a session. It raises an error when the file is not there, is not a PNG or JPG picture, or leaves the mod's folder with "..", and for a bare file name while no mod is running. A file that changed on disk is read again once everything that asked for it has let it go, which reloading your mod does when no other mod uses the file.
+A picture file as a texture, kept for your mod. The file is a .png or .jpg in your mod's folder, named from that folder ("logo.png", "pictures/logo.png"), or a whole path. Asked again, the same texture comes back and no file is read. A small picture took about half a millisecond. The first JPG of a session took 3.7 ms. It raises an error when the file is not there, is not a PNG or JPG picture, or leaves the mod's folder with "..", and for a bare file name while no mod is running. A file that changed on disk is read again once everything that asked for it has let it go, which reloading your mod does when no other mod uses the file.
 
 ```lua
 game.Assets:Texture(file: string): Texture2D

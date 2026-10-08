@@ -57,7 +57,8 @@ of the nearest thing lowest. A tag with no room left is hidden until there is ro
 ```lua title="init.lua"
 game.Creatures:Observe("Wolf", function(wolf)
     local facts = game.Creatures:Describe(wolf)
-    local tag = ui.Tag(wolf, { text = facts.DisplayName .. "  Lv " .. facts.Level, within = 150 })
+    local text = facts.DisplayName .. "  Lv " .. facts.Level
+    local tag = ui.Tag(wolf, { text = text, within = 150 })
     return function() tag:Remove() end
 end)
 ```

@@ -224,7 +224,8 @@ end)
 
 window:Button("A level 5 wolf, 20 metres away", function()
     local me = game.Me.Position
-    game.Creatures:Spawn("Conifer_Wolf", { X = me.X + 2000, Y = me.Y, Z = me.Z }, { level = 5 })
+    local place = { X = me.X + 2000, Y = me.Y, Z = me.Z }
+    game.Creatures:Spawn("Conifer_Wolf", place, { level = 5 })
 end)
 ```
 

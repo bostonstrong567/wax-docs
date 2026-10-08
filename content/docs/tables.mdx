@@ -135,9 +135,15 @@ end
 game reads from the row next is the new value.
 
 ```lua title="init.lua"
-local items = game.Data:Table("Itemable")
-items:Set("Item_Wood", "MaxStack", 500)
+local recipes = game.Data:Table("ProcessorRecipes")
+recipes:Set("Stone_Axe", "RequiredMillijoules", 3500)
 ```
+
+This is the write that [`game.Recipes`](/docs/recipes) makes for `SetWork`. In the game the Stone Axe's row
+read 3500 after it, where it read 2500 before, and a Stone Axe whose work was raised this way took longer to
+craft. The tables that were written in a running game are the recipes and the store's. `Set` takes any table,
+but whether the game reads a changed field again differs from table to table, so look at the result in the
+game when you change another one.
 
 `Change` works from the value the field has. Your function gets a copy and returns the new one. For a struct
 or a list it may change the copy and return nothing.

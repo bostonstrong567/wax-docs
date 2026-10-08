@@ -206,7 +206,8 @@ Pass `nil` as the caption and give an `icon` to get a small icon button.
 local window = ui.Window({ title = "Icon", width = 300, height = 140 })
 
 local row = window:Row()
-for _, name in ipairs({ "map", "user", "heart", "star", "settings", "bell", "camera", "flame", "leaf" }) do
+local names = { "map", "user", "heart", "star", "settings", "bell", "camera", "flame", "leaf" }
+for _, name in ipairs(names) do
     row:Icon(name)
 end
 ```
@@ -586,7 +587,8 @@ control goes onto a new line.
 local window = ui.Window({ title = "Flow", width = 300, height = 200 })
 
 local tags = window:Flow()
-for _, name in ipairs({ "Wood", "Stone", "Fiber", "Iron ore", "Copper ore", "Oxite", "Leather", "Bone" }) do
+local names = { "Wood", "Stone", "Fiber", "Iron ore", "Copper ore", "Oxite", "Leather", "Bone" }
+for _, name in ipairs(names) do
     tags:Button(name, function()
         ui.Notify(name)
     end, { stretch = false })

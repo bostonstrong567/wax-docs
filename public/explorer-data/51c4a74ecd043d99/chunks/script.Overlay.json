@@ -1,0 +1,6 @@
+{"chunk":"script.Overlay","types":[
+{"name":"BasicOverlays","kind":"class","from":"/Script/Overlay.BasicOverlays","parent":"Overlays","origin":"native","props":[["Overlays","OverlayItem[]","print(obj.Overlays)"]],"funcs":[]},
+{"name":"LocalizedOverlays","kind":"class","from":"/Script/Overlay.LocalizedOverlays","parent":"Overlays","origin":"native","props":[["DefaultOverlays","BasicOverlays","print(obj.DefaultOverlays)"],["LocaleToOverlaysMap","table<string, BasicOverlays>","print(obj.LocaleToOverlaysMap)"]],"funcs":[]},
+{"name":"OverlayItem","kind":"struct","from":"/Script/Overlay.OverlayItem","props":[["EndTime","Timespan","print(value.EndTime)"],["StartTime","Timespan","print(value.StartTime)"],["Text","string","print(value.Text)"],["position","Vector2D","print(value.position)"]]},
+{"name":"Overlays","kind":"class","from":"/Script/Overlay.Overlays","parent":"Object","origin":"native","props":[],"funcs":[]}
+]}

@@ -39,7 +39,8 @@ The third step is needed on Windows only. There, Next 16 writes the small files 
 nested folders, and the browser asks for flat names. On Linux, as in the workflow, the script does nothing.
 
 Search works without a server. The build writes `out\search-index.json`. The browser downloads it once and
-searches it locally.
+searches it locally. The page asks for it with `?v=` and a hash of the pages' source (`next.config.mjs`), so a
+browser that kept the index of an older build asks again after a publish.
 
 ### The path prefix
 
@@ -176,14 +177,31 @@ It runs in the browser. Nothing on it needs a server.
 | What | Made by | From | Kept in |
 | --- | --- | --- | --- |
 | Wax's own API | `scripts\generate-api.mjs` | `wax\types\*.lua` | `lib\explorer-wax.json` (part of the page's script) |
-| The game's types | `scripts\generate-explorer.mjs` | `build\game-index\site\` in the Wax workspace | `public\explorer-data\` |
+| The game's types | `scripts\generate-explorer.mjs` | `build\game-index\site\` in the Wax workspace | `public\explorer-data\<stamp>\` |
 
 `build\game-index\site\` is written by `python scripts\gameindex.py site` in the Wax workspace. It is not in
 git, so `generate-explorer.mjs` copies what the page needs and the copy is committed. Without the folder the
 script says so and keeps the copy. Set `GAME_INDEX_DIR` to read the index from somewhere else. After a game
-update, run `gameindex.py site`, then `npm run generate`, and commit `public\explorer-data\`.
+update, run `gameindex.py site`, then `npm run generate`, and commit `public\explorer-data\` and
+`lib\explorer-stamp.json`.
 
-| File in `public\explorer-data\` | What it holds | When the page fetches it |
+The data lies in a folder named after a hash of its content (the stamp), and `lib\explorer-stamp.json` holds
+that name. The page is built with it, so every address the page asks for has the stamp in it: a page reads the
+data it was built for and never data of another build, whatever a browser or a server in between has kept.
+A folder is used and not a `?v=` on each file, because a server of plain files gives the same file for any
+`?v=`: it would hand new data to a page that is still open from before a publish. `builds.json` lists the folders
+the site has, newest first. The data of the build before stays (`KEEP` in the script), so such a page goes on
+working. Without the game index the script checks that the folder still is what its stamp says and stops the
+build when it is not. Files straight in `public\explorer-data\` (`search.json`, `chunks\` and so on) are the data
+from before the stamps: pages published then still ask for them, and the script removes them when a second
+stamped build is made.
+
+When a file does not come, or is not the one meant, the page asks once more around the browser's own copy. If
+that fails too it says which file and why, and "Try again" fetches the list again and then the rest. If
+`builds.json` says the site no longer has the page's data, the page says it is older than the site and offers to
+reload.
+
+| File in `public\explorer-data\<stamp>\` | What it holds | When the page fetches it |
 | --- | --- | --- |
 | `search.json` | Every type's name, kind and chunk. A copy of the index's own file. | On every visit |
 | `tree.json` | Each type's parent, the date of the index, and the other names a type goes by. Worked out from the chunks. | On every visit |
@@ -205,8 +223,7 @@ How the page works:
 - The example for a game member goes through the member of `game` that is of that class (`game.Character`,
   `game.World` and so on, as `wax\types\game.lua` types them). Other classes use `game:Find`.
 - A function the index marks `oversized` is shown as one that cannot be called from Lua, without an example.
-- The index was read at the game's title screen. Blueprint classes that only load inside a prospect are not in
-  it, and the page says so.
+- The index is made from the game's own files, so it holds every class, loaded or not.
 
 Which guide page a Wax entry links to is set at the top of `scripts\generate-api.mjs` (`GUIDES`,
 `MEMBER_GUIDES`). The groups the page lists are `GROUPS` in the same file.
@@ -220,10 +237,15 @@ Which guide page a Wax entry links to is set at the top of `scripts\generate-api
 | From `wax\runtime\` | To |
 | --- | --- |
 | `Scripts\wax\gui\icons_list.lua` (the names, in order) | `lib\icon-names.json` |
-| `assets\lucide\sheet32.png` (all icons on one image, 40 per row, 32 pixels each) | `public\lucide\sheet32.png` |
+| `assets\lucide\sheet32.png` (all icons on one image, 40 per row, 32 pixels each) | `public\lucide\sheet32.<hash>.png`, and its name in `lib\icon-sheet.json` |
 | `assets\lucide\LICENSE.txt` | `public\lucide\LICENSE.txt` |
 
-The script runs before `npm run dev` and `npm run build`. The three files it writes are committed, for the
+The page places an icon by its number in the list, so the list and the sheet belong together. The hash in the
+sheet's name is made from both: after a change the page asks for another file, and a sheet a browser kept cannot
+show the wrong icons. `public\lucide\sheet32.png` is the sheet from before the names had a hash. Pages published
+then still ask for it, so it stays.
+
+The script runs before `npm run dev` and `npm run build`. The files it writes are committed, for the
 same reason as the reference pages. Without the runtime the script says so and keeps them. Set
 `WAX_RUNTIME_DIR` to read the runtime from somewhere else.
 
