@@ -120,6 +120,38 @@ print(pyramid.Size.Z)
 to get such a part is a [blueprint](/docs/blueprints#a-shape-of-your-own) whose part has the shape as its
 `mesh`. Putting a box on took 0.2 ms. Do it once, not every frame.
 
+## A 3D model from a file
+
+<Since version="0.3.4" />
+
+Save a model as Wavefront `.obj` from any 3D program, put the file in your mod's folder, and `game.Assets:Model`
+reads it. No Unreal editor and no pak are needed. It gives the same kind of shape as `game.Assets:Mesh`, so it
+goes on a part the same way.
+
+```lua title="init.lua"
+local rock = game.Assets:Model("models/rock.obj")
+print(rock.VertexCount, "vertices,", rock.TriangleCount, "triangles")
+
+local boulder = game.Blueprints:Define("Boulder", {
+    parts = { Body = { mesh = rock, collision = "solid" } },
+})
+print("Defined", boulder.Name)
+```
+
+| Option | What it does |
+| --- | --- |
+| `scale` | How much larger the model is made. `100` when omitted, which fits a model made in metres. |
+| `up` | Which way is up in the file: `"y"` when omitted, as most programs save it, or `"z"`. |
+| `flip` | `true` turns every triangle round, for a model that shows inside out. |
+| `collision` | `true` makes things stop at the shape. |
+
+- The file holds the shape only. Give the part a material for its look, and a picture for that material with
+  `game.Assets:Texture`.
+- A model can have up to 65,000 vertices and the file up to 16 MB. A larger one belongs in a mod's
+  [game content](/docs/game-content).
+- In VS Code, **Add 3D Model** on a mod copies the file into the mod's `models` folder and gives you the line
+  that loads it.
+
 ## Good to know
 
 - Nothing here runs between your calls, so it costs nothing a frame.

@@ -25,6 +25,22 @@ local lantern = game.Blueprints:Define("Lantern", { base = content:ClassPath("BP
 print("Defined", lantern.Name)
 ```
 
+## Do you need a pak?
+
+Most mods do not. A mod is Lua, and Lua alone does all of this in the running game, with nothing to build:
+
+- read and change the game's tables: items, recipes, creatures, the store
+- read and change what is in the world: your character, its stats, its inventory, the time
+- make windows, panels and overlays
+- show a picture from a `.png` or `.jpg` in the mod's folder, and a 3D model from an `.obj` file ([Assets](/docs/assets))
+
+A pak is for what Lua cannot make from a file: a blueprint with logic of its own, a material built in the
+editor, an animated or very large model, a sound set. Those are made in the Unreal editor, version 4.27, which is
+a separate download of about 19 GB from Epic Games. ICARUS itself does not come with it: a game holds the part of
+Unreal that plays content, not the editor that makes it.
+
+So the order to try things in is: Lua first, a file in the mod's folder second, a pak last.
+
 ## What a mod with content looks like
 
 ```text
@@ -113,7 +129,12 @@ While this runs, saving an asset in the editor builds the content again and the 
 </Steps>
 
 In VS Code the same is **Wax: Build Game Content** and **Wax: Open the Unreal Project**, and the setting
-**Wax: Content: Auto Build** builds whenever an asset is saved. A build takes a few minutes, most of it the
+**Wax: Content: Auto Build** builds whenever an asset is saved. Both are also buttons on the **Game content** line
+under a mod in the Wax view.
+
+The first time, the extension asks where the Unreal editor is. **Wax: Choose the Unreal Editor Folder** points it
+at an Unreal Engine 4.27 you already have, and **Wax: Install the Unreal Editor** downloads it into the Wax folder
+with your Epic Games account. The setting **Wax: Unreal Path** holds the choice. A build takes a few minutes, most of it the
 editor starting.
 
 ## Rules for the pak

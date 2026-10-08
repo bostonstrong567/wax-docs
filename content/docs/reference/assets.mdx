@@ -8,6 +8,8 @@ icon: Boxes
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
+<NextLegend />
+
 ## `game.Assets` [#game-assets]
 
 The game's assets by path, pictures from a mod's own files, materials made from the game's, and shapes made of numbers. What Load, Texture and Material give is kept in memory for the mod that asked: the game frees an asset nothing uses within minutes, and using it after that crashes. When the mod unloads, everything it asked for is let go. Nothing here runs between calls, so it costs nothing a frame. While Wax's interface is not running nothing can be kept. The log says so once, and what you get may then be freed within minutes: ask for it again right before each use.
@@ -103,6 +105,23 @@ game.Assets:Mesh(shape: WaxMeshShape): WaxMesh
 
 <InExplorer id="game.Assets.Mesh" />
 
+### `game.Assets:Model(file, options?)` [#game-assets-model]
+
+Reads a 3D model from an .obj file in your mod's folder and gives it as a shape, the same kind [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh) gives: put it on a part with Apply, or name it as the mesh of a blueprint's part. No Unreal editor is needed. The file holds the shape only: give the part a material for its look. At most 65,000 vertices and 16 MB.
+
+```lua
+game.Assets:Model(file: string, options?: WaxModelFileOptions): WaxMesh
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `file` | `string` | The file's name inside the mod's folder, such as "models/rock.obj", or a whole path. |
+| `options` (optional) | [`WaxModelFileOptions`](/docs/reference/assets#waxmodelfileoptions) |  |
+
+**Returns** [`WaxMesh`](/docs/reference/assets#waxmesh)
+
+<InExplorer id="game.Assets.Model" />
+
 ### `game.Assets:Release(what)` [#game-assets-release]
 
 Lets go of something your mod asked for, before the mod unloads: the Instance that Load, Texture or Material gave, or the path or file name it was asked for with. True when your mod held it. Once no mod holds it any more its Instance answers with an error, also for other code that had the same Instance, and the game frees it when nothing else uses it. To use it again, ask for it again.
@@ -123,7 +142,7 @@ game.Assets:Release(what: WaxInstance|string): boolean
 
 A shape made of numbers, as [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh) gives it. It is plain Lua and holds nothing of the game, so it can be kept for as long as you like and put on any number of parts. Its fields cannot be changed: make another mesh.
 
-You get one from [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh). Below, `mesh` stands for one of these.
+You get one from [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh), [`game.Assets:Model`](/docs/reference/assets#game-assets-model). Below, `mesh` stands for one of these.
 
 <InExplorer id="WaxMesh" />
 
@@ -174,7 +193,7 @@ Used by [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh).
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `vertices` (optional) | `({ X: number, Y: number, Z: number }\|number[])[]` | The corners, at least 3 and at most 20,000, each \{ X = 0, Y = 0, Z = 0 \} or \{ 0, 0, 0 \}. 100 is one metre, measured from the part's own place. |
+| `vertices` (optional) | `({ X: number, Y: number, Z: number }\|number[])[]` | The corners, at least 3 and at most 65,000, each \{ X = 0, Y = 0, Z = 0 \} or \{ 0, 0, 0 \}. 100 is one metre, measured from the part's own place. |
 | `triangles` (optional) | `integer[]` | Three vertex numbers for each triangle, counted from 1. A triangle is seen from the side on which its corners run counter-clockwise. |
 | `box` (optional) | `number` \| `{ X: number, Y: number, Z: number }` | A box around the part's place in the stead of vertices and triangles: the length of its sides, or one length for each direction. It has 24 vertices, four a side, so each side is flat and takes a whole picture. |
 | `normals` (optional) | `({ X: number, Y: number, Z: number }\|number[])[]` | The direction each vertex faces, one for each vertex. When omitted they are worked out from the triangles: a vertex that several triangles share faces between them, which shades a corner round. Give a side its own vertices to keep it flat. |
@@ -195,6 +214,23 @@ Used by [`mesh:Apply`](/docs/reference/assets#mesh-apply).
 | `section` | `integer` | Which section of the part the shape becomes, from 0 to 15. 0 when omitted. A part draws all its sections, each with its own material. |
 | `material` | [`MaterialInterface`](/explorer?game=MaterialInterface) | The material the section is drawn with: one from Material or Load. When omitted the section keeps the material the part has for it, which at first is the engine's default one. |
 | `collision` | `boolean` | Whether things stop at the shape here. The shape's own answer when omitted. |
+
+## WaxModelFileOptions [#waxmodelfileoptions]
+
+<NextMark block />
+
+What [`game.Assets:Model`](/docs/reference/assets#game-assets-model) takes besides the file.
+
+Used by [`game.Assets:Model`](/docs/reference/assets#game-assets-model).
+
+<InExplorer id="WaxModelFileOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `scale` | `number` | How much larger the model is made. 100 when omitted, which fits a model made in metres: the game counts in centimetres. |
+| `up` | `"y"` \| `"z"` | Which way is up in the file. "y" when omitted, as most programs save an .obj. "z" for a file saved with Z up. |
+| `flip` | `boolean` | True turns every triangle round. For a model that shows inside out. |
+| `collision` | `boolean` | True makes things stop at the shape. False when omitted. |
 
 ## Named values [#named-values]
 

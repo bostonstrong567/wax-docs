@@ -177,6 +177,7 @@
     "WaxMaterialOptions",
     "WaxMeshShape",
     "WaxMeshApplyOptions",
+    "WaxModelFileOptions",
     "WaxAssetColor"
    ],
    "members": []
@@ -784,6 +785,7 @@
   "game.Assets:Texture": "game.Assets.Texture",
   "game.Assets:Material": "game.Assets.Material",
   "game.Assets:Mesh": "game.Assets.Mesh",
+  "game.Assets:Model": "game.Assets.Model",
   "game.Assets:Release": "game.Assets.Release",
   "Blueprint:Spawn": "WaxBlueprint.Spawn",
   "Blueprint:GetThings": "WaxBlueprint.GetThings",
@@ -12001,6 +12003,13 @@
      "use": "local character = game.Character\nprint(character.PlayerName)"
     },
     {
+     "id": "WaxPlayerCharacter.CharacterName",
+     "name": "CharacterName",
+     "type": "string?",
+     "text": "The name the player gave this character, such as the one on the character screen. nil while the game has not said.",
+     "use": "local character = game.Character\nprint(character.CharacterName)"
+    },
+    {
      "id": "WaxPlayerCharacter.Local",
      "name": "Local",
      "type": "boolean",
@@ -17720,7 +17729,7 @@
      "name": "vertices",
      "type": "({ X: number, Y: number, Z: number }|number[])[]",
      "optional": true,
-     "text": "The corners, at least 3 and at most 20,000, each { X = 0, Y = 0, Z = 0 } or { 0, 0, 0 }. 100 is one metre, measured from the part's own place.",
+     "text": "The corners, at least 3 and at most 65,000, each { X = 0, Y = 0, Z = 0 } or { 0, 0, 0 }. 100 is one metre, measured from the part's own place.",
      "use": "local mesh = game.Assets:Mesh({ vertices = value })"
     },
     {
@@ -17828,7 +17837,8 @@
     "title": "Assets"
    },
    "makers": [
-    "game.Assets.Mesh"
+    "game.Assets.Mesh",
+    "game.Assets.Model"
    ],
    "use": "local mesh = game.Assets:Mesh(shape)",
    "props": [
@@ -18000,6 +18010,31 @@
      "use": "local mesh = game.Assets:Mesh(shape)"
     },
     {
+     "id": "game.Assets.Model",
+     "name": "Model",
+     "call": "game.Assets:Model",
+     "params": [
+      {
+       "name": "file",
+       "type": "string",
+       "text": "The file's name inside the mod's folder, such as \"models/rock.obj\", or a whole path."
+      },
+      {
+       "name": "options",
+       "type": "WaxModelFileOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxMesh"
+      }
+     ],
+     "text": "Reads a 3D model from an .obj file in your mod's folder and gives it as a shape, the same kind game.Assets:Mesh gives: put it on a part with Apply, or name it as the mesh of a blueprint's part. No Unreal editor is needed. The file holds the shape only: give the part a material for its look. At most 65,000 vertices and 16 MB.",
+     "ref": "/docs/reference/assets#game-assets-model",
+     "use": "local mesh = game.Assets:Model(file, options)"
+    },
+    {
      "id": "game.Assets.Release",
      "name": "Release",
      "call": "game.Assets:Release",
@@ -18018,6 +18053,61 @@
      "text": "Lets go of something your mod asked for, before the mod unloads: the Instance that Load, Texture or Material gave, or the path or file name it was asked for with. True when your mod held it. Once no mod holds it any more its Instance answers with an error, also for other code that had the same Instance, and the game frees it when nothing else uses it. To use it again, ask for it again.",
      "ref": "/docs/reference/assets#game-assets-release",
      "use": "local released = game.Assets:Release(what)"
+    }
+   ]
+  },
+  {
+   "id": "WaxModelFileOptions",
+   "name": "WaxModelFileOptions",
+   "title": "WaxModelFileOptions",
+   "kind": "data",
+   "group": "assets",
+   "text": "What game.Assets:Model takes besides the file.",
+   "next": true,
+   "ref": "/docs/reference/assets#waxmodelfileoptions",
+   "guide": {
+    "href": "/docs/gui/model",
+    "title": "3D models"
+   },
+   "users": [
+    "game.Assets.Model"
+   ],
+   "props": [
+    {
+     "id": "WaxModelFileOptions.scale",
+     "name": "scale",
+     "type": "number",
+     "optional": true,
+     "text": "How much larger the model is made. 100 when omitted, which fits a model made in metres: the game counts in centimetres.",
+     "next": true,
+     "use": "local mesh = game.Assets:Model(file, { scale = 1 })"
+    },
+    {
+     "id": "WaxModelFileOptions.up",
+     "name": "up",
+     "type": "\"y\"|\"z\"",
+     "optional": true,
+     "text": "Which way is up in the file. \"y\" when omitted, as most programs save an .obj. \"z\" for a file saved with Z up.",
+     "next": true,
+     "use": "local mesh = game.Assets:Model(file, { up = \"y\" })"
+    },
+    {
+     "id": "WaxModelFileOptions.flip",
+     "name": "flip",
+     "type": "boolean",
+     "optional": true,
+     "text": "True turns every triangle round. For a model that shows inside out.",
+     "next": true,
+     "use": "local mesh = game.Assets:Model(file, { flip = true })"
+    },
+    {
+     "id": "WaxModelFileOptions.collision",
+     "name": "collision",
+     "type": "boolean",
+     "optional": true,
+     "text": "True makes things stop at the shape. False when omitted.",
+     "next": true,
+     "use": "local mesh = game.Assets:Model(file, { collision = true })"
     }
    ]
   },
