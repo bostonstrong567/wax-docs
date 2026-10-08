@@ -27,7 +27,7 @@ things are not: a registry key that is only made when you say yes, and a small l
 | --- | --- | --- |
 | `dwmapi.dll` and the `ue4ss` folder | UE4SS, the script loader Wax runs on, as its own project released it, with its three cheat and console mods switched off. The game loads `dwmapi.dll` from its own folder when it starts, and that file starts UE4SS. | `Uninstall Wax.cmd` asks whether to remove it. By hand: delete both. |
 | `ue4ss\Mods\Wax` | Wax: Lua files in `Scripts`, pictures in `assets`, tables in `data`, two helper files in `bin`, and `Wax-Import.ps1`, which handles the **Add to game** button. | `Uninstall Wax.cmd`. By hand: delete the folder. |
-| `ue4ss\Mods\Wax\mods` | Your mods. Recipe Browser comes with Wax. | `Uninstall Wax.cmd` asks first. By hand: delete a mod's folder. |
+| `ue4ss\Mods\Wax\mods` | Your mods. Prospector's Codex comes with Wax, in the folder `RecipeBrowser`. | `Uninstall Wax.cmd` asks first. By hand: delete a mod's folder. |
 | `ue4ss\Mods\Wax\saved` | The settings of Wax and of your mods. | The same question as for `mods`. |
 | `ue4ss\Mods\Wax\run` | Working files: the log of this session and of the one before, downloads while they are checked, and your answer about the **Add to game** button. | Goes with the `Wax` folder. |
 | The registry key `HKEY_CURRENT_USER\Software\Classes\wax` | Tells Windows that links starting with `wax://` go to Wax. Made only when you say yes at install. | `Uninstall Wax.cmd` removes it. By hand: the line below. |
@@ -165,11 +165,11 @@ size and the checksum the text gives.
 Nothing checks the first Wax you download, unless you do. This is how.
 
 From the [release page](https://github.com/bostonstrong567/icarus-wax/releases/latest), download three files
-into one folder: `Wax-0.2.1.zip`, `Wax-0.2.1.manifest` and `Wax-0.2.1.manifest.sig`. Open PowerShell in that
+into one folder: `Wax-0.3.0.zip`, `Wax-0.3.0.manifest` and `Wax-0.3.0.manifest.sig`. Open PowerShell in that
 folder and paste this. Change the version in the first line to the one you downloaded.
 
 ```powershell
-$version = '0.2.1'
+$version = '0.3.0'
 $key = '8b37ac88ea0d9e8a8d239b731f1ba1d12fe163c605f6fe3c3933253e36421a953c5d04fdcb94e3934223e41aeb511593788140a7865c00ab2f6ad67746900d62'
 
 $point = [byte[]]($key -split '(..)' -ne '' | ForEach-Object { [Convert]::ToByte($_, 16) })
@@ -202,7 +202,7 @@ To check the zip of a mod, download it with **Download zip** on the [Mods page](
 lines into the same PowerShell window, with the name of your file in the first line:
 
 ```powershell
-$zip = Get-Item 'RecipeBrowser-0.9.1.zip'
+$zip = Get-Item 'RecipeBrowser-1.0.0.zip'
 $mod = Invoke-RestMethod 'https://wax-icarus.duckdns.org/api/mods/RecipeBrowser'
 $entry = $mod.versions | Where-Object { $zip.Name -ceq "$($mod.id)-$($_.version).zip" }
 $text = "zip {0} {1}`n{2} {3}`n" -f $mod.id, $entry.version, (Get-FileHash $zip.FullName -Algorithm SHA256).Hash.ToLower(), $zip.Length
@@ -221,7 +221,7 @@ In the game, one file talks to the network: `bin\waxnet.dll`. These things are f
 
 | When | What is asked | Why |
 | --- | --- | --- |
-| 20 seconds after the game starts, then every six hours, when a mod from the catalogue is installed | `/api/versions`, the newest version of every listed mod | To see whether one of your mods has a newer version. Recipe Browser comes from the catalogue, so this happens in a new install. |
+| 20 seconds after the game starts, then every six hours, when a mod from the catalogue is installed | `/api/versions`, the newest version of every listed mod | To see whether one of your mods has a newer version. Prospector's Codex comes from the catalogue, so this happens in a new install. |
 | When one of them has a newer version | The list of that version's files, then each file | To update the mod |
 | 30 seconds after the game starts, then every six hours | `/api/wax`, the newest version of Wax | To see whether Wax has a newer version |
 | When it has | The list of that version's files and the list of yours, then the files of the parts that differ | To update Wax. The new version is put in when the game next starts. If it does not start, the version before is put back. |

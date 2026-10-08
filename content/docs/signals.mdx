@@ -23,20 +23,20 @@ function the new map's name.
 | `game.MapChanged` | The world changes. | The new map's name. |
 | `ui.Opened` | The menu opens. | Nothing. |
 | `ui.Closed` | The menu closes. | Nothing. |
-| `ui.Keys.Changed` | The key of somebody's windows changes. Not in Wax 0.2.1. | The owner (`"Wax"` or a mod's id) and the new key. |
+| `ui.Keys.Changed` | The key of somebody's windows changes. New in Wax 0.3.0. | The owner (`"Wax"` or a mod's id) and the new key. |
 | `ui.KeyChanged` | The key of the Wax panel changes. | The new key. |
 | `ui.ThemeChanged` | The theme changes. | The theme's name. |
 | `ui.ScreenChanged` | The game's window or the interface size has a new size and has stopped changing. | The new width and height, as `ui.ScreenSize()` gives them. |
-| `ui.GameScreenChanged` | The game shows another of its own screens, another tab of its menu, or none any more. Not in Wax 0.2.1. | The screen's name and tab, as `ui.GameScreen()` gives them. |
+| `ui.GameScreenChanged` | The game shows another of its own screens, another tab of its menu, or none any more. New in Wax 0.3.0. | The screen's name and tab, as `ui.GameScreen()` gives them. |
 | `window.Opened`, `window.Closed` | A window is shown or hidden. | Nothing. |
 | `window.PageChanged` | Another page of a window is chosen. | The page's name. |
-| `panel.Resized` | A [panel](/docs/gui/overlays#panels) made with a `place` function got another size. Not in Wax 0.2.1. | Its new width and height. |
+| `panel.Resized` | A [panel](/docs/gui/overlays#panels) made with a `place` function got another size. New in Wax 0.3.0. | Its new width and height. |
 | `panel.Scrolled` | The mouse wheel was turned over a panel. | `1` for down, `-1` for up. |
 | `control.Changed` | The user changes a control. | The new value. |
 
 Controls have a few more. Each one is listed with its control on the [Controls](/docs/gui/controls) page.
 
-The world has signals too, from the next version of Wax on: for [your character](/docs/character#signals),
+The world has signals too, from Wax 0.3.0 on: for [your character](/docs/character#signals),
 [hits, deaths and items](/docs/events), [the time and the weather](/docs/time-and-weather), and for
 [any value you want to watch](/docs/watching). [Creatures](/docs/creatures#when-creatures-come-and-go) have
 theirs already.

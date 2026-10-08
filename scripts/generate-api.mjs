@@ -69,7 +69,6 @@ const PAGES = {
   },
   'character.lua': {
     slug: 'character',
-    note: NEXT,
     icon: 'User',
     title: 'Characters',
     description: 'The fields Wax gives every character, and game.Me for your own.',
@@ -77,7 +76,6 @@ const PAGES = {
   },
   'stats.lua': {
     slug: 'stats',
-    note: NEXT,
     icon: 'Activity',
     title: 'Stats and modifiers',
     description: 'The numbers the game keeps for a character, and the effects that are on it.',
@@ -85,7 +83,6 @@ const PAGES = {
   },
   'session.lua': {
     slug: 'session',
-    note: NEXT,
     icon: 'Clock',
     title: 'Time, weather and the prospect',
     description: 'game.Time, game.Weather, game.Prospect and the players of the session.',
@@ -93,7 +90,6 @@ const PAGES = {
   },
   'items.lua': {
     slug: 'items',
-    note: NEXT,
     icon: 'Backpack',
     title: 'Items and inventories',
     description: 'What a kind of item is, and what an inventory or a character holds.',
@@ -101,7 +97,6 @@ const PAGES = {
   },
   'creature.lua': {
     slug: 'creature',
-    note: NEXT,
     icon: 'PawPrint',
     title: 'Creatures',
     description: 'The fields Wax gives every creature, and what the tables of the game say about a kind.',
@@ -116,7 +111,6 @@ const PAGES = {
   },
   'recipes.lua': {
     slug: 'recipes',
-    note: NEXT,
     icon: 'Hammer',
     title: 'Recipes',
     description: 'game.Recipes: finding crafting recipes and changing what they take, give and where they are made.',
@@ -124,7 +118,6 @@ const PAGES = {
   },
   'workshop.lua': {
     slug: 'workshop',
-    note: NEXT,
     icon: 'Store',
     title: 'The store',
     description: 'game.Workshop: the store where exotics are spent, its categories, nodes and prices.',
@@ -132,7 +125,6 @@ const PAGES = {
   },
   'assets.lua': {
     slug: 'assets',
-    note: NEXT,
     icon: 'Boxes',
     title: 'Assets',
     description: 'game.Assets: loading the game\'s assets by path, and making textures, materials and shapes.',
@@ -140,7 +132,6 @@ const PAGES = {
   },
   'blueprints.lua': {
     slug: 'blueprints',
-    note: NEXT,
     icon: 'Box',
     title: 'Blueprints',
     description: 'game.Blueprints: things described in Lua and spawned into the world, and their parts.',
@@ -148,7 +139,6 @@ const PAGES = {
   },
   'creature_models.lua': {
     slug: 'creature-models',
-    note: NEXT,
     icon: 'Rotate3d',
     title: 'Creature models',
     description: 'What game.Creatures:GetModel gives: the mesh, coat and walk of a creature, for the 3D model control.',
@@ -156,7 +146,6 @@ const PAGES = {
   },
   'watch.lua': {
     slug: 'watch',
-    note: NEXT,
     icon: 'Eye',
     title: 'Watching values',
     description: 'game.Frame, and signals that fire when a value of the game changes.',

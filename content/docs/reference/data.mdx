@@ -8,8 +8,6 @@ icon: Database
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
-<NextLegend />
-
 ## `game.Data` [#game-data]
 
 The game's data tables as plain Lua values: recipes, items, creatures, talents and the rest. Nothing is read until you ask, and what was read is kept, so asking twice costs nothing. Text is kept in the language the game was showing when it was read. After the player changes the language it shows in the new one only after Flush, or when the game starts again.
@@ -21,7 +19,7 @@ Type name: `WaxData`.
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Changed` | `name`: `string?` | Fires when what was read from a table no longer holds: the game made the table again, or rows of it were written for a mod (then at the end of that frame, once for the table). While many fields are put back over several frames it fires at most four times a second, and once when the put-back is done. `name` is the table's name, or nil when everything was dropped. Flush fires it too, with no name. |
-| `Patched` <NextMark /> | `table`: `string`, `row`: `string`, `field`: `string?` | Fires for each field of a row that was written, by a mod's change, by a Reset or because a mod unloaded: at the end of that frame, or together with Changed while many fields are put back over several frames. `field` is nil when the row itself was added, switched off or taken out. |
+| `Patched` | `table`: `string`, `row`: `string`, `field`: `string?` | Fires for each field of a row that was written, by a mod's change, by a Reset or because a mod unloaded: at the end of that frame, or together with Changed while many fields are put back over several frames. `field` is nil when the row itself was added, switched off or taken out. |
 
 ### `game.Data:Table(name)` [#game-data-table]
 
@@ -101,8 +99,6 @@ game.Data:Flush()
 
 ### `game.Data:Changes()` [#game-data-changes]
 
-<NextMark block />
-
 What mods changed in every table and still stands, sorted by table, row and field.
 
 ```lua
@@ -114,8 +110,6 @@ game.Data:Changes(): WaxDataChange[]
 <InExplorer id="game.Data.Changes" />
 
 ### `game.Data:Conflicts()` [#game-data-conflicts]
-
-<NextMark block />
 
 Every field, in every table, where one mod's Set hides another mod's different result.
 
@@ -276,8 +270,6 @@ dataTable:Stamp(): string
 
 ### `dataTable:Set(row, field, value)` [#datatable-set]
 
-<NextMark block />
-
 Gives one field of a row a new value in the game. It is written before Set returns, so whatever the game reads from the row next is the new value. In a game someone else hosts, this changes the tables on this PC only: the host works from its own tables and decides what really happens. The player is told so once for each mod, in each game they join. `game.IsHost` says which it is. `field` is a whole field of the row, such as "Inputs", not a path into one. The value is whole: a struct with each of its fields, a list with each of its entries, as Change hands it to its function. Row gives the same, except that it leaves an enum inside a struct out until that enum's own path is named (`Row(name, { "SessionRequirement.DataTableName" })`). Set needs it and raises "SessionRequirement lacks DataTableName" without it. Two things may be left out of a struct: a typed row handle's DataTableName, which is filled in from the kind of handle, and text and references to assets, which stay as they are. A typed row handle only takes its own table: an [`ItemsStaticRowHandle`](/explorer?game=ItemsStaticRowHandle) names a row of ItemsStatic and nothing else, apart from the table and row the field holds already. A table name is taken with or without "D_", in any letter case, and written as the game lists it. An enum takes its number. Once Wax has read a value of that field in this session (for a list: from a row where the list has an entry), the number has to be one the enum has or the one the field holds, and the enum's name as the game spells it is taken too. Until then a name raises an error that asks for the number. Everything is checked before anything is written: the row, the field, the kind of every value, and that a row handle or a row enum names a row its table has (a row the field already names may stay, as some of the game's own rows name rows that are not there). What is wrong raises an error that names the place, such as "Inputs[2] lacks Count". After the write the field is read again. If the game did not take the value, the old one is put back and an error says what differed. The change belongs to the mod that makes it and is put back when the mod unloads. A mod that makes the same change again in the frame it reloads, or within 2 seconds of it, writes nothing. A change it no longer makes is put back when those 2 seconds are over. After a reload the row may still hold the mod's own earlier value, so a new value worked out from what the row holds belongs in Change. When two mods set one field, the mod that loads later is used, and Conflicts lists the field. With a table of fields in place of the field name, every value is checked before any is written. Two keys that mean the same field, such as Count and count, are an error. This version does not change text, references to assets, maps, sets, doubles or references to live objects. A list whose entries only the game can make (they hold one of those, a row enum or a multi row handle) keeps its length: its entries can be changed where they are, not added or removed. A kind of change that this version has switched off raises an error that says so. That can be a list that would get longer or shorter while it has more than 4 entries, while it is inside another value, or while its entries are strings or can hold strings or lists of their own. It can also be a row handle pointed at another table than the one it names now.
 
 ```lua
@@ -297,8 +289,6 @@ dataTable:Set(row: string, fields: table<string, any>)
 
 ### `dataTable:Change(row, field, fn)` [#datatable-change]
 
-<NextMark block />
-
 Changes one field of a row from the value it has. `fn` gets a copy of the whole value, enums included as numbers, and returns the new one. For a struct or a list it may change the copy and return nothing. The result is checked and written as Set does it. Wax keeps the function and runs it again when a mod that loads earlier changes the field or unloads, so it should depend on nothing but the value it is given. It has to return at once: a function that waits (`task.wait`, `Signal:Wait`, `Table:Load`) is an error. Changes of two mods to one field both hold: each builds on the other's, in the order the mods load. Change adds to what this mod changed in the field before. Set starts over.
 
 ```lua
@@ -316,8 +306,6 @@ dataTable:Change(row: string, field: string, fn: fun(value: any): any)
 <InExplorer id="WaxDataTable.Change" />
 
 ### `dataTable:Add(name, values?, options)` [#datatable-add]
-
-<NextMark block />
 
 Adds a row: a copy of the row `options.like` names, as that row is now, with `values` written over it as Set would. Returns the row's name. The name is letters, digits and underscores and begins with the mod's id and an underscore, such as "MyMod_Quick_Axe". A character of the id that is none of those counts as an underscore. The game's own index of the table is renewed, so the game knows the row at once. The row belongs to the mod that added it, and Add again for the same row uses the row that is there. When the mod unloads, what it wrote into the row is put back and the row stays in the table, because a row is not taken out while the game runs. A recipe is switched off then: bForceDisableRecipe is set and it is on no bench, which takes it off the game's lists. The game still makes it when something asks for it by name. A row of another table is left as it is. A row that could not be switched off like that in this version is refused as the row to start from, with an error that says why. A row of the game is never replaced or removed. In a game someone else hosts, Add raises an error, because the host's game would not have the row. While adding rows is switched off in a version of Wax, Add raises an error that says so.
 
@@ -337,8 +325,6 @@ dataTable:Add(name: string, values?: table<string, any>, options: WaxDataAddOpti
 
 ### `dataTable:Reset(row?, field?)` [#datatable-reset]
 
-<NextMark block />
-
 Takes this mod's changes back: of one field, of one row when no field is given, of the whole table when no row is given. A row this mod added is switched off as when the mod unloads. What other mods changed stays. If the game does not take a field back, Reset raises an error and that change stands as before, so Reset can be called again.
 
 ```lua
@@ -356,8 +342,6 @@ dataTable:Reset(row?: string, field?: string): integer
 
 ### `dataTable:Changes()` [#datatable-changes]
 
-<NextMark block />
-
 What mods changed in this table and still stands, sorted by row and field.
 
 ```lua
@@ -369,8 +353,6 @@ dataTable:Changes(): WaxDataChange[]
 <InExplorer id="WaxDataTable.Changes" />
 
 ### `dataTable:Conflicts()` [#datatable-conflicts]
-
-<NextMark block />
 
 The fields of this table where one mod's Set hides another mod's different result. Two mods that set the same value are in no conflict, and neither is a Change on top of another mod's change.
 
@@ -384,8 +366,6 @@ dataTable:Conflicts(): WaxDataConflict[]
 
 ## WaxDataCurveKey [#waxdatacurvekey]
 
-<NextMark block />
-
 One key of a curve.
 
 <InExplorer id="WaxDataCurveKey" />
@@ -396,8 +376,6 @@ One key of a curve.
 | `Value` | `number` | The curve's value there. |
 
 ## WaxDataCurve [#waxdatacurve]
-
-<NextMark block />
 
 A curve of the game (a [`CurveFloat`](/explorer?game=CurveFloat)) as plain numbers, the way a field that refers to one is read. For a creature's health or damage a step is a level: `curve.Values[level - curve.First + 1]` is the value at that level. A curve with no keys has First 0, Last -1 and empty Values and Keys.
 
@@ -452,8 +430,6 @@ Used by [`dataTable:Load`](/docs/reference/data#datatable-load).
 
 ## WaxDataAddOptions [#waxdataaddoptions]
 
-<NextMark block />
-
 Used by [`dataTable:Add`](/docs/reference/data#datatable-add).
 
 <InExplorer id="WaxDataAddOptions" />
@@ -463,8 +439,6 @@ Used by [`dataTable:Add`](/docs/reference/data#datatable-add).
 | `like` (required) | `string` | The row of the table that the new row is a copy of. |
 
 ## WaxDataChange [#waxdatachange]
-
-<NextMark block />
 
 One thing a mod changed in a table, as Changes lists it: a field of a row, or a row that was added.
 
@@ -487,8 +461,6 @@ Returned by [`dataTable:Changes`](/docs/reference/data#datatable-changes), [`gam
 | `Off` | `boolean?` | True for an added row that is switched off because its mod unloaded or reset it. |
 
 ## WaxDataConflict [#waxdataconflict]
-
-<NextMark block />
 
 A field that two mods changed in ways that do not both show, as Conflicts lists it.
 

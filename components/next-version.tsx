@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 // The newest Wax a player can download. Raise it when a release is out: every mark on the site goes by it.
-export const RELEASED = '0.2.1';
+export const RELEASED = '0.3.0';
 // Set to true on the day the next version is released. Every mark then disappears from the site.
-export const NEXT_IS_OUT = false;
+export const NEXT_IS_OUT = true;
 
 export const NEXT_SENTENCE = `This comes with the next version of Wax. It is not in Wax ${RELEASED}, the version you can download today.`;
 
