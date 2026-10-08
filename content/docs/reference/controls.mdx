@@ -95,6 +95,91 @@ container:Button(caption?: string, on_click?: fun(), options?: WaxButtonOptions)
 
 <InExplorer id="WaxContainer.Button" />
 
+### `container:Picture(file, options?)` [#container-picture]
+
+Adds a picture from a .png or .jpg file, in the shape the picture has. With nil for the file it shows nothing until Set is called.
+
+```lua
+container:Picture(file: string?, options?: WaxPictureOptions): WaxPicture
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `file` | `string?` | The whole path of the file, such as mod.dir .. "/logo.png". |
+| `options` (optional) | [`WaxPictureOptions`](/docs/reference/controls#waxpictureoptions) |  |
+
+**Returns** [`WaxPicture`](/docs/reference/controls#waxpicture)
+
+<InExplorer id="WaxContainer.Picture" />
+
+### `container:Tile(options)` [#container-tile]
+
+Adds a card to press: a title, a line of text, small counts and a badge, over a faded picture when it has one.
+
+```lua
+container:Tile(options: WaxTileOptions): WaxTile
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` | [`WaxTileOptions`](/docs/reference/controls#waxtileoptions) |
+
+**Returns** [`WaxTile`](/docs/reference/controls#waxtile)
+
+<InExplorer id="WaxContainer.Tile" />
+
+### `container:Badge(text, options?)` [#container-badge]
+
+Adds a word or two in a small pill, such as "New" or a tag.
+
+```lua
+container:Badge(text: string, options?: WaxBadgeOptions): WaxControl
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `string` |
+| `options` (optional) | [`WaxBadgeOptions`](/docs/reference/controls#waxbadgeoptions) |
+
+**Returns** [`WaxControl`](/docs/reference/controls#waxcontrol)
+
+<InExplorer id="WaxContainer.Badge" />
+
+### `container:Stat(caption, value)` [#container-stat]
+
+Adds a caption with its value under it. Several in a Flow make a line of facts.
+
+```lua
+container:Stat(caption: string, value: any): WaxStat
+```
+
+| Parameter | Type |
+| --- | --- |
+| `caption` | `string` |
+| `value` | `any` |
+
+**Returns** [`WaxStat`](/docs/reference/controls#waxstat)
+
+<InExplorer id="WaxContainer.Stat" />
+
+### `container:Count(icon, value, options?)` [#container-count]
+
+Adds an icon with a number or a word beside it, such as a count of downloads.
+
+```lua
+container:Count(icon: string, value: any, options?: WaxCountOptions): WaxCount
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `icon` | `string` | The icon's name. The menu's Icons page lists the names. |
+| `value` | `any` |  |
+| `options` (optional) | [`WaxCountOptions`](/docs/reference/controls#waxcountoptions) |  |
+
+**Returns** [`WaxCount`](/docs/reference/controls#waxcount)
+
+<InExplorer id="WaxContainer.Count" />
+
 ### `container:Icon(name, options?)` [#container-icon]
 
 Adds an icon on its own, by name. The menu's Icons page lists the names.
@@ -425,7 +510,7 @@ container:Console(options?: WaxConsoleOptions): WaxConsole
 
 What every control has.
 
-You get one from [`container:Separator`](/docs/reference/controls#container-separator), [`container:Spacer`](/docs/reference/controls#container-spacer). Below, `control` stands for one of these.
+You get one from [`container:Separator`](/docs/reference/controls#container-separator), [`container:Spacer`](/docs/reference/controls#container-spacer), [`container:Badge`](/docs/reference/controls#container-badge). Below, `control` stands for one of these.
 
 <InExplorer id="WaxControl" />
 
@@ -600,7 +685,7 @@ button:SetCaption(text: any)
 
 ### `button:SetActive(on)` [#button-setactive]
 
-Marks a button made with `tab = true` as the chosen tab, or as one of the others.
+Shows the button as the chosen one, or not. A tab shows its line. A button with an icon is drawn in its active_color, or in the accent colour when it has none. A button with neither raises an error.
 
 ```lua
 button:SetActive(on: boolean)
@@ -1207,6 +1292,124 @@ console:SetFollow(on: boolean)
 
 <InExplorer id="WaxConsole.SetFollow" />
 
+## WaxPicture [#waxpicture]
+
+A picture from a file.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Picture`](/docs/reference/controls#container-picture). Below, `picture` stands for one of these.
+
+<InExplorer id="WaxPicture" />
+
+### `picture:Set(file)` [#picture-set]
+
+Shows another picture file. Returns false and the reason when the file is not a PNG or JPG picture the game can read.
+
+```lua
+picture:Set(file: string): boolean, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `file` | `string` | The whole path of a .png or .jpg file. |
+
+**Returns**
+
+- `boolean` (`shown`)
+- `string?` (`why`)
+
+<InExplorer id="WaxPicture.Set" />
+
+### `picture:SetSelected(on)` [#picture-setselected]
+
+Draws or removes the line around a picture that was made with on_click.
+
+```lua
+picture:SetSelected(on: boolean)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `on` | `boolean` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxPicture.SetSelected" />
+
+## WaxTile [#waxtile]
+
+A card to press.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Tile`](/docs/reference/controls#container-tile). Below, `tile` stands for one of these.
+
+<InExplorer id="WaxTile" />
+
+### `tile:SetPicture(file)` [#tile-setpicture]
+
+Puts a picture behind the card, faded and cut to the card's shape. Returns false and the reason when the file cannot be read.
+
+```lua
+tile:SetPicture(file: string): boolean, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `file` | `string` | The whole path of a .png or .jpg file. |
+
+**Returns**
+
+- `boolean` (`shown`)
+- `string?` (`why`)
+
+<InExplorer id="WaxTile.SetPicture" />
+
+## WaxStat [#waxstat]
+
+A caption with its value under it.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Stat`](/docs/reference/controls#container-stat). Below, `stat` stands for one of these.
+
+<InExplorer id="WaxStat" />
+
+### `stat:Set(value)` [#stat-set]
+
+Changes the value.
+
+```lua
+stat:Set(value: any)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `value` | `any` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxStat.Set" />
+
+## WaxCount [#waxcount]
+
+An icon with a number or a word beside it.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Count`](/docs/reference/controls#container-count). Below, `count` stands for one of these.
+
+<InExplorer id="WaxCount" />
+
+### `count:Set(value)` [#count-set]
+
+Changes the value.
+
+```lua
+count:Set(value: any)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `value` | `any` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxCount.Set" />
+
 ## WaxGrid [#waxgrid]
 
 A grid for any number of items: only the cells in view exist, and they are reused as it scrolls. It follows its scrolling while the menu is open, so it belongs in a window, not in an overlay.
@@ -1527,6 +1730,8 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 
 | Option | Type | Description |
 | --- | --- | --- |
+| `active_color` | `table` | A theme colour the icon and the caption are drawn in while SetActive(true) holds. |
+| `bare` | `boolean` | Draws no box behind the button, only its icon and caption, with a faint box while the mouse is on it. |
 | `primary` | `boolean` | Draws the button in the accent colour. |
 | `stretch` | `boolean` | A button with a caption is as wide as its container. False keeps it as wide as its caption. An icon-only button is small unless this is true. |
 | `icon` | `string` | Icon name shown before the caption. The menu's Icons page lists the names. |
@@ -1586,6 +1791,9 @@ Used by [`container:Section`](/docs/reference/controls#container-section).
 | --- | --- | --- |
 | `open` | `boolean` | False starts the section collapsed. |
 | `collapsible` | `boolean` | False makes a plain titled group that is always open. |
+| `badge` | `string` | A word or two shown in a small pill at the right end of the title, such as "New" or "Off". |
+| `badge_color` | `table` | The colour of the badge: a theme colour. The muted text colour when omitted. |
+| `marks` | `{ icon: string, text: any }[]` | Small counts at the right end of the title, each an icon with a number or a word. |
 | `fit` | `boolean` | Keeps the title on one line. A title too long for the card is cut short with "..." and shown whole as a tip while the mouse rests on it, and it is cut again when the card gets another width. Without it a long title wraps. |
 
 ## WaxRowOptions [#waxrowoptions]
@@ -1628,6 +1836,63 @@ Used by [`container:Console`](/docs/reference/controls#container-console).
 | --- | --- | --- |
 | `height` | `number` | Default 220. On a page made with scroll = false it takes the space left when omitted. |
 | `max` | `integer` | The most lines shown. Default 150. |
+
+## WaxPictureOptions [#waxpictureoptions]
+
+What [`Container:Picture`](/docs/reference/controls#container-picture) takes besides the file.
+
+Used by [`container:Picture`](/docs/reference/controls#container-picture).
+
+<InExplorer id="WaxPictureOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `height` | `number` | How tall the picture is drawn. 160 when omitted. It is drawn less tall when that would make it wider than the room it has. |
+| `on_click` | `fun()` | Makes the picture something to press, and runs this when it is pressed. |
+| `selected` | `boolean` | Draws a line around the picture, for the chosen one of several. Only with on_click. |
+
+## WaxTileOptions [#waxtileoptions]
+
+What a Tile shows.
+
+Used by [`container:Tile`](/docs/reference/controls#container-tile).
+
+<InExplorer id="WaxTileOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `title` (required) | `string` | The name, in bold, kept to one line. |
+| `note` | `string` | A few muted words after the title, such as a version. |
+| `text` | `string` | A line or two under the title. Longer text is cut short. |
+| `badge` | `string` | A word or two in a small pill at the right end. |
+| `badge_color` | `table` | The colour of the badge: a theme colour. |
+| `marks` | `{ icon: string, text: any, on_click?: fun(), active?: boolean, color?: table }[]` | Small counts before the badge, each an icon with a number or a word. One with on_click is a small button of its own, pressed without pressing the card, and is drawn in its color while active is true. |
+| `picture` | `string` | The whole path of a .png or .jpg file, drawn faded behind the card. |
+| `on_click` | `fun()` | Runs when the card is pressed. |
+
+## WaxBadgeOptions [#waxbadgeoptions]
+
+What [`Container:Badge`](/docs/reference/controls#container-badge) takes besides the text.
+
+Used by [`container:Badge`](/docs/reference/controls#container-badge).
+
+<InExplorer id="WaxBadgeOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `color` | `table` | A theme colour. The muted text colour when omitted. |
+
+## WaxCountOptions [#waxcountoptions]
+
+What [`Container:Count`](/docs/reference/controls#container-count) takes besides the icon and the value.
+
+Used by [`container:Count`](/docs/reference/controls#container-count).
+
+<InExplorer id="WaxCountOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `color` | `table` | A theme colour for the icon and the value. The usual colours when omitted. |
 
 ## WaxGridOptions [#waxgridoptions]
 

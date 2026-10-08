@@ -269,6 +269,10 @@
     "WaxField",
     "WaxKeybind",
     "WaxConsole",
+    "WaxPicture",
+    "WaxTile",
+    "WaxStat",
+    "WaxCount",
     "WaxGrid",
     "WaxItem",
     "WaxSplit",
@@ -283,6 +287,10 @@
     "WaxProgressOptions",
     "WaxFieldOptions",
     "WaxConsoleOptions",
+    "WaxPictureOptions",
+    "WaxTileOptions",
+    "WaxBadgeOptions",
+    "WaxCountOptions",
     "WaxGridOptions",
     "WaxFlowOptions",
     "WaxItemLook",
@@ -508,6 +516,11 @@
   "Container:Separator": "WaxContainer.Separator",
   "Container:Spacer": "WaxContainer.Spacer",
   "Container:Button": "WaxContainer.Button",
+  "Container:Picture": "WaxContainer.Picture",
+  "Container:Tile": "WaxContainer.Tile",
+  "Container:Badge": "WaxContainer.Badge",
+  "Container:Stat": "WaxContainer.Stat",
+  "Container:Count": "WaxContainer.Count",
   "Container:Icon": "WaxContainer.Icon",
   "Container:Toggle": "WaxContainer.Toggle",
   "Container:Slider": "WaxContainer.Slider",
@@ -527,6 +540,11 @@
   "Container:Field": "WaxContainer.Field",
   "Container:Keybind": "WaxContainer.Keybind",
   "Container:Console": "WaxContainer.Console",
+  "Picture:Set": "WaxPicture.Set",
+  "Picture:SetSelected": "WaxPicture.SetSelected",
+  "Tile:SetPicture": "WaxTile.SetPicture",
+  "Stat:Set": "WaxStat.Set",
+  "Count:Set": "WaxCount.Set",
   "Grid:SetItems": "WaxGrid.SetItems",
   "Grid:Refresh": "WaxGrid.Refresh",
   "Grid:Count": "WaxGrid.Count",
@@ -1491,6 +1509,13 @@
    ],
    "use": "local window = ui.Window({ title = \"Example\" })\nlocal page = window:Page(name, options)",
    "signals": [
+    {
+     "id": "WaxPage.PressedAgain",
+     "name": "PressedAgain",
+     "type": "WaxSignal<fun()>",
+     "text": "Fires when the page's own name is pressed while the page is already showing. Use it to go back to the start of a page that has several views.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal page = window:Page(name, options)\npage.PressedAgain:Connect(function()\n    print(\"PressedAgain\")\nend)"
+    },
     {
      "id": "WaxPage.NearEnd",
      "name": "NearEnd",
@@ -4728,7 +4753,8 @@
    },
    "makers": [
     "WaxContainer.Separator",
-    "WaxContainer.Spacer"
+    "WaxContainer.Spacer",
+    "WaxContainer.Badge"
    ],
    "use": "local window = ui.Window({ title = \"Example\" })\nlocal control = window:Toggle(\"Example\")",
    "signals": [
@@ -4962,6 +4988,22 @@
    ],
    "props": [
     {
+     "id": "WaxButtonOptions.active_color",
+     "name": "active_color",
+     "type": "table",
+     "optional": true,
+     "text": "A theme colour the icon and the caption are drawn in while SetActive(true) holds.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { active_color = value })"
+    },
+    {
+     "id": "WaxButtonOptions.bare",
+     "name": "bare",
+     "type": "boolean",
+     "optional": true,
+     "text": "Draws no box behind the button, only its icon and caption, with a faint box while the mouse is on it.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, { bare = true })"
+    },
+    {
      "id": "WaxButtonOptions.primary",
      "name": "primary",
      "type": "boolean",
@@ -5101,7 +5143,7 @@
        "type": "boolean"
       }
      ],
-     "text": "Marks a button made with `tab = true` as the chosen tab, or as one of the others.",
+     "text": "Shows the button as the chosen one, or not. A tab shows its line. A button with an icon is drawn in its active_color, or in the accent colour when it has none. A button with neither raises an error.",
      "ref": "/docs/reference/controls#button-setactive",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)\nbutton:SetActive(on)"
     },
@@ -5816,6 +5858,30 @@
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal section = window:Section(title, { collapsible = true })"
     },
     {
+     "id": "WaxSectionOptions.badge",
+     "name": "badge",
+     "type": "string",
+     "optional": true,
+     "text": "A word or two shown in a small pill at the right end of the title, such as \"New\" or \"Off\".",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal section = window:Section(title, { badge = \"text\" })"
+    },
+    {
+     "id": "WaxSectionOptions.badge_color",
+     "name": "badge_color",
+     "type": "table",
+     "optional": true,
+     "text": "The colour of the badge: a theme colour. The muted text colour when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal section = window:Section(title, { badge_color = value })"
+    },
+    {
+     "id": "WaxSectionOptions.marks",
+     "name": "marks",
+     "type": "{ icon: string, text: any }[]",
+     "optional": true,
+     "text": "Small counts at the right end of the title, each an icon with a number or a word.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal section = window:Section(title, { marks = value })"
+    },
+    {
      "id": "WaxSectionOptions.fit",
      "name": "fit",
      "type": "boolean",
@@ -6393,6 +6459,126 @@
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal button = window:Button(caption, function() end, options)"
     },
     {
+     "id": "WaxContainer.Picture",
+     "name": "Picture",
+     "call": "container:Picture",
+     "params": [
+      {
+       "name": "file",
+       "type": "string?",
+       "text": "The whole path of the file, such as mod.dir .. \"/logo.png\"."
+      },
+      {
+       "name": "options",
+       "type": "WaxPictureOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxPicture"
+      }
+     ],
+     "text": "Adds a picture from a .png or .jpg file, in the shape the picture has. With nil for the file it shows nothing until Set is called.",
+     "ref": "/docs/reference/controls#container-picture",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, options)"
+    },
+    {
+     "id": "WaxContainer.Tile",
+     "name": "Tile",
+     "call": "container:Tile",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxTileOptions"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxTile"
+      }
+     ],
+     "text": "Adds a card to press: a title, a line of text, small counts and a badge, over a faded picture when it has one.",
+     "ref": "/docs/reference/controls#container-tile",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile(options)"
+    },
+    {
+     "id": "WaxContainer.Badge",
+     "name": "Badge",
+     "call": "container:Badge",
+     "params": [
+      {
+       "name": "text",
+       "type": "string"
+      },
+      {
+       "name": "options",
+       "type": "WaxBadgeOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxControl"
+      }
+     ],
+     "text": "Adds a word or two in a small pill, such as \"New\" or a tag.",
+     "ref": "/docs/reference/controls#container-badge",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal control = window:Badge(text, options)"
+    },
+    {
+     "id": "WaxContainer.Stat",
+     "name": "Stat",
+     "call": "container:Stat",
+     "params": [
+      {
+       "name": "caption",
+       "type": "string"
+      },
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxStat"
+      }
+     ],
+     "text": "Adds a caption with its value under it. Several in a Flow make a line of facts.",
+     "ref": "/docs/reference/controls#container-stat",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal stat = window:Stat(caption, value)"
+    },
+    {
+     "id": "WaxContainer.Count",
+     "name": "Count",
+     "call": "container:Count",
+     "params": [
+      {
+       "name": "icon",
+       "type": "string",
+       "text": "The icon's name. The menu's Icons page lists the names."
+      },
+      {
+       "name": "value",
+       "type": "any"
+      },
+      {
+       "name": "options",
+       "type": "WaxCountOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxCount"
+      }
+     ],
+     "text": "Adds an icon with a number or a word beside it, such as a count of downloads.",
+     "ref": "/docs/reference/controls#container-count",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal count = window:Count(icon, value, options)"
+    },
+    {
      "id": "WaxContainer.Icon",
      "name": "Icon",
      "call": "container:Icon",
@@ -6884,6 +7070,361 @@
      "text": "Adds a scrolling list of text lines, such as a log.",
      "ref": "/docs/reference/controls#container-console",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal console = window:Console(options)"
+    }
+   ]
+  },
+  {
+   "id": "WaxPictureOptions",
+   "name": "WaxPictureOptions",
+   "title": "WaxPictureOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "What Container:Picture takes besides the file.",
+   "ref": "/docs/reference/controls#waxpictureoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Picture"
+   ],
+   "props": [
+    {
+     "id": "WaxPictureOptions.height",
+     "name": "height",
+     "type": "number",
+     "optional": true,
+     "text": "How tall the picture is drawn. 160 when omitted. It is drawn less tall when that would make it wider than the room it has.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, { height = 1 })"
+    },
+    {
+     "id": "WaxPictureOptions.on_click",
+     "name": "on_click",
+     "type": "fun()",
+     "optional": true,
+     "text": "Makes the picture something to press, and runs this when it is pressed.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, { on_click = function() end })"
+    },
+    {
+     "id": "WaxPictureOptions.selected",
+     "name": "selected",
+     "type": "boolean",
+     "optional": true,
+     "text": "Draws a line around the picture, for the chosen one of several. Only with on_click.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, { selected = true })"
+    }
+   ]
+  },
+  {
+   "id": "WaxPicture",
+   "name": "WaxPicture",
+   "title": "WaxPicture",
+   "kind": "object",
+   "group": "controls",
+   "text": "A picture from a file.",
+   "parents": [
+    "WaxControl"
+   ],
+   "ref": "/docs/reference/controls#waxpicture",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "WaxContainer.Picture"
+   ],
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, options)",
+   "funcs": [
+    {
+     "id": "WaxPicture.Set",
+     "name": "Set",
+     "call": "picture:Set",
+     "params": [
+      {
+       "name": "file",
+       "type": "string",
+       "text": "The whole path of a .png or .jpg file."
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "shown"
+      },
+      {
+       "type": "string?",
+       "name": "why"
+      }
+     ],
+     "text": "Shows another picture file. Returns false and the reason when the file is not a PNG or JPG picture the game can read.",
+     "ref": "/docs/reference/controls#picture-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, options)\nlocal shown, why = picture:Set(file)"
+    },
+    {
+     "id": "WaxPicture.SetSelected",
+     "name": "SetSelected",
+     "call": "picture:SetSelected",
+     "params": [
+      {
+       "name": "on",
+       "type": "boolean"
+      }
+     ],
+     "text": "Draws or removes the line around a picture that was made with on_click.",
+     "ref": "/docs/reference/controls#picture-setselected",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal picture = window:Picture(file, options)\npicture:SetSelected(on)"
+    }
+   ]
+  },
+  {
+   "id": "WaxTileOptions",
+   "name": "WaxTileOptions",
+   "title": "WaxTileOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "What a Tile shows.",
+   "ref": "/docs/reference/controls#waxtileoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Tile"
+   ],
+   "props": [
+    {
+     "id": "WaxTileOptions.title",
+     "name": "title",
+     "type": "string",
+     "text": "The name, in bold, kept to one line.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ title = \"text\" })"
+    },
+    {
+     "id": "WaxTileOptions.note",
+     "name": "note",
+     "type": "string",
+     "optional": true,
+     "text": "A few muted words after the title, such as a version.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ note = \"text\" })"
+    },
+    {
+     "id": "WaxTileOptions.text",
+     "name": "text",
+     "type": "string",
+     "optional": true,
+     "text": "A line or two under the title. Longer text is cut short.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ text = \"text\" })"
+    },
+    {
+     "id": "WaxTileOptions.badge",
+     "name": "badge",
+     "type": "string",
+     "optional": true,
+     "text": "A word or two in a small pill at the right end.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ badge = \"text\" })"
+    },
+    {
+     "id": "WaxTileOptions.badge_color",
+     "name": "badge_color",
+     "type": "table",
+     "optional": true,
+     "text": "The colour of the badge: a theme colour.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ badge_color = value })"
+    },
+    {
+     "id": "WaxTileOptions.marks",
+     "name": "marks",
+     "type": "{ icon: string, text: any, on_click?: fun(), active?: boolean, color?: table }[]",
+     "optional": true,
+     "text": "Small counts before the badge, each an icon with a number or a word. One with on_click is a small button of its own, pressed without pressing the card, and is drawn in its color while active is true.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ marks = value })"
+    },
+    {
+     "id": "WaxTileOptions.picture",
+     "name": "picture",
+     "type": "string",
+     "optional": true,
+     "text": "The whole path of a .png or .jpg file, drawn faded behind the card.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ picture = \"text\" })"
+    },
+    {
+     "id": "WaxTileOptions.on_click",
+     "name": "on_click",
+     "type": "fun()",
+     "optional": true,
+     "text": "Runs when the card is pressed.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile({ on_click = function() end })"
+    }
+   ]
+  },
+  {
+   "id": "WaxTile",
+   "name": "WaxTile",
+   "title": "WaxTile",
+   "kind": "object",
+   "group": "controls",
+   "text": "A card to press.",
+   "parents": [
+    "WaxControl"
+   ],
+   "ref": "/docs/reference/controls#waxtile",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "WaxContainer.Tile"
+   ],
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile(options)",
+   "funcs": [
+    {
+     "id": "WaxTile.SetPicture",
+     "name": "SetPicture",
+     "call": "tile:SetPicture",
+     "params": [
+      {
+       "name": "file",
+       "type": "string",
+       "text": "The whole path of a .png or .jpg file."
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "shown"
+      },
+      {
+       "type": "string?",
+       "name": "why"
+      }
+     ],
+     "text": "Puts a picture behind the card, faded and cut to the card's shape. Returns false and the reason when the file cannot be read.",
+     "ref": "/docs/reference/controls#tile-setpicture",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal tile = window:Tile(options)\nlocal shown, why = tile:SetPicture(file)"
+    }
+   ]
+  },
+  {
+   "id": "WaxBadgeOptions",
+   "name": "WaxBadgeOptions",
+   "title": "WaxBadgeOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "What Container:Badge takes besides the text.",
+   "ref": "/docs/reference/controls#waxbadgeoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Badge"
+   ],
+   "props": [
+    {
+     "id": "WaxBadgeOptions.color",
+     "name": "color",
+     "type": "table",
+     "optional": true,
+     "text": "A theme colour. The muted text colour when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal control = window:Badge(text, { color = value })"
+    }
+   ]
+  },
+  {
+   "id": "WaxStat",
+   "name": "WaxStat",
+   "title": "WaxStat",
+   "kind": "object",
+   "group": "controls",
+   "text": "A caption with its value under it.",
+   "parents": [
+    "WaxControl"
+   ],
+   "ref": "/docs/reference/controls#waxstat",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "WaxContainer.Stat"
+   ],
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal stat = window:Stat(caption, value)",
+   "funcs": [
+    {
+     "id": "WaxStat.Set",
+     "name": "Set",
+     "call": "stat:Set",
+     "params": [
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "text": "Changes the value.",
+     "ref": "/docs/reference/controls#stat-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal stat = window:Stat(caption, value)\nstat:Set(value)"
+    }
+   ]
+  },
+  {
+   "id": "WaxCountOptions",
+   "name": "WaxCountOptions",
+   "title": "WaxCountOptions",
+   "kind": "data",
+   "group": "controls",
+   "text": "What Container:Count takes besides the icon and the value.",
+   "ref": "/docs/reference/controls#waxcountoptions",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "users": [
+    "WaxContainer.Count"
+   ],
+   "props": [
+    {
+     "id": "WaxCountOptions.color",
+     "name": "color",
+     "type": "table",
+     "optional": true,
+     "text": "A theme colour for the icon and the value. The usual colours when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal count = window:Count(icon, value, { color = value })"
+    }
+   ]
+  },
+  {
+   "id": "WaxCount",
+   "name": "WaxCount",
+   "title": "WaxCount",
+   "kind": "object",
+   "group": "controls",
+   "text": "An icon with a number or a word beside it.",
+   "parents": [
+    "WaxControl"
+   ],
+   "ref": "/docs/reference/controls#waxcount",
+   "guide": {
+    "href": "/docs/gui/controls",
+    "title": "Controls"
+   },
+   "makers": [
+    "WaxContainer.Count"
+   ],
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal count = window:Count(icon, value, options)",
+   "funcs": [
+    {
+     "id": "WaxCount.Set",
+     "name": "Set",
+     "call": "count:Set",
+     "params": [
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "text": "Changes the value.",
+     "ref": "/docs/reference/controls#count-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal count = window:Count(icon, value, options)\ncount:Set(value)"
     }
    ]
   },
