@@ -30,6 +30,54 @@ ui.Hotkey("F7", function()
 end, { in_menu = true })
 ```
 
+| Option | What it does |
+| --- | --- |
+| `in_menu` | `true` makes the hotkey react while the menu is open too. |
+| `typing` | `true` makes it react while a text box has the keyboard as well. Without it, a key that writes a letter is left to the box. |
+| `hover` | `true` makes it a key for the slot under the mouse. It only reacts while the mouse is over a slot of a [Slots](/docs/reference/controls#waxslots) control. |
+
+## A key with Ctrl, Shift or Alt
+
+Put `Ctrl+`, `Shift+` or `Alt+` before the key. The hotkey then reacts only while exactly those are held.
+
+```lua title="init.lua"
+ui.Hotkey("Ctrl+Three", function()
+    ui.Notify("Ctrl and 3.")
+end)
+
+ui.Hotkey("Ctrl+Shift+K", function()
+    ui.Notify("Ctrl, Shift and K.")
+end)
+```
+
+A plain key gives way to the same key with Ctrl, Shift or Alt. If `"Three"` and `"Ctrl+Three"` are both hotkeys,
+pressing 3 while Ctrl is held runs only the second.
+
+## Is a key held right now
+
+<NextVersion />
+
+`ui.IsKeyDown(key)` is `true` while the key is held. Use it in a loop that a hotkey started, to do something
+for as long as the key stays down.
+
+```lua title="init.lua"
+ui.Hotkey("F6", function()
+    local seconds = 0
+    while ui.IsKeyDown("F6") do
+        task.wait(0.1)
+        seconds = seconds + 0.1
+    end
+    ui.Notify(("You held F6 for %.1f seconds."):format(seconds))
+end)
+```
+
+- It takes the same key names as `ui.Hotkey`. With `Ctrl+`, `Shift+` or `Alt+` it is `true` only while the key is
+  down with exactly those held.
+- It does not look at whether the menu is open or a text box has the keyboard. `ui.IsTyping()` tells you the
+  second.
+- Every call asks the game. So call it in a loop that runs while something is held, not in every frame of
+  the game.
+
 ## Key names
 
 A key is given by its name, as text.
@@ -107,9 +155,25 @@ ui.Hotkey("F6", function()
 end)
 ```
 
-## The menu key
+## The key of your windows
 
-The key that opens the menu is not a hotkey of yours. The player sets it on the **Settings** page of the
-Wax panel. From code, use `ui.SetToggleKey` and `ui.GetToggleKey`. See [The menu](/docs/menu#the-menu-from-code).
+<NextVersion>In Wax 0.2.1 one key, **F8**, opens the menu for every mod. `ui.GetToggleKey` and
+`ui.SetToggleKey` read and change it.</NextVersion>
+
+The key that shows and hides your mod's windows is not a hotkey of yours. Wax gives every mod that has a
+window such a key, and the player can change it on the mod's card of the **Mods** page. To ask for a key,
+pass `key` to your first window:
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Tools", key = "F6" })
+window:Label("F6 shows and hides this window.")
+```
+
+- If you make a hotkey on the key Wax gave your windows, Wax gives the windows another key and tells the
+  player.
+- If your hotkey and your windows have the same key because you asked for it, the press runs your hotkey and
+  is not also taken as the key of the windows.
+
+`ui.Keys` reads and sets these keys from code. See [The menu](/docs/menu#the-keys).
 
 Every function is listed in the [ui reference](/docs/reference/ui#ui-hotkey).

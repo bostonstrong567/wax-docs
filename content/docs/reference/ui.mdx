@@ -19,21 +19,23 @@ Type name: `WaxUI`.
 | Member | Type | Description |
 | --- | --- | --- |
 | `Icons` | [`WaxIcons`](/docs/reference/ui#ui-icons) | Icon names: the bundled Lucide set ("shield", "wrench", "map-pin" ...) plus images that mods register. |
-| `Notifications` | [`WaxNotifications`](/docs/reference/ui#ui-notifications) |  |
+| `Notifications` | [`WaxNotifications`](/docs/reference/ui#ui-notifications) | What all notifications share: the corner they show in and how many show at once. It also counts them and closes them all. |
 | `Debug` | [`WaxDebugPanel`](/docs/reference/ui#ui-debug) | The in-game debug panel. |
-| `Pictures` | [`WaxPictures`](/docs/reference/ui#ui-pictures) |  |
+| `Pictures` | [`WaxPictures`](/docs/reference/ui#ui-pictures) | The game's own pictures, such as item icons, which a cell of a Slots control shows by their path. Loading them is given a few milliseconds a frame, so a picture can show a moment after it was asked for. |
+| `Keys` | [`WaxKeys`](/docs/reference/ui#ui-keys) | The keys that show and hide windows. Wax's own panel has one, and so has every mod that made a window: a key shows and hides its owner's windows and nobody else's. A mod's key is the one the player chose on the mod's card of the Mods page, else the one the mod asked for with ui.Window(\{ key = "F6" \}), else a key Wax gives it once and remembers: one that no window and no hotkey of any mod uses. A press that your mod's own [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes is not also taken as the key of its windows. |
 
 | Signal | Handler receives | Description |
 | --- | --- | --- |
-| `Opened` | nothing | Fires when the menu opens. |
-| `Closed` | nothing | Fires when the menu closes. |
-| `KeyChanged` | `key`: `string?` | Fires with the new menu key. |
+| `Opened` | nothing | Fires when the menu opens: somebody's windows come up and the mouse is freed. |
+| `Closed` | nothing | Fires when the menu closes: nobody's windows are up any more and the game has the mouse back. A mod that opened the menu with `windows = false` also hears it when its own [`ui.Close()`](/docs/reference/ui#ui-close) leaves the menu open for others. |
+| `KeyChanged` | `key`: `string?` | Fires with the new key of Wax's own panel. For any owner's key, use ui.Keys.Changed. |
 | `ThemeChanged` | `name`: `string` | Fires with the theme's name after SetTheme or ResetTheme. |
-| `ScreenChanged` | `width`: `number`, `height`: `number` | Fires when ScreenSize gives another answer: a new resolution or interface scale. |
+| `ScreenChanged` | `width`: `number`, `height`: `number` | Fires once with the new size when ScreenSize gives another answer: after the game's window or the interface size has stopped changing for a moment, never while it is still being resized. |
+| `GameScreenChanged` | `name`: `string?`, `tab`: `integer?` | Fires with what GameScreen answers, in the frame the game shows another of its menu screens, another tab of its main menu, or none any more (nil). Connect to it in place of asking GameScreen every frame: the game is only looked at while somebody listens. |
 
 ### `ui.Open(options?)` [#ui-open]
 
-Opens the menu: windows appear and the mouse is freed to use them.
+Shows your mod's windows and frees the mouse to use them. Other mods' windows and the Wax panel stay as they are. In the command bar it is the Wax panel that comes up.
 
 ```lua
 ui.Open(options?: { windows: boolean? })
@@ -41,7 +43,7 @@ ui.Open(options?: { windows: boolean? })
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `options` (optional) | `{ windows: boolean? }` | `windows = false` frees the mouse for panels only and leaves the windows hidden. |
+| `options` (optional) | `{ windows: boolean? }` | `windows = false` frees the mouse for panels only and brings no window up. |
 
 **Returns** nothing.
 
@@ -49,7 +51,7 @@ ui.Open(options?: { windows: boolean? })
 
 ### `ui.Close()` [#ui-close]
 
-Closes the menu and gives the mouse back to the game.
+Hides your mod's windows again. The menu closes, and the game has the mouse back, once nobody's windows are up.
 
 ```lua
 ui.Close()
@@ -61,7 +63,7 @@ ui.Close()
 
 ### `ui.Toggle()` [#ui-toggle]
 
-Opens the menu when it is closed, and closes it when it is open.
+Shows your mod's windows when they are away, and hides them when they are up.
 
 ```lua
 ui.Toggle()
@@ -87,9 +89,47 @@ ui.Copy(text: any)
 
 <InExplorer id="ui.Copy" />
 
+### `ui.TextWidth(text, options?)` [#ui-textwidth]
+
+How wide a line of text is drawn, in the units controls and panels are sized in. It is worked out from the letters, to within a few percent.
+
+```lua
+ui.TextWidth(text: any, options?: WaxTextOptions): number
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `any` |
+| `options` (optional) | [`WaxTextOptions`](/docs/reference/ui#waxtextoptions) |
+
+**Returns** `number` (`width`)
+
+<InExplorer id="ui.TextWidth" />
+
+### `ui.Shorten(text, width, options?)` [#ui-shorten]
+
+The text if it fits in a width, else its start with "..." after it. A little room is kept spare, as the library does for its own text.
+
+```lua
+ui.Shorten(text: any, width: number, options?: WaxTextOptions): string, boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `any` |
+| `width` | `number` |
+| `options` (optional) | [`WaxTextOptions`](/docs/reference/ui#waxtextoptions) |
+
+**Returns**
+
+- `string` (`shown`)
+- `boolean` (`cut`) True when the text did not fit.
+
+<InExplorer id="ui.Shorten" />
+
 ### `ui.IsOpen()` [#ui-isopen]
 
-True while the menu is open.
+True while the menu is open: the mouse is free, because somebody's windows are up.
 
 ```lua
 ui.IsOpen(): boolean
@@ -101,7 +141,7 @@ ui.IsOpen(): boolean
 
 ### `ui.SetPreview(on)` [#ui-setpreview]
 
-Shows the windows without taking the mouse (for screenshots and for looking while you play).
+Shows every window without taking the mouse (for screenshots and for looking while you play).
 
 ```lua
 ui.SetPreview(on: boolean)
@@ -129,23 +169,26 @@ ui.IsPreview(): boolean
 
 ### `ui.SetToggleKey(key)` [#ui-settogglekey]
 
-Sets the key that opens and closes the menu, by the engine's key name ("F8"). nil leaves the menu without a key.
+Sets the key that shows and hides Wax's own panel, by the engine's key name ("F8"). nil leaves the panel without a key. A key that somebody has is refused, as with [`ui.Keys.Set`](/docs/reference/ui#ui-keys-set). Every mod has a key of its own: see ui.Keys.
 
 ```lua
-ui.SetToggleKey(key: string?)
+ui.SetToggleKey(key: string?): boolean, string?
 ```
 
 | Parameter | Type |
 | --- | --- |
 | `key` | `string?` |
 
-**Returns** nothing.
+**Returns**
+
+- `boolean` (`changed`)
+- `string?` (`taken_by`)
 
 <InExplorer id="ui.SetToggleKey" />
 
 ### `ui.GetToggleKey()` [#ui-gettogglekey]
 
-The key that opens and closes the menu.
+The key that shows and hides Wax's own panel.
 
 ```lua
 ui.GetToggleKey(): string?
@@ -233,7 +276,7 @@ ui.IsTyping(): boolean
 
 ### `ui.ScreenSize()` [#ui-screensize]
 
-The size of the screen in the units windows and panels are laid out in. While the game is starting and has no screen yet, the answer is 1920 by 1080; ScreenChanged fires if the real one turns out different.
+The size of the screen in the units windows and panels are laid out in. It changes with the shape of the game's window and with the interface size. While the game is starting and has no screen yet, the answer is 1920 by 1080; ScreenChanged fires if the real one turns out different.
 
 ```lua
 ui.ScreenSize(): number, number
@@ -341,9 +384,25 @@ ui.Hotkey(key: string, callback: fun(), options?: WaxHotkeyOptions): WaxHotkey
 
 <InExplorer id="ui.Hotkey" />
 
+### `ui.IsKeyDown(key)` [#ui-iskeydown]
+
+True while the key is held down, as the game's own input reports it for the local player. It takes the key names [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes. A name with Ctrl, Shift or Alt ("Ctrl+K") is true only while the key is down with exactly those held; a plain name is true whatever else is held. It is false while the game has no local player, and for a name the game does not know. It does not look at whether the menu is open or a text box has the keyboard (see [`ui.IsTyping`](/docs/reference/ui#ui-istyping)). Every call asks the game, so use it in a loop that runs while something is held, such as one a [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) started, and not in every frame of the game. It raises an error for a key that is not text, for empty text, and for a word before the key that is not Ctrl, Shift or Alt.
+
+```lua
+ui.IsKeyDown(key: string): boolean
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `key` | `string` | An engine key name such as "A", "LeftShift" or "MiddleMouseButton". |
+
+**Returns** `boolean`
+
+<InExplorer id="ui.IsKeyDown" />
+
 ### `ui.MinScale()` [#ui-minscale]
 
-The smallest scale that still draws text at a readable size on this screen.
+The smallest interface size that still draws text at a readable size on this screen. It follows the size of the game's window.
 
 ```lua
 ui.MinScale(): number
@@ -481,7 +540,7 @@ ui.Theme(): WaxTheme
 
 ### `ui.AddSettings(container)` [#ui-addsettings]
 
-Adds the menu's own settings (key, theme, accent, animation, size) to a container, such as a "Settings" page.
+Adds Wax's own settings (the key of its panel, theme, accent, animation, size) to a container, such as a "Settings" page.
 
 ```lua
 ui.AddSettings(container: WaxContainer)
@@ -496,6 +555,8 @@ ui.AddSettings(container: WaxContainer)
 <InExplorer id="ui.AddSettings" />
 
 ## `ui.Pictures` [#ui-pictures]
+
+The game's own pictures, such as item icons, which a cell of a Slots control shows by their path. Loading them is given a few milliseconds a frame, so a picture can show a moment after it was asked for.
 
 Type name: `WaxPictures`.
 
@@ -530,6 +591,8 @@ ui.Pictures.Stats(): { loaded: integer, failed: integer, waiting: integer, pinne
 <InExplorer id="ui.Pictures.Stats" />
 
 ## `ui.Notifications` [#ui-notifications]
+
+What all notifications share: the corner they show in and how many show at once. It also counts them and closes them all.
 
 Type name: `WaxNotifications`.
 
@@ -700,7 +763,7 @@ ui.Debug.Window(): WaxWindow?
 
 ### `ui.Debug.Show()` [#ui-debug-show]
 
-Shows the debug panel and opens the menu.
+Shows the Wax panel and frees the mouse, whichever mod calls it. Your own windows stay as they are.
 
 ```lua
 ui.Debug.Show()
@@ -709,6 +772,66 @@ ui.Debug.Show()
 **Returns** nothing.
 
 <InExplorer id="ui.Debug.Show" />
+
+## `ui.Keys` [#ui-keys]
+
+The keys that show and hide windows. Wax's own panel has one, and so has every mod that made a window: a key shows and hides its owner's windows and nobody else's. A mod's key is the one the player chose on the mod's card of the Mods page, else the one the mod asked for with ui.Window(\{ key = "F6" \}), else a key Wax gives it once and remembers: one that no window and no hotkey of any mod uses. A press that your mod's own [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) takes is not also taken as the key of its windows.
+
+Type name: `WaxKeys`.
+
+<InExplorer id="ui.Keys" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Changed` | `owner`: `string`, `key`: `string?` | Fires with the owner and its new key when a key is changed. |
+
+### `ui.Keys.Get(owner?)` [#ui-keys-get]
+
+The key of an owner: "Wax" or a mod's id. Left out, it is the mod that asks.
+
+```lua
+ui.Keys.Get(owner?: string): string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `owner` (optional) | `string` |
+
+**Returns** `string?`
+
+<InExplorer id="ui.Keys.Get" />
+
+### `ui.Keys.Set(owner, key)` [#ui-keys-set]
+
+Gives an owner another key, or none with nil. A key that another owner has, or that another mod uses as a hotkey, is refused: the key stays what it was, a notification says who has it, and you get false and that name.
+
+```lua
+ui.Keys.Set(owner: string, key: string?): boolean, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `owner` | `string` | "Wax" or a mod's id. |
+| `key` | `string?` | An engine key name such as "F6". It can be held with Ctrl, Shift or Alt: "Ctrl+K". |
+
+**Returns**
+
+- `boolean` (`changed`)
+- `string?` (`taken_by`)
+
+<InExplorer id="ui.Keys.Set" />
+
+### `ui.Keys.Owners()` [#ui-keys-owners]
+
+Every owner that has a window, Wax first.
+
+```lua
+ui.Keys.Owners(): WaxKeyOwner[]
+```
+
+**Returns** [`WaxKeyOwner[]`](/docs/reference/ui#waxkeyowner)
+
+<InExplorer id="ui.Keys.Owners" />
 
 ## WaxPage [#waxpage]
 
@@ -724,7 +847,7 @@ It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer
 
 ## WaxWindow [#waxwindow]
 
-A window in the menu. Controls added to it go into its body, or into a first page called "Main" when it has pages.
+A window in the menu. Controls added to it go into its body, or into a first page called "Main" when it has pages. The player moves it by its title bar and resizes it by any edge or corner; the bottom right corner shows a grip. Resizing stops at the window's minimum size and at the edges of the screen. A mod's windows come up together, with that mod's key (see ui.Keys), and other mods' windows stay as they are.
 
 It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer) can. You get one from [`ui.Debug.Window`](/docs/reference/ui#ui-debug-window), [`ui.Window`](/docs/reference/ui#ui-window), [`ui.Windows`](/docs/reference/ui#ui-windows). Below, `window` stands for one of these.
 
@@ -804,7 +927,7 @@ window:SetNavWidth(width: number)
 
 ### `window:Show()` [#window-show]
 
-Shows the window, in front of the others.
+Shows the window, in front of the others. While the menu is open it comes up at once, with your mod's other windows. While the menu is closed it waits for your mod's key or for [`ui.Open()`](/docs/reference/ui#ui-open).
 
 ```lua
 window:Show()
@@ -816,7 +939,7 @@ window:Show()
 
 ### `window:Hide()` [#window-hide]
 
-Hides the window. Hiding the last one closes the menu.
+Hides the window. Hiding the last window that is up closes the menu.
 
 ```lua
 window:Hide()
@@ -844,7 +967,7 @@ window:SetVisible(shown: boolean)
 
 ### `window:IsVisible()` [#window-isvisible]
 
-True while the window is shown.
+True while the window is shown. A shown window is on screen only while its mod's windows are up: IsShowing tells you that.
 
 ```lua
 window:IsVisible(): boolean
@@ -853,6 +976,18 @@ window:IsVisible(): boolean
 **Returns** `boolean`
 
 <InExplorer id="WaxWindow.IsVisible" />
+
+### `window:IsShowing()` [#window-isshowing]
+
+True while the window is really on screen: it is shown, and its mod's windows are up (or every window is, in preview).
+
+```lua
+window:IsShowing(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxWindow.IsShowing" />
 
 ### `window:SetMinimized(minimized)` [#window-setminimized]
 
@@ -1055,6 +1190,7 @@ It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Scrolled` | `steps`: `integer` | On a panel made with [`ui.Panel`](/docs/reference/ui#ui-panel): the wheel was turned over it, 1 for down and -1 for up. The game does not see the wheel while the mouse is over a panel. |
+| `Resized` | `width`: `number`, `height`: `number?` | On a panel made with a place function: it was given another size, in its own units. Fires in the frame the screen changed. |
 
 ### `overlay:SetVisible(shown)` [#overlay-setvisible]
 
@@ -1153,6 +1289,8 @@ You get one from [`ui.FitGame`](/docs/reference/ui#ui-fitgame). Below, `fit` sta
 
 ### `fit:Set(scale, x?, y?)` [#fit-set]
 
+Changes how large the game's menus are drawn, and how far they are moved when x or y is given. The numbers mean what the `scale`, `x` and `y` options mean.
+
 ```lua
 fit:Set(scale: number, x?: number, y?: number)
 ```
@@ -1168,6 +1306,8 @@ fit:Set(scale: number, x?: number, y?: number)
 <InExplorer id="WaxFit.Set" />
 
 ### `fit:SetEnabled(on)` [#fit-setenabled]
+
+Switches the request on or off. While it is off the game's menus have their own size, unless another request is on.
 
 ```lua
 fit:SetEnabled(on: boolean)
@@ -1194,6 +1334,8 @@ fit:Remove()
 <InExplorer id="WaxFit.Remove" />
 
 ## WaxNotification [#waxnotification]
+
+One message in a corner of the screen, as [`ui.Notify`](/docs/reference/ui#ui-notify) returns it. Once it has closed, its functions do nothing.
 
 You get one from [`ui.Notify`](/docs/reference/ui#ui-notify). Below, `notification` stands for one of these.
 
@@ -1273,6 +1415,8 @@ You get one from [`ui.Tag`](/docs/reference/ui#ui-tag). Below, `tag` stands for 
 
 ### `tag:Set(text)` [#tag-set]
 
+Replaces the text.
+
 ```lua
 tag:Set(text: string)
 ```
@@ -1287,6 +1431,8 @@ tag:Set(text: string)
 
 ### `tag:SetColor(color)` [#tag-setcolor]
 
+Changes the colour of the text.
+
 ```lua
 tag:SetColor(color: WaxColor|string)
 ```
@@ -1300,6 +1446,8 @@ tag:SetColor(color: WaxColor|string)
 <InExplorer id="WaxTag.SetColor" />
 
 ### `tag:SetRange(metres)` [#tag-setrange]
+
+Sets how near the thing has to be for the tag to show, in metres.
 
 ```lua
 tag:SetRange(metres: number)
@@ -1326,6 +1474,8 @@ tag:Remove()
 <InExplorer id="WaxTag.Remove" />
 
 ## WaxHotkey [#waxhotkey]
+
+A key that runs a function when it is pressed, as [`ui.Hotkey`](/docs/reference/ui#ui-hotkey) returns it.
 
 You get one from [`ui.Hotkey`](/docs/reference/ui#ui-hotkey). Below, `hotkey` stands for one of these.
 
@@ -1358,6 +1508,124 @@ hotkey:SetKey(key: string)
 **Returns** nothing.
 
 <InExplorer id="WaxHotkey.SetKey" />
+
+## WaxModel [#waxmodel]
+
+A creature or any other skeletal mesh of the game, drawn in 3D. It turns slowly by itself until the player touches it. The model follows the mouse when dragged: to the right its near side goes right, and down it is seen more from above. The wheel moves the camera nearer and further while the mouse is over the view, and the page does not scroll then. Two presses in a row put the view back. Nothing is drawn while the view is not on screen.
+
+It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Model`](/docs/reference/controls#container-model). Below, `model` stands for one of these.
+
+<InExplorer id="WaxModel" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Loaded` | nothing | The model given at the start or to Show is in the picture. |
+| `Failed` | `reason`: `string` | The mesh could not be loaded or is not a skeletal mesh, or the game could not make the view. |
+| `Turned` | `yaw`: `number`, `pitch`: `number`, `distance`: `number` | The player let go after a drag, turned the wheel or put the view back. |
+| `Clicked` | nothing | The player pressed the view and let go without turning it. |
+
+### `model:Show(look)` [#model-show]
+
+Shows another model in the same box. The view goes back to where it starts.
+
+```lua
+model:Show(look: WaxModelLook)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `look` | [`WaxModelLook`](/docs/reference/ui#waxmodellook) |
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.Show" />
+
+### `model:Clear()` [#model-clear]
+
+Empties the box.
+
+```lua
+model:Clear()
+```
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.Clear" />
+
+### `model:GetView()` [#model-getview]
+
+Where the camera is: degrees round the model (0 looks at its front, 90 at its right side), degrees above it (negative is below), and how far away (1 fits the model in the box).
+
+```lua
+model:GetView(): number, number, number
+```
+
+**Returns**
+
+- `number` (`yaw`)
+- `number` (`pitch`)
+- `number` (`distance`)
+
+<InExplorer id="WaxModel.GetView" />
+
+### `model:SetView(yaw?, pitch?, distance?)` [#model-setview]
+
+Puts the camera somewhere. What is left out stays as it is. The slow turn stops.
+
+```lua
+model:SetView(yaw?: number, pitch?: number, distance?: number)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `yaw` (optional) | `number` |  |
+| `pitch` (optional) | `number` | Kept between -20 and 75. |
+| `distance` (optional) | `number` | Kept between 0.45 and 1.6. |
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.SetView" />
+
+### `model:Reset()` [#model-reset]
+
+Puts the view back where it started, and starts the slow turn again.
+
+```lua
+model:Reset()
+```
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.Reset" />
+
+### `model:SetAnimation(animation, speed?)` [#model-setanimation]
+
+Changes what plays: "walk", "idle", "blueprint", the game path of an animation, or false to stand still.
+
+```lua
+model:SetAnimation(animation: "walk"|"idle"|"blueprint"|string|false, speed?: number)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `animation` | `"walk"` \| `"idle"` \| `"blueprint"` \| `string` \| `false` |  |
+| `speed` (optional) | `number` | For "blueprint": what the creature is said to move at. 0 stands, 150 walks. |
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.SetAnimation" />
+
+### `model:IsLoaded()` [#model-isloaded]
+
+True once the model given at the start or to Show is in the picture.
+
+```lua
+model:IsLoaded(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxModel.IsLoaded" />
 
 ## WaxUnknownOption [#waxunknownoption]
 
@@ -1485,10 +1753,12 @@ Used by [`ui.Window`](/docs/reference/ui#ui-window).
 | `x` | `number` |  |
 | `y` | `number` |  |
 | `closable` | `boolean` | False leaves out the close button. |
+| `resizable` | `boolean` | False makes a window the player cannot resize: it has no grip, its edges and corners do nothing, and it is always the size your mod gives it. SetSize still works. |
 | `visible` | `boolean` | False creates the window hidden. |
 | `nav` | [`WaxNav`](/docs/reference/ui#waxnav) | Gives the window pages, listed down the side or along the top. |
 | `nav_width` | `number` | Width of the side navigation column. |
 | `remember` | `boolean` | False stops Wax remembering the window's position and size between sessions. |
+| `key` | `string` | The key that shows and hides your mod's windows, such as "F6" or "Ctrl+K". The first window a mod makes decides. Without it Wax gives the mod a key, and the player can choose another on the mod's card of the Mods page. |
 
 ## WaxPageOptions [#waxpageoptions]
 
@@ -1544,6 +1814,21 @@ Extends [`WaxOverlayOptions`](/docs/reference/ui#waxoverlayoptions). Used by [`u
 | `opacity` | `number` | How solid its background is, 0 to 1. 0.96 when omitted. |
 | `visible` | `boolean` | False makes it hidden until SetVisible(true). |
 | `on_press` | `fun()` | Runs when the panel is pressed where it has no control. |
+| `place` | `fun(screen_width: number, screen_height: number): WaxPanelPlace` | Where the panel goes on a screen of this size. It is asked when the panel is made and again, in the same frame, whenever the game's window changes size: the panel that exists is moved, sized and zoomed, and nothing is built again. The size is the real screen in the units the game lays its own menus out in, and the zoom is used as it is, so such a panel keeps its size beside the game's menus whatever the interface size is. |
+
+## WaxPanelPlace [#waxpanelplace]
+
+What a panel's place function answers. What is left out stays as it is.
+
+<InExplorer id="WaxPanelPlace" />
+
+| Field | Type |
+| --- | --- |
+| `x` (optional) | `number` |
+| `y` (optional) | `number` |
+| `width` (optional) | `number` |
+| `height` (optional) | `number` |
+| `zoom` (optional) | `number` |
 
 ## WaxFitOptions [#waxfitoptions]
 
@@ -1573,6 +1858,33 @@ Used by [`ui.Notify`](/docs/reference/ui#ui-notify).
 | `seconds` | `number` | Time on screen. Default 4, and 0 keeps it until closed. |
 | `progress` | `number` | 0..1. Shows progress in place of the countdown and keeps the notification until closed. |
 
+## WaxKeyOwner [#waxkeyowner]
+
+One owner of windows, as [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners) lists it.
+
+Returned by [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners).
+
+<InExplorer id="WaxKeyOwner" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | "Wax" for Wax's own panel, else the id of a mod. |
+| `name` | `string` | The name to show: "Wax", or the mod's name. |
+| `key` | `string?` | Its key, or nil when it has none. |
+| `open` | `boolean` | True while its windows are up. |
+
+## WaxTextOptions [#waxtextoptions]
+
+Used by [`ui.TextWidth`](/docs/reference/ui#ui-textwidth), [`ui.Shorten`](/docs/reference/ui#ui-shorten).
+
+<InExplorer id="WaxTextOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `size` | `number` | The font size. The interface's own when omitted. |
+| `face` | `string` | "Bold", "Book" or "Medium" (the default). |
+| `family` | `string` | "mono" for the fixed-width font. |
+
 ## WaxTagOptions [#waxtagoptions]
 
 Used by [`ui.Tag`](/docs/reference/ui#ui-tag).
@@ -1598,6 +1910,85 @@ Used by [`ui.Hotkey`](/docs/reference/ui#ui-hotkey).
 | `in_menu` | `boolean` | Also reacts while the menu is open (off by default, so that typing in a box does not trigger it). |
 | `typing` | `boolean` | Also reacts while a text box has the keyboard (for a key meant for the box, such as Tab). |
 | `hover` | `boolean` | Makes it a key for the slot under the mouse: it only reacts while a slot is under it. |
+
+## WaxModelFur [#waxmodelfur]
+
+The fur of a model: a second mesh that hair grows from. [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) fills it in from the creature's own data.
+
+<InExplorer id="WaxModelFur" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mesh` | `string` | The game path of the mesh the fur grows from. |
+| `splines` (optional) | `string` | The game path of the fur's splines. |
+| `layers` (optional) | `integer` | How many layers the fur is drawn in, 1 to 64. |
+| `length` (optional) | `number` |  |
+| `min_length` (optional) | `number` |  |
+| `bias` (optional) | `number` |  |
+| `noise` (optional) | `number` |  |
+| `hair_bias` (optional) | `number` |  |
+| `uniformity` (optional) | `number` |  |
+| `bare` (optional) | `boolean` | True leaves out the faces that have no splines. |
+| `materials` (optional) | `table<integer, string>` | Game paths of materials by slot, 1 first. |
+
+## WaxModelPart [#waxmodelpart]
+
+One more mesh of a model on the same skeleton, such as a piece of armour. It takes the pose of the first mesh.
+
+<InExplorer id="WaxModelPart" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mesh` | `string` | The game path of a skeletal mesh. |
+| `materials` (optional) | `table<integer, string>` | Game paths of materials by slot, 1 first. |
+
+## WaxModelLook [#waxmodellook]
+
+What a Model control shows. Every path is a game path such as "/Game/ASS/CRE/Deer/SK_CRE_PAS_Deer"; a path with no dot gets its last part again. [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) gives one of these for a creature.
+
+Used by [`model:Show`](/docs/reference/ui#model-show).
+
+<InExplorer id="WaxModelLook" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mesh` | `string` | The game path of a skeletal mesh. |
+| `materials` (optional) | `table<integer, string>` | Game paths of materials to put on the mesh, by slot, 1 first. |
+| `parts` (optional) | [`WaxModelPart[]`](/docs/reference/ui#waxmodelpart) | More meshes on the same skeleton. |
+| `fur` (optional) | [`WaxModelFur`](/docs/reference/ui#waxmodelfur) \| [`WaxModelFur[]`](/docs/reference/ui#waxmodelfur) |  |
+| `walk` (optional) | `string` | The game path of the animation "walk" plays. |
+| `idle` (optional) | `string` | The game path of the animation "idle" plays. |
+| `loop` (optional) | `string` | The game path of an animation for a model with no walk and no idle, such as flying. |
+| `animation` (optional) | `"walk"` \| `"idle"` \| `"blueprint"` \| `string` \| `false` | What plays, in a loop. "walk" (the default) plays walk, or idle or loop when there is none. "idle" plays idle, or loop when there is no walk either. "blueprint" runs the mesh's own animation blueprint. A game path plays that animation. false stands still. |
+| `blueprint` (optional) | `string` | The game path of the mesh's own animation blueprint. Only used with animation = "blueprint". |
+| `speed` (optional) | `number` | What an animation blueprint is told the creature moves at: 0 stands, 150 (the default) walks. Only blueprints of the game's creature kind listen to it. |
+| `facing` (optional) | `number` | The way the mesh faces as its creature's class turns it, in degrees. Default -90. The view starts in front of the model by it. |
+| `scale` (optional) | `number` | How much larger the game draws the creature than its mesh. The view fits every model to its box, so it changes nothing there. |
+| `walks` (optional) | `boolean` | True when there is a walk to play. [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) sets it; the view does not read it. |
+| `against` (optional) | [`WaxModelLook`](/docs/reference/ui#waxmodellook) | Another model to be seen beside, such as a young animal's adult. This one is then as much smaller in its box as it is smaller than that one in the game, by the two meshes' sizes and their scale. It never fills less than four tenths of the box, and a model larger than the other fills the box as it would alone. Only mesh and scale of the other are read. |
+
+## WaxModelOptions [#waxmodeloptions]
+
+Extends [`WaxModelLook`](/docs/reference/ui#waxmodellook). Used by [`container:Model`](/docs/reference/controls#container-model).
+
+<InExplorer id="WaxModelOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `mesh` | `string` | Nothing shows until Show is called when this is left out. |
+| `width` | `number` | Default 240. |
+| `height` | `number` | As tall as it is wide when left out. |
+| `size` | `number` | The side of a square view, in place of width and height. |
+| `align` | `"left"` \| `"center"` \| `"right"` | Where the view sits in its line. Default "center". |
+| `backdrop` | [`WaxColor`](/docs/reference/ui#waxcolor) \| `boolean` | A colour behind the model, or true for the theme's card colour. See-through when left out. |
+| `spin` | `number` \| `false` | Degrees a second it turns by itself until the player touches it. Default 12. |
+| `turn` | `boolean` | False: the player cannot turn it. |
+| `zoom` | `boolean` | False: the wheel is left to the page. |
+| `reset` | `boolean` | False leaves out the small button that puts the view back. |
+| `light` | `number` | How bright the three lights are: 1 as designed, up to 4. At 0 the model is a dark shape. |
+| `yaw` | `number` | Where the view starts, in degrees round the model: 0 looks at its front, 90 at its right side. Default -40. |
+| `pitch` | `number` | How many degrees above the model the view starts. Default 10. Kept between -20 and 75. |
+| `distance` | `number` | How far away the view starts: 1 fits the model in the box. Default 1. Kept between 0.45 and 1.6. |
 
 ## Named values [#named-values]
 

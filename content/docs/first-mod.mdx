@@ -31,7 +31,7 @@ In that folder, make a text file called `init.lua`. Paste this in and save it.
 local hud = ui.Overlay({ title = "My first mod", anchor = "top-left" })
 hud:Field("Map", game.MapName or "none")
 
--- A window lives in the menu. F8 opens the menu.
+-- A window lives in the menu. Your mod's own key shows and hides it.
 local window = ui.Window({ title = "My first mod", icon = "sparkles", width = 300, height = 170 })
 
 window:Label("Hello from my first mod.")
@@ -63,12 +63,18 @@ it, and it loads by itself when the game starts.
 
 ### Find your window
 
-The menu is still open, and your window is in it.
+Every mod that has a window gets a key of its own. A notification tells you which one Wax picked for your
+mod, for example **F6**. It is also on the mod's card, as **Open key**.
+
+Press that key. Your window comes up.
+
+<NextVersion>In Wax 0.2.1 there is no key for each mod. Press **F8**: it shows every mod's windows, and
+**F8** again hides them.</NextVersion>
 
 - Flip the switch. The overlay hides and comes back.
 - Click **Say hi**. A green message shows in a corner of the screen.
 
-Press **F8** or **Escape** to close the menu.
+Press the key again to hide your window. **Escape** closes everything that is up.
 
 </Step>
 <Step>

@@ -78,6 +78,48 @@ This page cannot settle it.
 
 If RocketWerkz publishes rules about mods, those rules come first, and this page will be changed to say so.
 
+## Host and guest
+
+<NextVersion />
+
+Whoever hosts a game runs its rules. Their game decides what is in the world, what a character carries and
+how much health it has. `game.IsHost` is `true` when that is you: you play alone, or you host.
+
+Wax has functions that change the world. They work for the host and are refused for a guest:
+
+- changing a character: `Heal`, `Kill`, `Teleport`, assigning `Health`, `Stamina`, `Food`, `Water` and
+  `Oxygen`, and putting a modifier on or taking it off ([Your character](/docs/character#what-the-host-can-change),
+  [Stats and modifiers](/docs/stats#put-one-on-or-take-it-off));
+- giving and taking items ([Items and inventories](/docs/items#give-and-take));
+- spawning and changing creatures ([Creatures](/docs/creatures#spawn-a-creature));
+- spawning things from a blueprint ([Blueprints](/docs/blueprints#spawn));
+- setting the time of day ([Time, weather and the prospect](/docs/time-and-weather#set-the-time)).
+
+As a guest, each of these raises an error at the line that called it, and the game is asked nothing. The error
+says that only the host can do it. So a mod that offers such a thing should look at `game.IsHost` first:
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Helper", width = 280, height = 130 })
+
+window:Button("Heal me", function()
+    if not game.IsHost then
+        ui.Notify("Only the host can do this.", { kind = "warn" })
+        return
+    end
+    game.Me:Heal()
+end)
+```
+
+Changes to the [game's tables](/docs/tables#in-a-game-someone-else-hosts), which is what
+[Recipes](/docs/recipes) and [The store](/docs/store) make, are different. As a guest they are made on your PC
+only, and the host's game goes on working from its own tables.
+
+Reading works for everybody, with what your PC knows. A guest's PC only knows the creatures near it, and it
+does not have the list of all the weather on the map.
+
+All of this was built and tried on the host of a session. None of it has been tried from a second PC that
+joined a game: not the refusals, and not whether the other players see what a host's mod spawned or changed.
+
 ## Sources
 
 - The Steam page of ICARUS: [store.steampowered.com/app/1149460/ICARUS](https://store.steampowered.com/app/1149460/ICARUS/).

@@ -1,31 +1,59 @@
 ---
 title: The menu
-description: One key opens every mod's windows and frees the mouse.
+description: Each mod's windows come up with that mod's own key, and the mouse is free while any are up.
 icon: Menu
 ---
 
-Windows made by mods are shown in **the menu**. Press **F8** to open it. Press **F8** again to close it.
+<NextVersion>In Wax 0.2.1 one key, **F8**, opens the menu and shows every mod's windows together, a window
+is resized by the grip in its bottom right corner only, and `ui.Keys` is not there.</NextVersion>
+
+Windows made by mods are shown in **the menu**. The menu is open while anybody's windows are up.
+
+- **F8** shows and hides the Wax panel.
+- Every mod that has a window has a key of its own. That key shows and hides that mod's windows, and nobody
+  else's.
+
+So you can have the Wax panel up, or one mod's windows, or several at once.
 
 ## While the menu is open
 
-- Every mod's windows are on screen.
+- The windows of whoever you brought up are on screen.
 - The mouse is free, so you can click.
 - The game does not act on your keys or clicks. A click on a button does not also swing your axe.
-- **Escape** closes the menu. If a dropdown list is open, Escape closes that first.
+- **Escape** closes the menu: everything that is up goes away. If a dropdown list is open, Escape closes that
+  first.
 
-Closing the last window also closes the menu. Open the menu again and the windows are back.
+Closing the last window that is up also closes the menu. Press the key again and the windows are back.
+
+## A key for each mod
+
+A mod's key is on its card of the **Mods** page of the Wax panel, as **Open key**.
+
+- A mod can ask for a key. For a mod that asks for none, Wax picks the first of F6, F9, F10, F11, F5, F4, F3
+  and F2 that nobody uses, and a notification tells you once which it is.
+- To change it, click the key on the card and press the new one. It can be held with Ctrl, Shift or Alt.
+- A key that somebody else already has is refused. A notification says who has it.
+
+[The Wax panel](/docs/debug-panel#a-key-for-each-mod) has more on this.
 
 ## Moving windows around
 
 | To do this | Do this |
 | --- | --- |
 | Move a window | Drag its title bar. |
-| Resize it | Drag the grip in its bottom right corner. |
+| Resize it | Drag any edge or any corner. The bottom right corner shows a grip. |
 | Roll it up to its title bar | Click the minus button. Click the plus to roll it down. |
 | Close it | Click the cross. |
 | Make the page list wider | Drag the line between the list and the page. |
 
+The mouse pointer changes over an edge or a corner, and that part of the window's outline lights up. It is
+brighter while you hold it. The edge across from the one you drag stays where it is. A window does not get
+smaller than it can be used at, and no edge goes past the edge of the screen.
+
 Wax remembers each window's place and size the next time you play.
+
+When the game's own window gets smaller, a window that would be out of reach is drawn back onto the screen.
+Its own place is kept, so it goes back there when the game's window is large again.
 
 ## Things that are not part of the menu
 
@@ -34,23 +62,29 @@ mouse, and clicks go through them.
 
 While the menu is open you can drag an overlay to a new place. Wax remembers that too.
 
-## Changing the key
+## Changing the keys
 
-Open the Wax panel, go to **Settings** and click the **Menu key** button. Then press the key you want.
+For the Wax panel: open it, go to **Settings** and click the **Wax panel key** button. Then press the key you
+want.
 
 <Shot
   src="panel-settings.png"
-  alt="The Settings page of the Wax panel with five rows: Menu key set to F8, Theme set to Midnight, Accent colour set to From the theme, an Animations switch that is on, and Interface size set to 100%."
+  alt="The Settings page of the Wax panel with five rows: Wax panel key set to F8, Theme set to Midnight, Accent colour set to From the theme, an Animations switch that is on, and Interface size set to 100%."
 />
+
+For a mod: open its card on the **Mods** page and click its **Open key**.
 
 ## The menu from code
 
+`ui.Open`, `ui.Close` and `ui.Toggle` are about your own mod's windows. Other mods' windows and the Wax panel
+stay as they are.
+
 ```lua title="init.lua"
-local window = ui.Window({ title = "Menu" })
+local window = ui.Window({ title = "Menu", key = "F6" })
 
-window:Field("Menu key", ui.GetToggleKey() or "none")
+window:Field("My key", ui.Keys.Get() or "none")
 
-window:Button("Close the menu", function()
+window:Button("Hide my windows", function()
     ui.Close()
 end)
 
@@ -65,18 +99,46 @@ end)
 
 | Function | What it does |
 | --- | --- |
-| `ui.Open()` | Opens the menu. |
-| `ui.Close()` | Closes the menu and gives the mouse back to the game. |
-| `ui.Toggle()` | Opens it when closed, closes it when open. |
-| `ui.IsOpen()` | `true` while the menu is open. |
-| `ui.SetToggleKey("F9")` | Changes the menu key. Pass `nil` for no key at all. |
-| `ui.GetToggleKey()` | The menu key, for example `"F8"`. |
+| `ui.Open()` | Shows your mod's windows and frees the mouse. |
+| `ui.Open({ windows = false })` | Frees the mouse and brings no window up. For a mod that shows [panels](/docs/gui/overlays#panels) only. |
+| `ui.Close()` | Hides your mod's windows. The menu closes once nobody's windows are up. |
+| `ui.Toggle()` | Shows them when they are away, hides them when they are up. |
+| `ui.IsOpen()` | `true` while the menu is open, whoever opened it. |
+| `ui.Window({ key = "F6" })` | The key your mod asks for. The first window your mod makes decides. |
 | `ui.Opened`, `ui.Closed` | [Signals](/docs/signals) that fire when the menu opens and closes. |
-| `ui.KeyChanged` | A signal that fires with the new key when the menu key changes. |
+
+### The keys
+
+`ui.Keys` knows the key of everybody who has a window. An owner is `"Wax"` for the Wax panel, or a mod's id.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Keys", width = 320, height = 200 })
+
+for _, owner in ipairs(ui.Keys.Owners()) do
+    window:Field(owner.name, owner.key or "none")
+end
+
+ui.Keys.Changed:Connect(function(owner, key)
+    print(owner, "now opens with", key or "no key")
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `ui.Keys.Get(owner)` | The key of an owner. Leave `owner` out for your own mod. |
+| `ui.Keys.Set(owner, key)` | Gives an owner another key, or none with `nil`. A key somebody has is refused: you get `false` and the name of who has it, and a notification says so. |
+| `ui.Keys.Owners()` | Everybody who has a window, Wax first. Each entry has `id`, `name`, `key` and `open`. |
+| `ui.Keys.Changed` | A signal that fires with the owner and the new key. |
+| `ui.GetToggleKey()`, `ui.SetToggleKey(key)` | The key of the Wax panel. The same as `ui.Keys.Get("Wax")` and `ui.Keys.Set("Wax", key)`. |
+| `ui.KeyChanged` | A signal that fires with the new key of the Wax panel. |
+
+Write `ui.Keys.Get` with a dot, not a colon.
+
+A press that a [hotkey](/docs/gui/hotkeys) of your mod takes is not also taken as the key of your windows.
 
 ## Look without taking the mouse
 
-`ui.SetPreview(true)` shows the windows without freeing the mouse. You keep playing and can see the
+`ui.SetPreview(true)` shows every window without freeing the mouse. You keep playing and can see the
 windows. Use it for screenshots. `ui.SetPreview(false)` hides them again.
 
 ```lua

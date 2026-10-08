@@ -71,9 +71,14 @@ Open the Wax menu (F8) and go to **Mods**. Each mod has a card:
 | Control | What it does |
 | --- | --- |
 | **Enabled** | Switches the mod on or off. It stays that way after you restart the game. |
+| **Auto Update** | On a mod you added from the catalogue: whether a newer version is put in by itself. See [Updates](#updates). |
+| **Open key** | On a mod that has a window: the key that shows and hides its windows. Click it and press another key to change it. |
 | **Reload** | Loads the mod again. |
-| Up and down arrows | Move the mod in the list. Mods load in this order. |
+| The six dots | At the left of the card's name. Hold them and drag the card up or down to move the mod in the list. Mods load in this order. |
 | Bin | Removes the mod. Wax asks first. |
+
+<NextVersion>In Wax 0.2.1 a card has no **Open key** and no **Auto Update** switch, and it has up and down
+arrows in place of the six dots.</NextVersion>
 
 A removed mod is not erased. Its folder is renamed so that it starts with `.removed-`, and Wax leaves folders
 with such names alone. To get the mod back, rename the folder to the mod's name again.
@@ -93,9 +98,20 @@ tells you, for example "Recipe Browser was updated to 0.9.2."
   the same name. Wax only updates a folder that holds a `wax.origin` file, which **Add to game** writes.
 - A version that needs a newer Wax than yours is left out until you update Wax.
 
-To decide yourself when a mod is updated, open the Wax menu (F8), go to **Mods** and switch off **Auto Update**.
-Wax then only shows that a newer version is out: the mod's card has an **Update to** button. **Check now** asks
-the catalogue at once.
+Every mod that came from the catalogue has its own **Auto Update** switch. Open the Wax menu (F8), go to
+**Mods** and open the mod's card to find it. It is on until you switch it off.
+
+- With a mod's switch off, Wax only shows that a newer version of that mod is out: its card has an
+  **Update to** button, and the mod is updated when you press it. Your other mods go on updating themselves.
+- **Check now**, above the cards, asks the catalogue at once.
+- **Look for updates**, above the cards, is the switch for all of it. Off, the catalogue is not asked at all,
+  and no mod is updated.
+- A mod's **Auto Update** switch is about that mod only. Updates of Wax itself have a setting of their own:
+  [Switching it off](/docs/security#switching-it-off) says how to change it.
+
+Wax 0.2.0 and 0.2.1 have one **Auto Update** switch for all mods, above the cards, and no **Look for
+updates** switch. The next version of Wax gives each mod its own. If you had switched the old one off, every
+mod's switch starts off.
 
 Wax asks one address, `wax-icarus.duckdns.org`. It sends the name and version of the mod it fetches and its own
 version. [What Wax asks the network for](/docs/security#what-wax-asks-the-network-for) has every request.

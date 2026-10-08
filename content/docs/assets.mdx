@@ -1,0 +1,128 @@
+---
+title: Assets
+description: game.Assets loads the game's meshes, textures and materials by path, makes materials of your own, and builds shapes from numbers.
+icon: Boxes
+---
+
+<NextVersion />
+
+An **asset** is a file of the game: a mesh, a texture, a material, a blueprint's class. `game.Assets` loads
+one by its path and keeps it in memory for your mod.
+
+```lua title="init.lua"
+local cube, why = game.Assets:Load("/Engine/BasicShapes/Cube.Cube")
+if cube then
+    print("Loaded", cube.Name, "a", cube.ClassName)
+else
+    print("Not loaded:", why)
+end
+```
+
+Assets are what [Blueprints](/docs/blueprints) are built from: the mesh a part shows and the material it is
+drawn with.
+
+## Load by path
+
+A path is written `"/Game/Folder/Name"` or `"/Game/Folder/Name.Name"`. The form the Unreal editor copies,
+`Texture2D'/Game/Folder/Name.Name'`, works too. A blueprint's class is `"/Game/Folder/BP_Thing.BP_Thing_C"`.
+Letter case does not matter.
+
+| Function | What it does |
+| --- | --- |
+| `game.Assets:Load(path)` | Loads an asset and gives its [Instance](/docs/instances). Gives `nil` and the reason when there is no such asset. |
+| `game.Assets:IsLoaded(path)` | `true` while the asset is in memory. It loads nothing. |
+| `game.Assets:Release(what)` | Lets go of something your mod asked for, before the mod unloads. |
+
+- When the path is wrong, the reason names the nearest names in that folder where it can.
+- Asked again, the same Instance comes back at once.
+- After a map change an Instance from before answers with an error. Call `Load` again, which costs little
+  because the asset is still kept.
+
+To find paths, look in the game's files with a tool such as FModel, or read them from the
+[game's tables](/docs/tables): an item's `Icon` is a path.
+
+<Callout type="warn" title="Loading holds the game up">
+  A first load stops the game until it is done. An item picture took 0.2 to 1 ms and a mesh 5 ms. Load when
+  your mod starts or a window opens, not in the middle of a fight.
+</Callout>
+
+### Why Wax keeps them
+
+The game frees an asset that nothing uses within minutes, and using it after that crashes. So Wax holds on to
+everything `Load`, `Texture` and `Material` give your mod, and lets go of it all when the mod unloads. You
+have nothing to do.
+
+## A picture of your own
+
+`game.Assets:Texture(file)` reads a `.png` or `.jpg` from your mod's folder and gives it as a texture.
+
+```lua title="init.lua"
+local logo = game.Assets:Texture("pictures/logo.png")
+print(logo.ClassName)
+```
+
+- The file is named from your mod's folder. A path that leaves the folder with `..` raises an error, and so
+  does a file that is not there or is no picture.
+- Asked again, the same texture comes back and no file is read.
+- A changed file is read again after your mod reloads.
+
+Such a texture goes onto a material, as below. Wax has no control yet that shows one in a window.
+
+## A material of your own
+
+`game.Assets:Material(parent, options)` makes a new material from one of the game's, with your colours,
+numbers and textures set on it.
+
+```lua title="init.lua"
+local glow = game.Assets:Material("/Engine/EngineMaterials/EmissiveMeshMaterial", {
+    colors = { Color = "Orange" },
+})
+print(glow.ClassName)
+```
+
+| Option | What it sets |
+| --- | --- |
+| `colors` | Colour parameters. A colour is a name such as `"Red"`, `"#rrggbb"`, or `{ R = 1, G = 0.5, B = 0 }`. |
+| `numbers` | Number parameters. |
+| `textures` | Texture parameters: a texture from `Load` or `Texture`, or the path of one. |
+
+- The parameter names belong to the material you start from. `EmissiveMeshMaterial` has `Color`. Another
+  material has other names. A name the material does not have changes nothing, and no error says so.
+- Every call makes a new material, so make it once and keep it.
+- A material does not outlive the map. Make it again after `game.MapChanged`.
+- A material that `Material` made cannot be the parent of another. Start from the one it was made from.
+
+## A shape made of numbers
+
+`game.Assets:Mesh(shape)` describes a shape: a box, or your own corners and triangles. It is plain Lua until
+you put it on a part with `mesh:Apply`.
+
+```lua title="init.lua"
+local slab = game.Assets:Mesh({ box = { X = 200, Y = 200, Z = 20 }, collision = true })
+print(slab.VertexCount, "corners,", slab.TriangleCount, "triangles")
+
+local pyramid = game.Assets:Mesh({
+    vertices = { { -40, -40, 0 }, { 40, -40, 0 }, { 40, 40, 0 }, { -40, 40, 0 }, { 0, 0, 70 } },
+    triangles = { 2, 1, 5,  3, 2, 5,  4, 3, 5,  1, 4, 5,  1, 2, 3,  1, 3, 4 },
+})
+print(pyramid.Size.Z)
+```
+
+- 100 is one metre, measured from the part's own place.
+- Triangles name three corners each, counted from 1. A triangle is seen from the side on which its corners
+  run counter-clockwise.
+- `collision = true` makes things stop at the shape. A character stood on such a slab when it was tried.
+- A mistake in the shape raises an error that names the entry.
+
+`mesh:Apply(part, options)` puts the shape on a part of the class `ProceduralMeshComponent`. The easiest way
+to get such a part is a [blueprint](/docs/blueprints#a-shape-of-your-own) whose part has the shape as its
+`mesh`. Putting a box on took 0.2 ms. Do it once, not every frame.
+
+## Good to know
+
+- Nothing here runs between your calls, so it costs nothing a frame.
+- Nothing here asks whether you are the host. Spawning things from assets is for the host: see
+  [Blueprints](/docs/blueprints). All of it has only been tried on the host of a session.
+- Sounds, and packed files of a mod's own, are not in this version.
+
+Every function is listed in the [Assets reference](/docs/reference/assets).

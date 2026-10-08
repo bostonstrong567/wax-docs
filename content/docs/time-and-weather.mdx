@@ -1,0 +1,146 @@
+---
+title: Time, weather and the prospect
+description: Read the game's clock, the weather on your character and the prospect you are in, and hear when a player joins or leaves.
+icon: CloudSun
+---
+
+<NextVersion />
+
+Three names tell you about the session you are in: `game.Time`, `game.Weather` and `game.Prospect`. Each
+field asks the game when you read it, and is `nil` while you are not in a prospect.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Prospect", anchor = "top-right", width = 240 })
+local clock = hud:Field("Time", "")
+local weather = hud:Field("Weather", "")
+
+task.every(1, function()
+    if not game.InProspect then return end
+    clock:Set((game.Time.Clock or "?") .. "  " .. (game.Time.Phase or ""))
+    weather:Set(game.Weather.Current or "Clear")
+end)
+```
+
+## The time of day
+
+| Field | What it is |
+| --- | --- |
+| `game.Time.Hour` | The hour of the game's clock, from 0 to 23. |
+| `game.Time.Minute` | The minute, from 0 to 59. |
+| `game.Time.Clock` | The time as text, such as `"7:05"` or `"19:30"`. |
+| `game.Time.Phase` | `"Morning"` from 6, `"Day"` from 10, `"Afternoon"` from 14, `"Night"` from 18 to 6. |
+| `game.Time.IsNight` | `true` while the phase is `"Night"`. |
+| `game.Time.Scale` | The speed the game's clock is set to. 1 as the game sets it. |
+
+The game's clock does not run evenly. It runs faster at night. So read `Hour`, and do not work the time out
+from seconds.
+
+`game.Time.HourChanged` fires with the new hour and the one before. It is looked at twice a second, and only
+while something is connected.
+
+```lua title="init.lua"
+game.Time.HourChanged:Connect(function(hour)
+    if hour == 18 then
+        ui.Notify("Night is coming.", { kind = "warn" })
+    end
+end)
+```
+
+### Set the time
+
+The host can move the clock forward to a time later the same day.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Clock", width = 260, height = 130 })
+
+window:Button("Skip to noon", function()
+    local hour = game.Time.Hour
+    if game.IsHost and hour and hour < 12 then
+        game.Time:Set(12)
+    end
+end)
+```
+
+- `game.Time:Set(hour, minute)` gives back `true` when the clock says that time afterwards.
+- The game's clock only goes forward within a day. An earlier time raises an error that says what the clock
+  shows. Going on to the next day is not in this version.
+- In a game someone else hosts it raises an error that says only the host can. See
+  [Multiplayer](/docs/multiplayer#host-and-guest).
+
+## The weather
+
+| Field | What it is |
+| --- | --- |
+| `game.Weather.Current` | The weather event your character is in, such as `"T3_Conifer_Rain"`. `nil` in clear weather. |
+| `game.Weather.Tier` | How heavy it is: 0 for the lightest up to 6 for the heaviest. `nil` in clear weather. |
+| `game.Weather.IsStorm` | `true` while your character is in weather of tier 1 or more. |
+| `game.Weather.Active` | Every weather event running on the map. Only the host has it. |
+
+The names are rows of the game's table `D_WeatherEvents`.
+
+`game.Weather.Changed` fires when the weather on your character is another event than before. Your function
+gets the new event and the one before, with `nil` for clear weather. It is looked at once a second.
+
+```lua title="init.lua"
+game.Weather.Changed:Connect(function(current)
+    if game.Weather.IsStorm then
+        ui.Notify("A storm: " .. tostring(current), { kind = "warn" })
+    end
+end)
+```
+
+`game.Weather.Active` is a list with one entry for each biome an event runs in: `Event`, `Biome`, `Tier`
+and `Since`. It reads each of them, so do not read it every frame. It is `nil` when you are a guest in
+someone else's game.
+
+Wax reads the weather. Starting or stopping it is not in this version.
+
+## The prospect
+
+```lua
+local prospect = game.Prospect
+print(prospect.Name, prospect.Difficulty, prospect.Elapsed)
+```
+
+| Field | What it is |
+| --- | --- |
+| `Name` | The prospect's name in the game's data, such as `"Tier1_Forest_Recon_0"`. |
+| `Mission` | The mission's name in the game's data, or `nil` when the prospect has none. |
+| `Difficulty` | `"Easy"`, `"Medium"`, `"Hard"` or `"Extreme"`. |
+| `Elapsed` | How long the prospect has run, in seconds. |
+| `Duration` | How long it lasts in all, in seconds. |
+| `Remaining` | `Duration` less `Elapsed`. `nil` when the game gives the prospect no duration. |
+| `IsOpenWorld`, `IsOutpost` | The game's own marks for an open world and an outpost. |
+| `Id`, `Seed` | The game's id and seed for this prospect. |
+
+## Players who join and leave
+
+`game.Players` has two signals for the session:
+
+```lua title="init.lua"
+game.Players.Joined:Connect(function(player)
+    ui.Notify((player.PlayerName or "Somebody") .. " joined.")
+end)
+
+game.Players.Left:Connect(function(player, name)
+    ui.Notify((name or "Somebody") .. " left.")
+end)
+```
+
+- The players are looked at once a second, and only while something is connected to one of the two.
+- `Joined` does not fire for the players who are there when you connect.
+- After `Left`, the player's Instance can no longer be used. You can still compare it with one you kept.
+- Neither fires for what a map change brings or takes away.
+
+A player from `game.Players:GetPlayers()` or from `Joined` has three fields:
+
+| Field | What it is |
+| --- | --- |
+| `player.PlayerName` | The player's name. `nil` while the game has not said. |
+| `player.IsHost` | `true` for the player who hosts the session. |
+| `player.Character` | The character the player controls right now, or `nil`. |
+
+These two signals have only been run with one player in the session. A second player joining has not been
+seen yet.
+
+Every field is listed in the [Time, weather and the prospect reference](/docs/reference/session).

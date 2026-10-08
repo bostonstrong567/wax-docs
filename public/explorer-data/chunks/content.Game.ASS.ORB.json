@@ -1,0 +1,4 @@
+{"chunk":"content.Game.ASS.ORB","types":[
+{"name":"BP_ORB_FuseBox_C","kind":"class","from":"/Game/ASS/ORB/ICARUS_STATION/BP_ORB_FuseBox.BP_ORB_FuseBox_C","parent":"Actor","origin":"blueprint","props":[["SM_ORB_STN_Fuse","StaticMeshComponent","print(obj.SM_ORB_STN_Fuse)"],["StaticMesh","StaticMeshComponent","print(obj.StaticMesh)"]],"funcs":[]},
+{"name":"BP_ORB_STN_FireExtinguisher_C","kind":"class","from":"/Game/ASS/ORB/ICARUS_STATION/BP_ORB_STN_FireExtinguisher.BP_ORB_STN_FireExtinguisher_C","parent":"Actor","origin":"blueprint","props":[["SM_ORB_STN_FireExtinguisher","StaticMeshComponent","print(obj.SM_ORB_STN_FireExtinguisher)"],["SM_ORB_STN_FireExtinguisher_Tank","StaticMeshComponent","print(obj.SM_ORB_STN_FireExtinguisher_Tank)"],["StaticMesh","StaticMeshComponent","print(obj.StaticMesh)"]],"funcs":[]}
+]}

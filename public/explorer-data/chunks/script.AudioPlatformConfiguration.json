@@ -1,3 +1,4 @@
 {"chunk":"script.AudioPlatformConfiguration","types":[
-{"name":"ESoundwaveSampleRateSettings","kind":"enum","from":"/Script/AudioPlatformConfiguration.ESoundwaveSampleRateSettings","values":[["Max",0],["High",1],["Medium",2],["Low",3],["Min",4],["MatchDevice",5]]}
+{"name":"ESoundwaveSampleRateSettings","kind":"enum","from":"/Script/AudioPlatformConfiguration.ESoundwaveSampleRateSettings","values":[["Max",0],["High",1],["Medium",2],["Low",3],["Min",4],["MatchDevice",5]]},
+{"name":"PlatformRuntimeAudioCompressionOverrides","kind":"struct","from":"/Script/AudioPlatformConfiguration.PlatformRuntimeAudioCompressionOverrides","props":[["DurationThreshold","number","print(value.DurationThreshold)"],["MaxNumRandomBranches","integer","print(value.MaxNumRandomBranches)"],["SoundCueQualityIndex","integer","print(value.SoundCueQualityIndex)"],["bOverrideCompressionTimes","boolean","print(value.bOverrideCompressionTimes)"]]}
 ]}

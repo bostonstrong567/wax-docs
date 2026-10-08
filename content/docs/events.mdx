@@ -1,0 +1,126 @@
+---
+title: Events of the game
+description: Hear when a character is hit or dies, and when items come into an inventory or leave it.
+icon: Zap
+---
+
+<NextVersion />
+
+For a few things the game itself tells Wax the moment they happen: a hit, a death, and an item that comes or
+goes. Wax hands them to you as [signals](/docs/signals).
+
+```lua title="init.lua"
+game.Me.Damaged:Connect(function(_, amount, info)
+    ui.Notify(("You lost %d health. %s left."):format(amount, tostring(info.Health)), { kind = "warn" })
+end)
+
+game.Creatures.Died:Connect(function(creature, info)
+    if info.Killer then
+        print(info.Kind, "was killed by", info.Killer.Name)
+    end
+end)
+```
+
+## Where they are
+
+| Signal | Fires for |
+| --- | --- |
+| `game.Me.Damaged`, `game.Me.Died` | Your own character. They stay connected through a respawn and a map change. |
+| `character.Damaged`, `character.Died` | One character you have as an Instance: a player's or a creature's. |
+| `game.Creatures.Damaged` | Every creature. |
+| `game.Creatures.Died` | Every creature. This one is in Wax 0.2.1 too, without `Killer`, `Instigator` and `Damage`. |
+| `game.Me.ItemAdded`, `ItemRemoved`, `ItemChanged` | Everything your character carries, over all its inventories. |
+| `inventory.ItemAdded`, `ItemRemoved`, `ItemChanged` | One inventory, such as `game.Me.Backpack`. |
+
+## Damaged
+
+Your function gets the character, the damage of the hit, and a table with what the game knows of it.
+
+| In `info` | What it is |
+| --- | --- |
+| `Health` | The character's health after the hit. |
+| `Applied` | What the game took off its health. |
+| `Causer` | The actor the game names as what did it. For hunger and for a fall that is the character itself. |
+| `Instigator` | The controller the game names as who did it. For hunger and for a fall there is none. |
+| `Radial` | `true` for damage over an area. |
+| `Stealth` | `true` for a stealth hit. |
+
+- Health that goes down with no hit is not damage. Assigning `character.Health` as the host does not fire it.
+- The handlers of one signal share one `info` table. Copy what you want to keep.
+
+## Died
+
+`Died` fires once when the character is dead.
+
+| In `info` | What it is |
+| --- | --- |
+| `Killer` | The `Causer` of the hit that left it no health. |
+| `Instigator` | The `Instigator` of that hit. |
+| `Damage` | The damage of that hit. |
+
+All three are `nil` when the character died with no hit that Wax heard. A creature killed with `Kill()` is
+such a death. For `game.Creatures.Died`, `info` also has `Kind`, `Variant`, `ClassName` and `Name`, as
+before.
+
+A character that lives again and dies again is told again. When a character leaves the world, the handlers
+you connected to that Instance are disconnected.
+
+## Items
+
+```lua title="init.lua"
+game.Me.ItemAdded:Connect(function(item, amount, stack)
+    local where = stack and stack.Inventory or "an inventory"
+    print(("+%d %s into %s"):format(amount, item, where))
+end)
+
+game.Me.ItemRemoved:Connect(function(item, amount)
+    print(("-%d %s"):format(amount, item))
+end)
+```
+
+| Signal | Fires when | Your function gets |
+| --- | --- | --- |
+| `ItemAdded` | There is more of an item than a frame before. | The item's name, how many more, and a stack it went onto. |
+| `ItemRemoved` | There is less of an item than a frame before. | The item's name, how many fewer, and a stack it came out of. |
+| `ItemChanged` | A slot holds something else than a frame before. | What it holds now and what it held, with `nil` for nothing. |
+
+- A stack that only moves from one slot or inventory of your character to another is not added and not
+  removed. It is a change of both slots.
+- A tool that wore is a change. A spoil timer that only counts down is not.
+- The item's name is spelled as the game spells it, which is not always the same letter case. Compare names
+  without it, or ask `Count` or `Has`.
+
+A stack is the same table that [inventories](/docs/items#one-inventory) give.
+
+## When your function runs
+
+Your function never runs inside the game's own call. Wax notes what it heard and tells you from its frame
+loop, in the same frame or the next. So your function can wait, show a window or call the game, like any
+other task.
+
+## What they cost
+
+- Nothing until the first handler connects. Wax starts listening to the game's function then.
+- While connected, each time the game calls that function costs a little: about 0.1 ms for a hit, and 0.02
+  to 0.06 ms for an item. The game reports a spoiling stack about once a second.
+- The first handler on `game.Me.ItemAdded`, `ItemRemoved` or `ItemChanged` reads all six inventories once.
+
+## What has been seen
+
+All of this was seen on the host of a session, on a player's character: damage from a fall, and items given
+and taken. A poisoned deer fired `Damaged` for each tick of the poison. These have not been seen:
+
+- Any of it as a guest in someone else's game.
+- A player's death. `game.Me.Died` has only run in tests outside the game.
+- A creature killed by a player's hit, so what `Killer` names then has not been looked at. Poison named the
+  animal itself.
+- The item signals of a chest or a bench. There, an inventory you keep asking about is still kept up to date
+  by looking, as [Items and inventories](/docs/items#how-fresh-the-answer-is) says.
+- The few bosses of the class `IcarusPawn` are not told by `game.Creatures.Damaged`. Their death is told, with
+  no killer.
+
+Wax has no function for listening to other functions of the game. To follow a value, see
+[Watching a value](/docs/watching).
+
+The signals are listed in the [Characters reference](/docs/reference/character) and the
+[Items and inventories reference](/docs/reference/items).

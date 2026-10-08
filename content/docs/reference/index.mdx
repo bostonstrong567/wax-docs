@@ -8,12 +8,34 @@ The guides explain one idea at a time. The reference lists everything. Use it wh
 looking for.
 
 <Cards>
+  <Card title="Mods" href="/docs/reference/mods" description="mod, log, print, persist, storage, require and raw." />
+  <Card title="Tasks and signals" href="/docs/reference/tasks" description="task, Signal and connections." />
+  <Card title="game" href="/docs/reference/game" description="The game tree, Instances, players, creatures and outlines." />
   <Card title="ui" href="/docs/reference/ui" description="Windows, overlays, notifications, hotkeys, themes and icons." />
   <Card title="Controls" href="/docs/reference/controls" description="Every control and every option it takes." />
-  <Card title="game" href="/docs/reference/game" description="The game tree and Instances." />
-  <Card title="Tasks and signals" href="/docs/reference/tasks" description="task, Signal and connections." />
-  <Card title="Mods" href="/docs/reference/mods" description="mod, log, print, persist, storage, require and raw." />
+  <Card title="Game tables" href="/docs/reference/data" description="game.Data: the game's own tables, read and changed." />
 </Cards>
+
+These pages are about things that come with the next version of Wax. They are not in Wax 0.2.1, the version
+you can download today:
+
+<Cards>
+  <Card title="Characters" href="/docs/reference/character" description="game.Me, and the fields of every character." />
+  <Card title="Stats and modifiers" href="/docs/reference/stats" description="A character's stats and the effects that are on it." />
+  <Card title="Items and inventories" href="/docs/reference/items" description="game.Items, inventories, Give and Take." />
+  <Card title="Time, weather and the prospect" href="/docs/reference/session" description="game.Time, game.Weather and game.Prospect." />
+  <Card title="Creatures" href="/docs/reference/creature" description="The fields of a creature, and what the game's data says about a kind." />
+  <Card title="Creature models" href="/docs/reference/creature-models" description="What game.Creatures:GetModel gives." />
+  <Card title="Recipes" href="/docs/reference/recipes" description="game.Recipes: finding and changing recipes." />
+  <Card title="The store" href="/docs/reference/workshop" description="game.Workshop: categories, nodes and prices." />
+  <Card title="Assets" href="/docs/reference/assets" description="game.Assets: assets by path, materials and shapes." />
+  <Card title="Blueprints" href="/docs/reference/blueprints" description="game.Blueprints: things described in Lua and spawned." />
+  <Card title="Watching values" href="/docs/reference/watch" description="game.Frame, the signal for every frame." />
+</Cards>
+
+The older pages list some newer functions too, without a mark on each one: the writing functions of
+`game.Data`, the newer members of `game`, `task.every`, and the model control, `ui.Keys`, `ui.TextWidth` and
+`ui.Shorten`. The guide page of each says when it is new.
 
 To search all of it at once, open the [Explorer](/explorer). It also has the classes of the game itself, such
 as `IcarusPlayerCharacter`, with their properties and functions.

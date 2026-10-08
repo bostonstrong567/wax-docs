@@ -7,6 +7,9 @@ icon: HeartPulse
 This page builds a small overlay that shows your character's health, stamina, food, water and oxygen. It uses
 the game tree, an overlay and a task.
 
+The next version of Wax has a shorter way to the same numbers. It is [at the end of this
+page](#the-same-with-gameme).
+
 ## Where the numbers are
 
 Your character has a part called `ActorState`. It holds the numbers.
@@ -116,3 +119,52 @@ end)
 ```
 
 `warned` remembers that the message was shown. Without it, the message would come back every second.
+
+## The same with game.Me
+
+<NextVersion>The code above works in both.</NextVersion>
+
+[`game.Me`](/docs/character) is your character by name. It has the numbers as fields of their own, and
+signals that fire when they change. So the overlay needs no loop, and no check for the main menu or a new
+map: `game.Me` finds the character each time, and its signals stay connected.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Vitals", anchor = "top-left", width = 260 })
+
+local health = hud:Progress("Health", 0, { color = ui.Theme().bad })
+local stamina = hud:Field("Stamina", "", { mono = true })
+local food = hud:Field("Food", "", { mono = true })
+local water = hud:Field("Water", "", { mono = true })
+local oxygen = hud:Field("Oxygen", "", { mono = true })
+
+local function refresh()
+    local me = game.Me
+    hud:SetVisible(me.Exists)
+    if not me.Exists then return end
+
+    if (me.MaxHealth or 0) > 0 then
+        health:Set(me.Health / me.MaxHealth)
+    end
+    stamina:Set(me.Stamina)
+    food:Set(me.Food)
+    water:Set(me.Water)
+    oxygen:Set(me.Oxygen)
+end
+
+refresh()
+for _, signal in ipairs({
+    game.Me.HealthChanged, game.Me.StaminaChanged, game.Me.FoodChanged, game.Me.WaterChanged,
+    game.Me.OxygenChanged, game.Me.Spawned, game.Me.Despawned,
+}) do
+    signal:Connect(refresh)
+end
+
+game.Me.HealthChanged:Connect(function(now, before)
+    local low = (game.Me.MaxHealth or 0) * 0.25
+    if now < low and before >= low then
+        ui.Notify("Your health is low.", { title = "Careful", kind = "warn" })
+    end
+end)
+```
+
+`ActorState` still works. `game.Me` is the shorter way to the numbers.

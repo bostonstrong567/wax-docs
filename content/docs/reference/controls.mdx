@@ -335,6 +335,22 @@ container:Slots(options?: WaxSlotsOptions): WaxSlots
 
 <InExplorer id="WaxContainer.Slots" />
 
+### `container:Model(options?)` [#container-model]
+
+Adds a box that shows a creature or any other skeletal mesh of the game in 3D. Give it what [`game.Creatures:GetModel`](/docs/reference/game#game-creatures-getmodel) gives, or a mesh by its path.
+
+```lua
+container:Model(options?: WaxModelOptions): WaxModel
+```
+
+| Parameter | Type |
+| --- | --- |
+| `options` (optional) | [`WaxModelOptions`](/docs/reference/ui#waxmodeloptions) |
+
+**Returns** [`WaxModel`](/docs/reference/ui#waxmodel)
+
+<InExplorer id="WaxContainer.Model" />
+
 ### `container:Progress(caption, value?, options?)` [#container-progress]
 
 Adds a progress bar. value is 0..1.
@@ -463,6 +479,8 @@ control:SetEnabled(enabled: boolean)
 
 ## WaxLabel [#waxlabel]
 
+A piece of text. It wraps to the width of its container. In a row it is one line: text too long for its share is cut short with "..." and shown whole as a tip while the mouse rests on it.
+
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Label`](/docs/reference/controls#container-label). Below, `label` stands for one of these.
 
 <InExplorer id="WaxLabel" />
@@ -501,6 +519,8 @@ label:SetColor(color: WaxColor)
 
 ## WaxHeading [#waxheading]
 
+A bold line of text above a group of controls. It is smaller than a Title and has no rule under it.
+
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Heading`](/docs/reference/controls#container-heading). Below, `heading` stands for one of these.
 
 <InExplorer id="WaxHeading" />
@@ -522,6 +542,8 @@ heading:Set(value: any)
 <InExplorer id="WaxHeading.Set" />
 
 ## WaxButton [#waxbutton]
+
+A button with a caption, an icon, or both. Made with `tab = true` it is one of a row of tabs.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Button`](/docs/reference/controls#container-button). Below, `button` stands for one of these.
 
@@ -610,6 +632,8 @@ button:SetTip(tip: string|table|nil)
 
 ## WaxIcon [#waxicon]
 
+One icon on its own, shown by its name.
+
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Icon`](/docs/reference/controls#container-icon). Below, `icon` stands for one of these.
 
 <InExplorer id="WaxIcon" />
@@ -631,6 +655,8 @@ icon:Set(name: string)
 <InExplorer id="WaxIcon.Set" />
 
 ## WaxToggle [#waxtoggle]
+
+A switch that is on or off, with a caption beside it.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Toggle`](/docs/reference/controls#container-toggle). Below, `toggle` stands for one of these.
 
@@ -808,6 +834,8 @@ slider:Set(value: number)
 <InExplorer id="WaxSlider.Set" />
 
 ## WaxInput [#waxinput]
+
+A box the user types text into, with or without a caption.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Input`](/docs/reference/controls#container-input). Below, `input` stands for one of these.
 
@@ -997,6 +1025,8 @@ It can also do everything [`WaxContainer`](/docs/reference/controls#waxcontainer
 
 ## WaxProgress [#waxprogress]
 
+A progress bar, with its caption and the value as a percentage on a line above it.
+
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Progress`](/docs/reference/controls#container-progress). Below, `progress` stands for one of these.
 
 <InExplorer id="WaxProgress" />
@@ -1047,6 +1077,8 @@ progress:SetColor(color: WaxColor)
 
 ## WaxField [#waxfield]
 
+A name with a value at the right, for read-outs. The user cannot change it.
+
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Field`](/docs/reference/controls#container-field). Below, `field` stands for one of these.
 
 <InExplorer id="WaxField" />
@@ -1084,6 +1116,8 @@ field:SetColor(color: WaxColor)
 <InExplorer id="WaxField.SetColor" />
 
 ## WaxKeybind [#waxkeybind]
+
+A key the user can change: after a click on it, the next key pressed becomes the key. Escape leaves it as it was.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`container:Keybind`](/docs/reference/controls#container-keybind). Below, `keybind` stands for one of these.
 
@@ -1253,6 +1287,8 @@ item:Set(look: WaxItemLook)
 
 ### `item:SetSelected(selected)` [#item-setselected]
 
+Marks the line as the picked one, or takes the mark off. Nothing else of the line changes.
+
 ```lua
 item:SetSelected(selected: boolean)
 ```
@@ -1324,6 +1360,8 @@ split:Show(which: "left"|"right")
 
 ### `split:Shown()` [#split-shown]
 
+The area that shows while there is only room for one. It is "left" until Show picks the other.
+
 ```lua
 split:Shown(): "left"|"right"
 ```
@@ -1333,6 +1371,8 @@ split:Shown(): "left"|"right"
 <InExplorer id="WaxSplit.Shown" />
 
 ### `split:SetShare(share)` [#split-setshare]
+
+Sets the left area's part of the width, from 0.05 to 0.95. Neither area is drawn narrower than `least`.
 
 ```lua
 split:SetShare(share: number)
@@ -1348,6 +1388,8 @@ split:SetShare(share: number)
 
 ### `split:GetShare()` [#split-getshare]
 
+The left area's part of the width, as SetShare or the user's drag of the divider last left it.
+
 ```lua
 split:GetShare(): number
 ```
@@ -1358,7 +1400,7 @@ split:GetShare(): number
 
 ## WaxSlots [#waxslots]
 
-A block of square cells that each show a picture, a count and a mark.
+A block of square cells that each show a picture, a count and a mark. Switched off with SetEnabled(false), its cells take no click, are not under the mouse for [`ui.Hovered`](/docs/reference/ui#ui-hovered), and show the arrow in place of the hand.
 
 It can also do everything [`WaxControl`](/docs/reference/controls#waxcontrol) can. You get one from [`ui.Hovered`](/docs/reference/ui#ui-hovered), [`container:Slots`](/docs/reference/controls#container-slots). Below, `slots` stands for one of these.
 
@@ -1406,6 +1448,8 @@ slots:SetLook(index: integer, look: WaxSlotLook?)
 
 ### `slots:GetLook(index)` [#slots-getlook]
 
+The look a cell was last given, or nil for an empty cell.
+
 ```lua
 slots:GetLook(index: integer): WaxSlotLook?
 ```
@@ -1429,6 +1473,23 @@ slots:Capacity(): integer
 **Returns** `integer`
 
 <InExplorer id="WaxSlots.Capacity" />
+
+### `slots:SetLayout(columns, size?)` [#slots-setlayout]
+
+Changes how many cells stand in a row and how large a cell is. The cells that exist are kept and put in their new rows, and missing ones are made over the next frames. What a cell shows stays; set the looks again if fewer fit.
+
+```lua
+slots:SetLayout(columns: integer, size?: number)
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `columns` | `integer` |  |
+| `size` (optional) | `number` | The side of one cell. As it was when left out. |
+
+**Returns** nothing.
+
+<InExplorer id="WaxSlots.SetLayout" />
 
 ### `slots:Ready()` [#slots-ready]
 
@@ -1472,6 +1533,7 @@ Used by [`container:Button`](/docs/reference/controls#container-button).
 | `spin` | `boolean` | The icon turns round once on every click, to show that something has started. |
 | `tab` | `boolean` | Makes it one of a row of tabs: SetActive marks the chosen one. |
 | `tip` | `string` \| `table` | A line of help shown beside the mouse once it has rested on the button. Give one to every button that is only an icon. A table is `{ title = "...", lines = { "more" } }`. |
+| `size` | `number` | For a button that is an icon only: the side of the square it is drawn as. Left out, it is as tall as the other buttons. |
 
 ## WaxIconOptions [#waxiconoptions]
 
@@ -1524,6 +1586,7 @@ Used by [`container:Section`](/docs/reference/controls#container-section).
 | --- | --- | --- |
 | `open` | `boolean` | False starts the section collapsed. |
 | `collapsible` | `boolean` | False makes a plain titled group that is always open. |
+| `fit` | `boolean` | Keeps the title on one line. A title too long for the card is cut short with "..." and shown whole as a tip while the mouse rests on it, and it is cut again when the card gets another width. Without it a long title wraps. |
 
 ## WaxRowOptions [#waxrowoptions]
 
@@ -1659,7 +1722,7 @@ Returned by [`ui.Hovered`](/docs/reference/ui#ui-hovered), [`slots:GetLook`](/do
 | `mark` (optional) | `string` | A small icon in the upper left corner. |
 | `value` (optional) | `any` | What the signals and [`ui.Hovered`](/docs/reference/ui#ui-hovered) give for this cell. |
 | `tip` (optional) | `string` \| `table` \| `fun(): any` | The tooltip: a text, `{ title = "...", lines = { "text" or { "text", "warn" } } }`, or a function that returns one. |
-| `dim` (optional) | `boolean` | Draws the picture faint. |
+| `dim` (optional) | `boolean` | Draws the picture faint, or the icon of a cell that has no picture. |
 | `selected` (optional) | `boolean` | Marks the cell as the chosen one. |
 | `tone` (optional) | `"good"` \| `"warn"` \| `"bad"` \| `"accent"` | A short line of that colour under the picture. |
 | `plain` (optional) | `boolean` | A picture only: no box, and the mouse passes over it. |

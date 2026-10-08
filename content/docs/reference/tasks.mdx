@@ -10,6 +10,8 @@ The [Explorer](/explorer) searches everything on this page, and the classes of t
 
 ## `task` [#task]
 
+Runs functions as tasks: now, at the end of the frame, after a time, or again and again. A task can pause with [`task.wait`](/docs/reference/tasks#task-wait), and the game goes on while it waits.
+
 Type name: `WaxTask`.
 
 <InExplorer id="task" />
@@ -66,6 +68,24 @@ task.delay(seconds: number, f: function|thread, ...: any): thread
 
 <InExplorer id="task.delay" />
 
+### `task.every(seconds, f, ...)` [#task-every]
+
+Runs f(...) again and again: the first time after `seconds`, then `seconds` after each run has ended. It never runs more than once a frame. An error in f is reported and the runs go on. After five errors in a row they stop. It stops when the mod unloads, and [`task.cancel`](/docs/reference/tasks#task-cancel) stops it.
+
+```lua
+task.every(seconds: number, f: function, ...: any): thread
+```
+
+| Parameter | Type |
+| --- | --- |
+| `seconds` | `number` |
+| `f` | `function` |
+| `...` | `any` |
+
+**Returns** `thread`
+
+<InExplorer id="task.every" />
+
 ### `task.wait(seconds?)` [#task-wait]
 
 Pauses the calling task for `seconds` (at least until the next frame) and returns the time it waited. It only works inside a task.
@@ -117,6 +137,8 @@ task.label(thread: thread, label: string): thread
 
 ## `Signal` [#signal]
 
+Where a mod makes signals of its own: `local Opened = Signal.new("Opened")`.
+
 Type name: `WaxSignalLibrary`.
 
 <InExplorer id="Signal" />
@@ -141,7 +163,7 @@ Signal.new(name?: string): WaxSignal
 
 What Connect returns: one handler's link to a signal.
 
-You get one from [`game.Players:ObserveCharacters`](/docs/reference/game#game-players-observecharacters), [`game.Creatures:Observe`](/docs/reference/game#game-creatures-observe), [`game.Creatures:Highlight`](/docs/reference/game#game-creatures-highlight), [`signal:Connect`](/docs/reference/tasks#signal-connect), [`signal:Once`](/docs/reference/tasks#signal-once). Below, `connection` stands for one of these.
+You get one from [`game.Players:ObserveCharacters`](/docs/reference/game#game-players-observecharacters), [`game.Creatures:Observe`](/docs/reference/game#game-creatures-observe), [`game.Creatures:Highlight`](/docs/reference/game#game-creatures-highlight), [`signal:Connect`](/docs/reference/tasks#signal-connect), [`signal:Once`](/docs/reference/tasks#signal-once), [`game.Frame:Connect`](/docs/reference/watch#game-frame-connect), [`game.Frame:Once`](/docs/reference/watch#game-frame-once). Below, `connection` stands for one of these.
 
 <InExplorer id="WaxConnection" />
 
@@ -165,7 +187,7 @@ connection:Disconnect()
 
 An event that handlers connect to. `F` is the shape of a handler, as in `WaxSignal<fun(name: string)>`.
 
-You get one from [`instance:GetAttributeChangedSignal`](/docs/reference/game#instance-getattributechangedsignal), [`Signal.new`](/docs/reference/tasks#signal-new). Below, `signal` stands for one of these.
+You get one from [`instance:GetAttributeChangedSignal`](/docs/reference/game#instance-getattributechangedsignal), [`instance:GetPropertyChangedSignal`](/docs/reference/game#instance-getpropertychangedsignal), [`Signal.new`](/docs/reference/tasks#signal-new). Below, `signal` stands for one of these.
 
 <InExplorer id="WaxSignal" />
 

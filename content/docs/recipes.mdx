@@ -1,0 +1,170 @@
+---
+title: Recipes
+description: game.Recipes finds crafting recipes and changes what they take, what they give, how long they take and where they are made.
+icon: Hammer
+---
+
+<NextVersion />
+
+`game.Recipes` is for the game's crafting recipes. You find a recipe by name, read it, and change it with one
+call.
+
+```lua title="init.lua"
+game.Recipes:Get("Stone_Axe"):SetInputs({ Fiber = 2 })
+```
+
+<Shot
+  src="recipe-stone-axe.webp"
+  alt="The game's own crafting screen with the Stone Axe chosen. Under Required elements there is one box, fiber, marked 16/2, and the blue button under it is lit."
+  caption="The game's crafting screen after the line above: a stone axe takes two fiber and nothing else."
+/>
+
+Every change is made through [`game.Data`](/docs/tables#changing-a-table). It is checked first, it belongs to
+your mod, and it is put back when your mod unloads.
+
+## Find a recipe
+
+| Function | What it gives |
+| --- | --- |
+| `game.Recipes:Get(name)` | One recipe by its name. |
+| `game.Recipes:Has(name)` | `true` when the game has a recipe of this name. |
+| `game.Recipes:All()` | Every recipe. |
+| `game.Recipes:At(bench)` | The recipes a bench lists: `At("Fabricator")`, `At("Hand")`. |
+| `game.Recipes:Making(item)` | The recipes that give an item. |
+| `game.Recipes:Using(name)` | The recipes that take an item, a tag or a resource. |
+| `game.Recipes:Find(fn)` | The recipes your function returns `true` for. |
+
+- A recipe is named by its row in the game's table `D_ProcessorRecipes`. It often has the name of the item
+  it makes, but not always, and some items have several recipes. `Making` finds them all.
+- A bench is named by the item that is the bench, such as `"Crafting_Bench"`, or `"Hand"` for what a player
+  makes without one.
+- Letter case does not matter. A name the game does not have raises an error that suggests the nearest ones.
+
+`Making`, `Using` and `Find` look through every recipe, which took up to 10 ms each time it was measured.
+Call them when your mod loads, inside a [task](/docs/tasks), not every frame. Inside a task they pause after
+a millisecond of a frame and go on in the next.
+
+## Read a recipe
+
+```lua title="init.lua"
+task.spawn(function()
+    for _, recipe in ipairs(game.Recipes:Making("Rope")) do
+        print(recipe.Name, "at", table.concat(recipe.Benches, ", "))
+        for _, input in ipairs(recipe.Inputs) do
+            print("  takes", input.Count, input.Item)
+        end
+    end
+end)
+```
+
+| Field | What it is |
+| --- | --- |
+| `Name` | The recipe's name. |
+| `Inputs` | The items it takes. Each entry has `Item` and `Count`. |
+| `Tags` | What it takes by tag, such as any raw meat. Each entry has `Tag` and `Count`. |
+| `Resources` | The resources it takes, such as water. Each entry has `Resource` and `Units`. |
+| `Outputs` | What comes out. Each entry has `Item` and `Count`. |
+| `Benches` | The recipe sets it is in. A bench lists the recipes of its set. `"Character"` is what is made by hand. |
+| `Work` | The work making it once takes, in millijoules. |
+| `Requirement` | The node of the tech tree that has to be researched first, or `nil`. |
+| `Hidden` | `true` when the recipe is taken off every list. |
+
+Reading a field reads the game's table, so it is what the table holds now. The lists are yours: changing one
+changes nothing in the game.
+
+`recipe:GetSeconds(bench)` gives the time at a bench, in seconds. The time is the work divided by how fast
+the bench works. By hand, 2500 millijoules is two and a half seconds. It is the time before talents and
+upgrades.
+
+## Change a recipe
+
+Every function that changes a recipe gives the recipe back, so changes can follow one another:
+
+```lua title="init.lua"
+local axe = game.Recipes:Get("Stone_Axe")
+
+axe:SetInputs({ Stone = 2, Stick = 1 })
+   :SetSeconds(1, "Hand")
+   :SetRequirement(nil)
+```
+
+| Function | What it does |
+| --- | --- |
+| `recipe:SetInputs({ Wood = 2, Fiber = 4 })` | Sets the items it takes. |
+| `recipe:SetInput(name, count)` | Sets how many of one thing it takes, and adds it when the recipe does not take it yet. |
+| `recipe:RemoveInput(name)` | Takes one item or tag out. |
+| `recipe:ScaleInputs(0.5)` | Multiplies every count it takes. A count is rounded up and never goes under 1. |
+| `recipe:ScaleInput(name, factor)` | Multiplies the count of one thing. |
+| `recipe:SetOutputs({ Stone_Axe = 2 })` | Sets what comes out. |
+| `recipe:SetOutput(name, count)` | Sets how many of one item come out. |
+| `recipe:ScaleOutputs(factor)` | Multiplies the count of everything that comes out. |
+| `recipe:SetWork(millijoules)` | Sets the work it takes. |
+| `recipe:SetSeconds(seconds, bench)` | Sets how long it takes at a bench. |
+| `recipe:ScaleTime(0.5)` | Multiplies the work. `0.5` makes it twice as fast at every bench. |
+| `recipe:SetBenches({ "Hand", "Crafting_Bench" })` | Sets where it is made. |
+| `recipe:AddBench(bench)`, `recipe:RemoveBench(bench)` | Adds a place, or takes one away. |
+| `recipe:MoveTo(bench)` | Makes one bench the only place it is made. |
+| `recipe:SetRequirement(node)` | Sets the node of the tech tree it needs. `nil` means no research is needed. |
+| `recipe:Hide()`, `recipe:Show()` | Takes it off the lists players choose from, and puts it back. |
+| `recipe:Reset()` | Takes back everything your mod changed in it. |
+
+The game's crafting tab follows by itself when it is the screen that shows.
+
+## Many recipes at once
+
+`All`, `At`, `Making`, `Using` and `Find` give a list of recipes. The list has every changing function too,
+and does it to each recipe.
+
+```lua title="init.lua"
+task.spawn(function()
+    -- everything the Fabricator makes, twice as fast
+    game.Recipes:At("Fabricator"):ScaleTime(0.5)
+
+    -- every recipe that takes fiber takes half as much of it
+    game.Recipes:Using("Fiber"):ScaleInput("Fiber", 0.5)
+end)
+```
+
+- `#list` is how many, `list[1]` the first. `list:Each(fn)` calls your function with each recipe, and
+  `list:GetNames()` gives their names.
+- When a change is refused for some recipes, the others are still changed. Then an error says how many were
+  not, and why the first was not.
+- Inside a task, work on many recipes pauses after a millisecond of a frame. Anywhere else it is all done at
+  once, which for hundreds of recipes is a frame the player can notice.
+
+## What this version cannot do
+
+- Adding a new recipe is not possible yet. `game.Recipes:Add` is there and raises an error that says it
+  is switched off.
+- An output cannot be added or taken away. Each output can become another item and another count.
+- A resource cannot be added or taken away. How much of a resource a recipe takes can be changed.
+- Items, tags and benches can be added and taken away only while the list has 4 entries or fewer, before
+  and after. Rope, for one, is made at 7 benches, so `AddBench` is refused for it. Changing counts always
+  works.
+- A bench screen that is open is not built again. The crafting tab is.
+
+A change that is refused raises an error that says so, and changes nothing.
+
+## Things to know
+
+- Hiding does not stop a recipe from being made. It takes the recipe off the lists. One that is being
+  made is finished, and the host still makes a hidden recipe when it is asked for by name. The one thing the
+  host was seen to check is research.
+- A change can come while something is being made. A new time counts from the next moment. What is taken
+  and what comes out is read when the making ends. If the player cannot pay the new cost then, the making is dropped
+  without a message and nothing is lost. So change recipes when your mod loads.
+- Unloading your mod puts every recipe back, also under something that is being made. When that was
+  tried, the making was dropped, and nothing was taken or made.
+- In a game someone else hosts, a change is made on your PC only. The host works from its own tables and
+  decides what is taken, what is made and how long it takes. See
+  [Multiplayer](/docs/multiplayer#host-and-guest).
+- When two mods change one recipe, `SetInput`, `RemoveInput`, the `Scale` functions, `AddBench`,
+  `RemoveBench` and the output functions build on what the earlier mod did. `SetInputs`, `SetBenches`, `MoveTo`, `SetWork`, `SetSeconds`,
+  `SetRequirement`, `Hide` and `Show` replace it. `game.Data:Conflicts()` lists where that hides another mod's
+  value.
+
+All of this was tried on the host of a prospect, on the crafting tab. It has not been tried on a real bench,
+as a guest, or after a fresh start of the game.
+
+Every function is listed in the [Recipes reference](/docs/reference/recipes). The bench or crafting screen
+that is open is [`game.Crafting`](/docs/reference/game#game-crafting).

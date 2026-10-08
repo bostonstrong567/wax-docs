@@ -21,8 +21,13 @@ end, { primary = true })
   alt="A window titled My first mod with a sparkles icon in its title bar, a minimise button and a close button. Inside are a line of text, a switch that is on and a wide blue button labelled Say hi."
 />
 
-Press **F8** to see it. The title bar has a button to roll the window up, and a cross to close it. The user
-can drag the window by its title bar and resize it by its bottom right corner.
+Switch the mod on, then press the key of your mod's windows to see it. Wax tells you once which key that is,
+and it is on the mod's card of the Mods page as **Open key**. The title bar has a button to roll the window
+up, and a cross to close it. The user can drag the window by its title bar and resize it by any edge or
+corner. The bottom right corner shows a grip.
+
+<NextVersion>In Wax 0.2.1 every mod's windows come up with **F8**, a window is resized by the grip in its
+bottom right corner only, and the options `resizable` and `key` are not there.</NextVersion>
 
 Everything you add with `window:Something(...)` is a control. The [Controls](/docs/gui/controls) page lists them all.
 
@@ -38,6 +43,8 @@ Everything you add with `window:Something(...)` is a control. The [Controls](/do
 | `height` | The height. | 420, or 380 with pages. |
 | `x`, `y` | Where the window first appears, counted from the top left of the screen. | A little below and to the right of the window before it. |
 | `closable` | `false` leaves out the close button. | `true` |
+| `resizable` | `false` makes a window the user cannot resize. It has no grip, its edges and corners do nothing, and it is always the size you give it. `window:SetSize` still works. | `true` |
+| `key` | The key that shows and hides your mod's windows, such as `"F6"` or `"Ctrl+K"`. The first window your mod makes decides. The user can pick another on the mod's card. | Wax gives your mod a key. |
 | `visible` | `false` makes the window hidden. Show it later with `window:Show()`. | `true` |
 | `nav` | `"side"` or `"top"` gives the window pages. See below. | No pages. |
 | `nav_width` | The width of the page list of a `"side"` window. | The theme's width. |
@@ -67,7 +74,7 @@ end)
 | Function | What it does |
 | --- | --- |
 | `window:Show()` | Shows the window, in front of the others. |
-| `window:Hide()` | Hides it. Hiding the last window closes the menu. |
+| `window:Hide()` | Hides it. With the last window of your mod hidden, your mod is no longer up, and the menu closes once nobody's windows are. |
 | `window:SetVisible(shown)` | Shows or hides it. |
 | `window:IsVisible()` | `true` while it is shown. |
 | `window:SetTitle(text)` | Changes the title. |
@@ -86,6 +93,53 @@ end)
 A window is removed when your mod reloads. `init.lua` then makes it again.
 
 `ui.Windows()` gives a list of every window in the menu.
+
+## Resizing
+
+<NextVersion />
+
+The player resizes a window by dragging any of its four edges or four corners. You do nothing for it:
+every window has it.
+
+- The mouse pointer changes over an edge or a corner, and that piece of the window's outline lights up. It
+  is brighter while it is held. The bottom right corner also shows a grip.
+- The edge across from the one that is dragged stays where it is.
+- Resizing stops at the window's smallest size and at the edges of the screen.
+- A window rolled up to its title bar cannot be resized.
+- Wax remembers the size, as it remembers the place.
+
+The smallest size is 240 by 140 for a plain window. A window with side pages is never narrower than 420, and
+one with tabs along the top never lower than 200 or narrower than its tabs need.
+
+`resizable = false` makes a window that is always the size you give it. It has no grip, its edges and
+corners do nothing, and a size remembered from before is not used. `window:SetSize` still works.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Fixed", width = 280, height = 120, resizable = false })
+window:Label("This window keeps its size.")
+```
+
+Lay your controls out so that they work at any size the player picks. Controls fill the width they are
+given, a [Row](/docs/gui/controls#row) shares it, and a page scrolls when the window is too low for it.
+
+## One key for your mod's windows
+
+<NextVersion />
+
+All windows of your mod come up together, with one key, and go away with it. Other mods' windows and the Wax
+panel stay as they are. Ask for the key with the `key` option of your first window. Without it Wax gives your
+mod a free key and tells the player once.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Garage", key = "F6", width = 300, height = 160 })
+window:Label("F6 shows and hides the windows of this mod.")
+
+local second = ui.Window({ title = "Garage tools", width = 260, height = 140 })
+second:Label("This one comes up with the same key.")
+```
+
+The player can change the key on your mod's card of the Mods page. [The menu](/docs/menu#the-keys) says how
+to read and set it from code.
 
 ## Pages down the side
 

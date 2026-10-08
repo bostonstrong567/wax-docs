@@ -87,6 +87,7 @@ end)
 | `task.wait(seconds)` | Pauses the task it is called in. Gives back how long it really waited. |
 | `task.delay(seconds, f, ...)` | Runs `f` after that many seconds. |
 | `task.defer(f, ...)` | Runs `f` at the end of the current frame. |
+| `task.every(seconds, f, ...)` | Runs `f` again and again, that many seconds apart. Not in Wax 0.2.1: see [Watching a value](/docs/watching#at-a-steady-pace). |
 | `task.cancel(thread)` | Stops a task. |
 | `task.label(thread, name)` | Names a task. The name shows up in error messages. |
 

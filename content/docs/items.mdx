@@ -1,0 +1,193 @@
+---
+title: Items and inventories
+description: Look up what an item is, count what a character carries, and give or take items as the host.
+icon: Backpack
+---
+
+<NextVersion />
+
+There are two things here. `game.Items` knows what each kind of item is. An **inventory** knows what is in
+it: a character's backpack, its hotbar, and so on.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Wood", width = 280, height = 150 })
+local have = window:Field("Wood carried", 0)
+
+window:Button("Count", function()
+    if not game.Me.Exists then return end
+    have:Set(game.Me:Count("Wood"))
+end)
+```
+
+## Naming an item
+
+An item is named by its row in the game's table `D_ItemsStatic`, such as `"Wood"` or `"Stone_Pickaxe"`.
+Letter case, spaces, underscores and hyphens do not matter, so `"stone pickaxe"` is the same item. A name the
+game does not have raises an error that suggests the nearest ones.
+
+## What an item is
+
+```lua
+local facts = game.Items:Get("Stone_Pickaxe")
+print(facts.DisplayName, facts.Weight, facts.MaxStack, facts.MaxDurability)
+```
+
+| Field | What it is |
+| --- | --- |
+| `Name` | The item's name, spelled as the game spells it. |
+| `DisplayName` | The name the game shows players. |
+| `Description` | The game's description, or `nil`. |
+| `Weight` | What one weighs, in kilograms. |
+| `MaxStack` | How many fit in one stack. |
+| `MaxDurability` | Its durability when new. `nil` for an item with none. |
+| `Icon` | The path of its picture in the game's files. |
+
+| Function | What it gives |
+| --- | --- |
+| `game.Items:Get(name)` | The facts of one item. |
+| `game.Items:Has(name)` | `true` when the game has an item of this name. |
+| `game.Items:GetNames()` | The name of every item. |
+| `game.Items:Find(text)` | The names that contain the text. |
+| `game.Items:Load()` | Reads the name the game shows for every item, so that `Find` matches those too. |
+
+The first `Get` of an item reads a few rows of the game's tables. After that it costs nothing.
+
+### Search by the name players see
+
+`Find` goes by item names until `Load` has run. After it, `"iron"` also finds `Metal_Ore`, which the game
+shows as Iron Ore. `Load` only works inside a [task](/docs/tasks). It reads a little each frame and took
+about half a second when it was measured.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Find an item", width = 320, height = 300 })
+local results = window:Console({ height = 170 })
+
+task.spawn(function()
+    game.Items:Load()
+end)
+
+window:Input("Search", { hint = "iron" }, function(text)
+    local lines = {}
+    for _, name in ipairs(game.Items:Find(text)) do
+        lines[#lines + 1] = { game.Items:Get(name).DisplayName .. "  (" .. name .. ")" }
+    end
+    results:SetLines(lines)
+end)
+```
+
+`Find` goes through every item. Call it when the player types something, not every frame.
+
+## What a character carries
+
+A player's character has six inventories:
+
+| Field | What it is |
+| --- | --- |
+| `character.Backpack` | The backpack. |
+| `character.Hotbar` | The hotbar. |
+| `character.Equipment` | What the character wears. |
+| `character.Suit`, `character.Upgrades`, `character.Vision` | The envirosuit, its upgrades and the vision slot. |
+
+One is `nil` when the character has no such inventory. The character in the station has no backpack.
+
+These work on a player's character, and on `game.Me`, over all six:
+
+| Function | What it gives |
+| --- | --- |
+| `character:Count(item)` | How many of an item it carries. |
+| `character:Has(item, count)` | `true` when it carries at least that many. One when `count` is left out. |
+| `character:List()` | Every stack it carries. Each says in `Inventory` which one it is in. |
+
+`character.HeldItem` is the stack in the hotbar slot that is in hand, and `character.HotbarSlot` is that
+slot's number.
+
+```lua
+local held = game.Me.HeldItem
+if held then
+    print(held.Item, held.Count, held.Durability)
+end
+```
+
+## One inventory
+
+Each inventory has the same three functions for itself, and a few more:
+
+```lua
+local backpack = game.Me.Backpack
+if backpack then
+    print(backpack.Used, "of", backpack.Size, "slots,", backpack.Weight, "kg")
+    for _, stack in ipairs(backpack:List()) do
+        print(stack.Slot, stack.Item, stack.Count)
+    end
+end
+```
+
+| Name | What it gives |
+| --- | --- |
+| `inventory.Size`, `inventory.Used` | How many slots it has, and how many hold something. |
+| `inventory.Weight` | What everything in it weighs, in kilograms. |
+| `inventory.Kind` | What kind the game says it is, such as `"Backpack"` or `"Quickbar"`. |
+| `inventory:List()` | Every stack, in the order of its slots. |
+| `inventory:Slot(number)` | What one slot holds, or `nil`. Slots are counted from 1. |
+| `inventory:Count(item)`, `inventory:Has(item, count)` | As for a character, for this inventory alone. |
+| `inventory:Where(item)` | The stacks of one item. |
+| `inventory:Refresh()` | Reads every slot again now. |
+
+A stack is a plain table: `Item`, `Count`, `Slot`, `Durability`, and `Properties` with every number the game
+keeps for it. Changing the table changes nothing in the game.
+
+Other things that hold items have inventories of the game's class `Inventory` too, and the same functions
+work on them. Reading them was tried on a drop ship and a gravestone. Giving, taking and the signals were not
+tried there.
+
+### How fresh the answer is
+
+Wax keeps a copy of an inventory you ask about, so asking often costs little.
+
+- For the inventories of your own character on the host, the game tells Wax of every slot it changes, and the
+  copy follows at once.
+- Anywhere else Wax looks at most four times a second. A new stack shows about a quarter of a second
+  later, and a change that leaves the weight as it was, such as durability, within two seconds.
+- `inventory:Refresh()` reads it all now. A whole backpack took about a millisecond, so use it when something
+  has to be exact at once, not every frame.
+
+`Count` looks at the inventory's own slots. It does not look inside a bag that lies in a slot.
+
+## Give and take
+
+Only the host can do this. In a game someone else hosts, both raise an error that says so. See
+[Multiplayer](/docs/multiplayer#host-and-guest).
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Supplies", width = 280, height = 160 })
+
+window:Button("Give me 20 wood", function()
+    local given, why = game.Me:Give("Wood", 20)
+    if why then
+        ui.Notify(why, { title = given .. " wood given", kind = "warn" })
+    end
+end)
+
+window:Button("Take 5 wood", function()
+    game.Me:Take("Wood", 5)
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `character:Give(item, count)` | Puts items into the backpack. Gives back how many went in, and why not all of them when fewer did. |
+| `character:Take(item, count)` | Takes items out of the backpack first, then the hotbar. Gives back how many were taken. |
+| `inventory:Give(item, count)` | The same for one inventory. |
+| `inventory:Take(item, count)` | The same for one inventory. The last stack of the item goes first. |
+
+- Items go onto the stacks of that item first, then into empty slots.
+- What does not fit is not given. Nothing is dropped on the ground and nothing goes to the hotbar.
+- A tool comes new, with its full durability.
+- What is taken is gone, not dropped. What a character wears is left alone.
+- `Count`, `Has` and `List` follow in the same frame. The weight follows a moment later.
+- Both were tried on a player's backpack. One call took 0.6 to 2.3 ms.
+- What a mod gave stays when the mod unloads.
+
+Signals for items that come and go are on [Events of the game](/docs/events#items).
+
+Every field and function is listed in the [Items and inventories reference](/docs/reference/items).

@@ -75,6 +75,15 @@ print(mod.version)  -- the version from mod.lua
 print(mod.dir)      -- the path of the mod's folder
 ```
 
+`mod.Reload()` loads your mod again at the start of the next frame, as saving one of its files does. Use it
+when something your mod worked out at load has changed, such as the size of the screen:
+
+```lua
+ui.ScreenChanged:Connect(function()
+    mod.Reload()
+end)
+```
+
 ### Each mod has its own globals
 
 A global variable you set in one mod is not seen by other mods. Two mods can both use the name `settings`
@@ -124,7 +133,7 @@ print(Utils.shout("hello"))   -- HELLO!
 - In VS Code, `mod.` lists your files and folders, and what a file returns completes too.
 
 The name in quotes works as well, with dots for folders: `require("Utils")`, `require("extras.Maths")`. You need
-that form for a file whose name has a dash in it, or is called `id`, `name`, `version` or `dir`.
+that form for a file whose name has a dash in it, or is called `id`, `name`, `version`, `dir` or `Reload`.
 
 Saving any `.lua` file of the mod reloads the whole mod.
 

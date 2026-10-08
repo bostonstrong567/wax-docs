@@ -1,0 +1,156 @@
+---
+title: Your character
+description: game.Me gives your character's health, food, level and place by name, tells you when they change, and lets the host change them.
+icon: User
+---
+
+<NextVersion />
+
+`game.Me` is your own character. You read its numbers by name, and it has signals that fire when they change.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Me", anchor = "top-left", width = 240 })
+local health = hud:Field("Health", "")
+local level = hud:Field("Level", "")
+
+local function show()
+    if not game.Me.Exists then return end
+    health:Set(game.Me.Health .. " / " .. game.Me.MaxHealth)
+    level:Set(game.Me.Level)
+end
+
+show()
+game.Me.HealthChanged:Connect(show)
+game.Me.LevelUp:Connect(show)
+game.Me.Spawned:Connect(show)
+```
+
+## It is always there
+
+`game.Character` is `nil` at the main menu and is a new object after every map change. `game.Me` is not an
+object of the game. It finds your character each time you use it, so you can keep it and connect to its
+signals once.
+
+| While you have no character | What happens |
+| --- | --- |
+| `game.Me.Exists` | `false` |
+| Reading a field, such as `game.Me.Health` | `nil` |
+| Calling a function or assigning a field | An error that says there is no character. |
+
+`game.Me.Character` is the character itself, as an [Instance](/docs/instances), or `nil`. Use it where a
+function wants an Instance.
+
+## What you can read
+
+Every field asks the game when you read it.
+
+| Field | What it is |
+| --- | --- |
+| `Health`, `MaxHealth` | Health now, and when it is full. |
+| `Stamina`, `MaxStamina` | Stamina now, and when it is full. |
+| `Food`, `MaxFood` | How much food is left. |
+| `Water`, `MaxWater` | How much water is left. |
+| `Oxygen`, `MaxOxygen` | How much oxygen is left. |
+| `Armor`, `MaxArmor` | Armour now, and the most it can be. |
+| `Alive` | `false` once the character is dead. |
+| `Level`, `XP` | The level, and all the experience earned. |
+| `Weight`, `MaxWeight` | What is carried and what can be carried, in kilograms. |
+| `Position` | Where it is, as `{ X = , Y = , Z = }`. 100 is one metre. |
+| `Rotation` | Which way the body is turned, in degrees. |
+| `Velocity`, `MoveSpeed` | How fast it moves now, and its top walking speed. |
+| `Biome` | The biome it stands in, such as `"Conifer"`. |
+| `Temperature`, `BodyTemperature` | The temperature around it and of its body. |
+| `Crouching`, `Swimming`, `InCave` | `true` while it does that. |
+| `PlayerName` | The name of the player. |
+
+A field is `nil` when the character has no such value. `game.Me:DistanceTo(target)` gives the metres to an
+Instance or a position.
+
+What the character carries is on [Items and inventories](/docs/items). Its other numbers, and the effects
+that are on it, are on [Stats and modifiers](/docs/stats).
+
+## Signals
+
+```lua title="init.lua"
+game.Me.FoodChanged:Connect(function(food, previous)
+    if food < 20 and previous >= 20 then
+        ui.Notify("You are getting hungry.", { kind = "warn" })
+    end
+end)
+
+game.Me.BiomeChanged:Connect(function(biome)
+    ui.Notify("You are now in " .. biome)
+end)
+```
+
+| Signal | Fires when | Your function gets |
+| --- | --- | --- |
+| `HealthChanged`, `StaminaChanged` | The number is not what it was. | The new value and the one before. |
+| `FoodChanged`, `WaterChanged`, `OxygenChanged` | The number is not what it was. | The new value and the one before. |
+| `WeightChanged` | The weight carried changed. | The new weight and the one before. |
+| `LevelUp` | The level went up. | The new level and the one before. |
+| `XPGained` | Experience was earned. | How much, and the total. |
+| `BiomeChanged` | The character stands in another biome. | The new biome and the one before. |
+| `ModifierAdded`, `ModifierRemoved` | An effect came onto the character or left it. | The [modifier](/docs/stats#modifiers). |
+| `Damaged`, `Died` | The character was hit, or is dead. | See [Events of the game](/docs/events). |
+| `ItemAdded`, `ItemRemoved`, `ItemChanged` | What the character carries changed. | See [Events of the game](/docs/events). |
+| `Respawned` | The character is alive after it was dead. | The character. |
+| `Spawned`, `Despawned` | A character appeared where there was none, or the one that was there is gone. | The character, for `Spawned`. |
+
+Most of these are fed by looking at the character a few times a second, and only while something is
+connected. So a signal you do not use costs nothing, and a value that changes and changes back between two
+looks is not told. With twelve signals connected, Wax used about 0.02 ms more a frame.
+
+The signals stay connected through a respawn and a map change.
+
+## Any character
+
+The same fields are on every character, not only yours: another player's, and nearly every creature.
+`Food`, `Water`, `Oxygen`, the weight and the inventories are on players' characters only.
+
+```lua title="init.lua"
+for _, character in ipairs(game.Players:GetCharacters()) do
+    print(character.PlayerName, character.Health, character.Level)
+end
+```
+
+An Instance of a character has `Damaged` and `Died` too. The other signals in the table above belong to
+`game.Me`. To follow another value of any object, see [Watching a value](/docs/watching).
+
+## What the host can change
+
+These work when you play alone or host the game. In a game someone else hosts, each of them raises an error
+that says only the host can. `game.IsHost` tells you which you are. See
+[Multiplayer](/docs/multiplayer#host-and-guest).
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Helper", width = 280, height = 200 })
+
+window:Button("Heal me", function()
+    if not game.IsHost then
+        ui.Notify("Only the host can do this.", { kind = "warn" })
+        return
+    end
+    game.Me:Heal()
+    game.Me.Food = game.Me.MaxFood
+    game.Me.Water = game.Me.MaxWater
+end)
+```
+
+| You write | What it does |
+| --- | --- |
+| `character.Health = 150` | Sets the health. Never more than `MaxHealth`. Below 1 raises an error: use `Kill`. |
+| `character.Stamina = 50` | Sets the stamina, between 0 and `MaxStamina`. |
+| `character.Food = 80` | Sets the food. `Water` and `Oxygen` work the same way. Players' characters only. |
+| `character:Heal(amount)` | Gives health back. Without an amount, all of it. It does not bring a dead character back. |
+| `character:Kill()` | Kills a creature at once. On a player's character it raises an error in this version. |
+| `character:Teleport(place, facing)` | Moves the character at once. `place` is a position, an Instance or `game.Me`. |
+
+- `Teleport` puts the character exactly where you say. Above the ground, it falls and can take damage.
+- No other field can be assigned.
+- What a mod changed stays changed when the mod unloads.
+
+Giving and taking items is on [Items and inventories](/docs/items#give-and-take). Putting an effect on a
+character is on [Stats and modifiers](/docs/stats#put-one-on-or-take-it-off).
+
+Every field and function is listed in the [Characters reference](/docs/reference/character).

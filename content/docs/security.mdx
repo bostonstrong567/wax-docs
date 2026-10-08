@@ -237,18 +237,28 @@ list of versions is the same for everyone, so asking for it does not say which m
 
 ### Switching it off
 
-**Updates of mods.** Open the Wax menu (F8), go to **Mods** and switch off **Auto Update**. Wax then
-replaces no mod by itself. It still asks the catalogue which versions are out, so that a mod's card can offer
-an **Update to** button.
+<NextVersion>Wax 0.2.1 has one **Auto Update** switch for all mods, above the cards, and no **Look for
+updates** switch. With it off, Wax 0.2.1 replaces no mod by itself and still asks the catalogue which
+versions are out.</NextVersion>
 
-**Updates of Wax.** Type this line into the command bar of the **Log** page and press **Enter**:
+**Updates of one mod.** Open the Wax menu (F8), go to **Mods**, open the mod's card and switch off its
+**Auto Update**. Wax then does not replace that mod by itself. It still asks the catalogue which versions are
+out, so that the card can offer an **Update to** button. Every mod that came from the catalogue has this switch
+on its own card.
+
+**Asking the catalogue at all.** Switch off **Look for updates**, above the cards. Wax then asks the catalogue
+nothing: not about your mods and not about itself.
+
+**Updates of Wax.** Wax has a setting of its own for this, apart from the switches of the mods. It is on until
+you switch it off, and no control shows it yet. Type this line into the command bar of the **Log** page and
+press **Enter**:
 
 ```lua
 Wax.selfupdate.set_auto(false)
 ```
 
 Wax then asks nothing about itself and puts in no new version of itself. It remembers this the next time you
-play. The same line with `true` switches it on again.
+play. The same line with `true` switches it on again. A mod's **Auto Update** switch does not change it.
 
 **Everything.** Take `waxnet.dll` out of `ue4ss\Mods\Wax\bin`. Without that file Wax in the game cannot use
 the network at all. It says once in the log that the helper is missing, and everything else works. Installing

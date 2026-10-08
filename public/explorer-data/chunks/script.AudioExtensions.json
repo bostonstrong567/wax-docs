@@ -1,7 +1,12 @@
 {"chunk":"script.AudioExtensions","types":[
+{"name":"AudioEndpointSettingsBase","kind":"class","from":"/Script/AudioExtensions.AudioEndpointSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"DummyEndpointSettings","kind":"class","from":"/Script/AudioExtensions.DummyEndpointSettings","parent":"AudioEndpointSettingsBase","origin":"native","props":[],"funcs":[]},
 {"name":"OcclusionPluginSourceSettingsBase","kind":"class","from":"/Script/AudioExtensions.OcclusionPluginSourceSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
 {"name":"ReverbPluginSourceSettingsBase","kind":"class","from":"/Script/AudioExtensions.ReverbPluginSourceSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
 {"name":"SoundModulatorBase","kind":"class","from":"/Script/AudioExtensions.SoundModulatorBase","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"SoundfieldEffectBase","kind":"class","from":"/Script/AudioExtensions.SoundfieldEffectBase","parent":"Object","origin":"native","props":[["Settings","SoundfieldEffectSettingsBase","print(obj.Settings)"]],"funcs":[]},
+{"name":"SoundfieldEffectSettingsBase","kind":"class","from":"/Script/AudioExtensions.SoundfieldEffectSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
 {"name":"SoundfieldEncodingSettingsBase","kind":"class","from":"/Script/AudioExtensions.SoundfieldEncodingSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"SoundfieldEndpointSettingsBase","kind":"class","from":"/Script/AudioExtensions.SoundfieldEndpointSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]},
 {"name":"SpatializationPluginSourceSettingsBase","kind":"class","from":"/Script/AudioExtensions.SpatializationPluginSourceSettingsBase","parent":"Object","origin":"native","props":[],"funcs":[]}
 ]}

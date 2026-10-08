@@ -1,0 +1,208 @@
+---
+title: The game's tables
+description: game.Data reads the game's own tables of recipes, items and creatures as plain Lua, and changes them for as long as your mod is loaded.
+icon: Database
+---
+
+Nearly everything the game knows about its items, recipes, creatures and talents is kept in **data tables**.
+`game.Data` gives them to you as plain Lua values.
+
+```lua title="init.lua"
+local recipes = game.Data:Table("ProcessorRecipes")
+print(recipes:Count(), "recipes")
+
+local axe = recipes:Row("Stone_Axe")
+if axe then
+    for _, input in ipairs(axe.Inputs) do
+        print(input.Count, input.Element.RowName)
+    end
+end
+```
+
+## Tables and rows
+
+A table is named as the game names it, with or without the `D_` in front: `"ProcessorRecipes"`,
+`"ItemsStatic"`, `"Itemable"`. Letter case does not matter, and a wrong name raises an error that suggests
+the right one. `game.Data:GetTables()` lists them all.
+
+| Function | What it gives |
+| --- | --- |
+| `game.Data:Table(name)` | One table. |
+| `game.Data:GetTables()` | The name of every table. |
+| `game.Data:Has(name)` | `true` when the game has a table of this name. |
+| `table:Count()` | How many rows it has. |
+| `table:GetNames()` | The name of every row, in the game's order. |
+| `table:Has(row)` | `true` when it has a row of this name. |
+| `table:Row(row, fields)` | One row, or `nil`. |
+| `table:Fields(path)` | The fields of a row as the game declares them, with what each holds. |
+
+A row is a plain table, shaped like the game's own data files with every default filled in:
+
+- `Name` is the row's name.
+- A struct is a table and an array is a list.
+- A name, a string and a text are Lua strings. Text is in the language the game is showing.
+- A reference to an asset, such as an icon, is its path.
+- A **row handle** points at a row of another table. It is a table with `RowName` and `DataTableName`.
+
+`game.Data:Resolve(handle)` gives the row a handle points at:
+
+```lua
+local axe = game.Data:Table("ProcessorRecipes"):Row("Stone_Axe")
+local item = axe and game.Data:Resolve(axe.Inputs[1].Element)
+print(item and item.Name)
+```
+
+<Callout type="warn" title="Do not change a row you read">
+  A row is shared by every mod that reads it. Writing into it changes nothing in the game and confuses the
+  others. To change the game, use `Set` or `Change`, below.
+</Callout>
+
+## Read only what you need
+
+Reading takes time: about 20 whole recipes fit in a millisecond. Rows are read once and kept, so the second
+time costs nothing.
+
+Name the fields you want and only those are read. A field path is a field's name, with a dot for each step
+into a struct or an array:
+
+```lua
+local recipes = game.Data:Table("ProcessorRecipes")
+local row = recipes:Row("Stone_Axe", { "RequiredMillijoules", "Requirement.RowName" })
+print(row and row.RequiredMillijoules)
+```
+
+To read many rows, use `Load` inside a [task](/docs/tasks). It reads for a millisecond a frame and pauses, so
+the game keeps running:
+
+```lua title="init.lua"
+task.spawn(function()
+    local items = game.Data:Table("Itemable")
+    local rows = items:Load({ fields = { "DisplayName", "Weight" } })
+
+    local heaviest
+    for _, row in pairs(rows) do
+        if not heaviest or (row.Weight or 0) > (heaviest.Weight or 0) then
+            heaviest = row
+        end
+    end
+    print("The heaviest item is", heaviest and heaviest.DisplayName)
+end)
+```
+
+`table:Loaded(fields)` says how far a `Load` has come.
+
+`game.Data.Changed` fires when what you read may no longer hold: the game made a table again, or a mod
+changed rows of it. Your function gets the table's name, or `nil` when everything was dropped. Work out
+again what you kept from that table.
+
+## Maps and curves
+
+<NextVersion>In Wax 0.2.1, naming a map raises an error.</NextVersion>
+
+Some fields are a **map**: a table from keys to values, such as the stats a piece of armour gives. Others
+refer to a **curve**, such as a creature's health by level. Both are left out of a row unless you name them.
+
+```lua
+local suit = game.Data:Table("Armour"):Row("IO_Undersuit_Tier3", { "ArmourStats" })
+for stat, value in pairs(suit and suit.ArmourStats or {}) do
+    print(stat, value)
+end
+```
+
+A curve comes as a table with `First`, `Last`, `Values` and `Keys`. `Values` holds the curve's value at
+`First`, `First + 1` and so on. For a creature's growth a step is a level:
+
+```lua
+local deer = game.Data:Table("AIGrowth"):Row("Deer", { "Health" })
+local curve = deer and deer.Health
+if curve and curve.Values then
+    local level = 28
+    print("A level 28 deer has", curve.Values[level - curve.First + 1], "health")
+end
+```
+
+- A map is read whole. A path cannot go on into it.
+- A struct or a list that you read with a map or a curve inside it cannot be handed to `Set` as it is.
+  Take that key out first.
+- Some maps cannot be read, such as one whose values are lists. Naming one raises an error that says what
+  it is.
+
+## Changing a table
+
+<NextVersion />
+
+`Set` gives one field of a row a new value in the game. It is written before `Set` returns, so whatever the
+game reads from the row next is the new value.
+
+```lua title="init.lua"
+local items = game.Data:Table("Itemable")
+items:Set("Item_Wood", "MaxStack", 500)
+```
+
+`Change` works from the value the field has. Your function gets a copy and returns the new one. For a struct
+or a list it may change the copy and return nothing.
+
+```lua title="init.lua"
+local recipes = game.Data:Table("ProcessorRecipes")
+
+recipes:Change("Stone_Axe", "Inputs", function(inputs)
+    for _, input in ipairs(inputs) do
+        input.Count = math.max(1, input.Count // 2)
+    end
+end)
+```
+
+For recipes there is a shorter way to do this: [Recipes](/docs/recipes).
+
+What to know about a change:
+
+- A field is changed whole. `field` is a field of the row, such as `"Inputs"`, not a path into one. The
+  value has every part of it: a struct with each of its fields, a list with each of its entries.
+- Everything is checked first. The row, the field, the kind of every value, and that a row handle names a
+  row its table has. What is wrong raises an error that names the place, such as `Inputs[2] lacks Count`, and
+  nothing is written.
+- It belongs to your mod. When your mod unloads, the field goes back to what it was. When your mod
+  reloads and makes the same change again, nothing is written twice.
+- `Set` replaces, `Change` builds. When two mods `Set` one field, the mod that loads later wins. Two
+  `Change`s both hold: each builds on the other, in the order the mods load. So prefer `Change` for anything
+  another mod might also touch.
+- The function you give `Change` must return at once. Wax keeps it and runs it again when an earlier
+  mod's change comes or goes, so it should depend on nothing but the value it is given.
+
+| Function | What it does |
+| --- | --- |
+| `table:Set(row, field, value)` | Gives a field a new value. |
+| `table:Set(row, { Field = value, Other = value })` | Several fields of one row. All are checked before any is written. |
+| `table:Change(row, field, fn)` | Changes a field from the value it has. |
+| `table:Reset(row, field)` | Takes your mod's changes back: of one field, of a row, or of the whole table when you name nothing. |
+| `table:Changes()`, `game.Data:Changes()` | What mods changed and still stands, with what each field was and is. |
+| `table:Conflicts()`, `game.Data:Conflicts()` | The fields where one mod's `Set` hides another mod's different value. |
+
+`game.Data.Patched` fires for each field of a row that was written, with the table, the row and the field.
+
+### What cannot be changed in this version
+
+- Text, references to assets, maps and a few rarer kinds of field. `Set` raises an error that says which.
+- A list can be made longer or shorter only when it is a field of the row itself, has 4 entries or fewer
+  before and after, and its entries hold no strings, text or lists of their own. Any other list keeps its
+  length: its entries can be changed where they are.
+- A row handle cannot be pointed at another table than the one it names now.
+- Adding a row is not possible yet. `table:Add` is there and raises an error that says it is switched
+  off. A row of the game is never removed.
+- A table's meta table can be read, not changed.
+
+A change that is refused raises an error that says so, and changes nothing.
+
+### In a game someone else hosts
+
+A change is made in the tables on your PC only. The host works from its own tables and decides what really
+happens. Wax tells the player so once for each mod, in each game they join. `game.IsHost` says which you
+are. See [Multiplayer](/docs/multiplayer#host-and-guest). This has not been tried with two PCs yet.
+
+### What the game makes of a change
+
+The game reads its tables at different moments. Some things follow at once, such as what a recipe costs when
+its making ends. Others the game worked out earlier and keeps, such as a screen that is already open. Try
+your change in the game, and look at what it changed.
+
+Every function is listed in the [Game tables reference](/docs/reference/data).

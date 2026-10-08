@@ -1,0 +1,3 @@
+{"chunk":"content.Game.ASS.DCO","types":[
+{"name":"SK_DCO_Giant_Ranch_Sign_Gate_Skeleton_AnimBp_C","kind":"class","from":"/Game/ASS/DCO/Giant_Ranch_Sign/SK_DCO_Giant_Ranch_Sign_Gate_Skeleton_AnimBp.SK_DCO_Giant_Ranch_Sign_Gate_Skeleton_AnimBp_C","parent":"AnimInstance","origin":"blueprint","props":[["bOpen","boolean","print(obj.bOpen)"]],"funcs":[["AnimGraph",[["AnimGraph","PoseLink"]],"","obj:AnimGraph({})"],["BlueprintUpdateAnimation",[["DeltaTimeX","number"]],"","obj:BlueprintUpdateAnimation(1.0)"]]}
+]}

@@ -1,0 +1,134 @@
+---
+title: Watching a value
+description: Get a signal when a value of the game changes, run code at a steady pace, or run it every frame.
+icon: Eye
+---
+
+<NextVersion />
+
+Most of what a mod wants to know is a value that changes now and then. There are three ways to follow one,
+from the cheapest to the most exact.
+
+| Use | When |
+| --- | --- |
+| `instance:GetPropertyChangedSignal(name)` | You want to hear when one value of an object changes. |
+| `task.every(seconds, fn)` | You want to do something at a steady pace, such as refresh a window. |
+| `game.Frame:Connect(fn)` | It has to happen every frame, such as moving something smoothly. |
+
+## A signal for one value
+
+`GetPropertyChangedSignal` gives a [signal](/docs/signals) for one value of an [Instance](/docs/instances).
+It fires with the new value and the one before.
+
+```lua title="init.lua"
+local connection
+
+local function follow(character)
+    if connection then connection:Disconnect() end
+    connection = character:GetPropertyChangedSignal("JumpMaxCount"):Connect(function(jumps, previous)
+        ui.Notify(("Jumps in a row: %s, was %s"):format(tostring(jumps), tostring(previous)))
+    end)
+end
+
+if game.Me.Exists then follow(game.Me.Character) end
+game.Me.Spawned:Connect(follow)
+```
+
+- The value can be a property of the game that holds a number, `true` or `false`, text or an object. It can
+  also be a field Wax gives the class, such as a creature's `Behaviour`.
+- Wax reads the value ten times a second, and only while something is connected. A change that is undone
+  between two reads is not told.
+- An object arrives as an Instance, or `nil` when the property holds none.
+- A wrong name raises an error that suggests the right one.
+
+Give a second value for another pace, in seconds:
+
+```lua
+local creature = game.Creatures:GetNearest()
+if creature then
+    creature:GetPropertyChangedSignal("Target", 0.5):Connect(function(target)
+        print("Now after", target and target.Name or "nothing")
+    end)
+end
+```
+
+The pace is rounded to the nearest 0.05 seconds and can be as long as an hour.
+
+### What can be watched
+
+- It works on an actor in the world, such as a character or a creature, and on a part of an actor that one
+  of the actor's properties holds. On anything else it raises an error that says why.
+- Vectors, rotations, lists and maps of the game cannot be watched. A field of Wax that gives a table, such
+  as `Position`, can: it is compared by what it holds.
+- When the object is gone, reading stops and every handler is disconnected. A task that waits on the signal
+  with `:Wait()` is then not woken.
+- An Instance does not outlive a map change, so connect again on the new object, as the example does with
+  `game.Me.Spawned`.
+
+For your own character you seldom need this. [`game.Me`](/docs/character#signals) has ready signals for its
+health, food, level and the rest, and they stay connected through a respawn and a map change.
+
+### What it costs
+
+Six watched values cost about 0.02 ms a frame when it was measured, and 68 values on 17 creatures about
+0.06 ms. Nothing is read while no handler is connected.
+
+## At a steady pace
+
+`task.every` runs a function again and again.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Nearby", anchor = "top-right", width = 220 })
+local wolves = hud:Field("Wolves within 100 m", 0)
+
+task.every(1, function()
+    wolves:Set(#game.Creatures:GetAll("Wolf", { within = 100 }))
+end)
+```
+
+- The first run comes after that many seconds, and each next one that many seconds after the run before
+  has ended.
+- It never runs more than once a frame.
+- An error is reported and the runs go on. After five errors in a row they stop.
+- It gives back the task. `task.cancel` stops it, and it stops by itself when your mod unloads.
+
+It does the same as a loop with `task.wait` inside a `task.spawn`, in one line. See [Tasks](/docs/tasks).
+
+## Every frame
+
+`game.Frame` fires once every frame, with the seconds since the frame before.
+
+```lua title="init.lua"
+local hud = ui.Overlay({ title = "Speed", anchor = "bottom-left", width = 200 })
+local shown = hud:Field("Metres a second", "", { mono = true })
+
+local last
+game.Frame:Connect(function(seconds)
+    local now = game.Me.Position
+    if now and last and seconds > 0 then
+        local dx, dy = now.X - last.X, now.Y - last.Y
+        shown:Set(("%.1f"):format(math.sqrt(dx * dx + dy * dy) / 100 / seconds))
+    end
+    last = now
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `game.Frame:Connect(fn)` | Calls `fn(seconds)` every frame. Gives back a connection. |
+| `game.Frame:Once(fn)` | The same, for the next frame only. |
+| `game.Frame:Wait()` | Pauses the task it is called in until the next frame, and gives back the seconds. |
+
+- `seconds` is 0 on the first frame Wax runs.
+- Each call runs as a task and may wait. A handler that is still waiting is called again on the next frame
+  all the same.
+- The handler is disconnected when your mod unloads.
+
+<Callout type="warn" title="Keep it short">
+  What you do here is done 60 times a second or more. Read a value or two and set a control. Do not search
+  the world, read tables or build windows in it. For anything that can wait a quarter of a second, use
+  `task.every`.
+</Callout>
+
+Every function is listed in the [Watching values reference](/docs/reference/watch) and the
+[game reference](/docs/reference/game#instance-getpropertychangedsignal).

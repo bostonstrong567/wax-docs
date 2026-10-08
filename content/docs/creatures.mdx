@@ -71,6 +71,85 @@ print(facts.DisplayName, facts.Level, facts.Health, facts.MaxHealth, facts.IsAli
 `Describe` returns plain values: `Kind`, `Variant`, `DisplayName`, `ClassName`, `Name`, `Level`, `Health`,
 `MaxHealth`, `IsAlive` and `Position`.
 
+## Fields on a creature
+
+<NextVersion />
+
+A creature has fields of its own, so you can read one value without `Describe`. Each asks the game when you
+read it.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Nearest creature", width = 320, height = 220 })
+local name = window:Field("Kind", "")
+local doing = window:Field("Doing", "")
+local health = window:Field("Health", "")
+
+task.every(0.5, function()
+    local creature = game.Creatures:GetNearest()
+    if not creature then return end
+    name:Set((creature.DisplayName or "?") .. "  level " .. tostring(creature.Level))
+    doing:Set(creature.Action or "nothing")
+    health:Set(tostring(creature.Health) .. " / " .. tostring(creature.MaxHealth))
+end)
+```
+
+| Field | What it is |
+| --- | --- |
+| `Kind`, `Variant`, `DisplayName` | Its kind, such as `"Wolf"`, the version of its kind, such as `"Conifer_Wolf"`, and the name the game shows. |
+| `Epic` | The name of the boss or alpha it is, such as `"AlphaWolf_Boss"`. `nil` for an ordinary creature. |
+| `Behaviour` | Whom it treats as an enemy: `"Default"`, `"Friendly"`, `"Tame"`, `"HostileToPlayers"`, `"HostileToAll"`, or the name of one of the game's teams. |
+| `Action` | What it is doing now, as the game calls it: `"Wander"`, `"FindFood"`. |
+| `Target` | The actor it is after right now, or `nil`. |
+| `Stance` | `"Standing"`, `"Sitting"` or `"Lying"`. |
+| `IsJuvenile` | `true` for a young animal. |
+| `IsTamed`, `CanBeTamed` | Whether it has been tamed, and whether the game's data has a taming rule for it. |
+| `IsFrozen` | `true` while it is held frozen. |
+
+A creature is a character too. It also has `Health`, `MaxHealth`, `Level`, `Alive`, `Position` and the other
+fields listed on [Your character](/docs/character#what-you-can-read), and [stats and
+modifiers](/docs/stats).
+
+A few bosses are built differently in the game: their class is `IcarusPawn`, which is not a character. On
+those, `Epic`, `Behaviour`, `Action`, `Target`, `Stance` and `IsFrozen` read `nil`, and they have none of the
+character fields.
+
+## What the game's data says about a kind
+
+<NextVersion />
+
+`GetInfo` reads the game's tables for one kind or variant. The creature does not have to be in the world.
+
+```lua
+local info = game.Creatures:GetInfo("Buffalo")
+print(info.DisplayName, info.Diet, info.Carcass)
+
+if info.Tame then
+    print("Taming takes", info.Tame.Seconds, "seconds")
+end
+```
+
+| Field | What it is |
+| --- | --- |
+| `Kind`, `DisplayName`, `Tag` | The kind's name, the name the game shows, and the game's own tag for it. |
+| `Variants` | Every variant of the kind. |
+| `Variant` | The variant the fields below are about. |
+| `Team` | The team it starts on, which decides whom it attacks. |
+| `Diet` | `"Carnivore"` or `"Herbivore"`. |
+| `Descriptors` | The words the game's data describes it with, such as `"Passive"`. |
+| `Carcass`, `Loot` | The item its dead body is, and what the body gives. |
+| `Tame` | The taming rule that names it: how long a taming takes, the food and shelter it wants, and what the animal becomes. `nil` when none does. |
+| `Mount` | What the data says about the tamed animal: its orders and the saddles that fit. `nil` when there is none. |
+
+Give a variant such as `"Conifer_Wolf"` or a creature for that variant. Give a kind such as `"Wolf"` for the
+variant named like the kind, or else its first one.
+
+The first call reads three of the game's tables, which took between 1 and 15 ms. Later calls are quick.
+Call it when a window opens, not in the middle of a fight.
+
+`game.Creatures:GetTamed()` lists the tamed animals in the world: mounts, pets and livestock, whoever they
+belong to. It takes a kind and the same options as `GetAll`. No tamed animal was in the world when this was
+tested, so it has only been seen to answer an empty list.
+
 ## When creatures come and go
 
 ```lua
@@ -96,6 +175,9 @@ end)
 
 After `Removed`, the creature can no longer be used. You can still compare it with one you kept.
 
+From the next version of Wax there is also `game.Creatures.Damaged`, and `Died` says what killed the
+creature. Both are on [Events of the game](/docs/events).
+
 ## Now and later in one call
 
 `Observe` calls your function for every matching creature that is here now and for each one that appears
@@ -120,6 +202,103 @@ game.Players:ObserveCharacters(function(character)
     print(game.Players:GetName(character), "is here")
 end)
 ```
+
+## Spawn a creature
+
+<NextVersion />
+
+Only the host can do what this section and the next describe. In a game someone else hosts, each of these
+raises an error that says so. See [Multiplayer](/docs/multiplayer#host-and-guest).
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Spawner", width = 280, height = 170 })
+
+window:Button("A deer in front of me", function()
+    local deer, why = game.Creatures:Spawn("Deer")
+    if not deer then
+        ui.Notify(why or "Nothing was spawned.", { kind = "warn" })
+        return
+    end
+    ui.Notify("A level " .. tostring(deer.Level) .. " deer.")
+end)
+
+window:Button("A level 5 wolf, 20 metres away", function()
+    local me = game.Me.Position
+    game.Creatures:Spawn("Conifer_Wolf", { X = me.X + 2000, Y = me.Y, Z = me.Z }, { level = 5 })
+end)
+```
+
+`game.Creatures:Spawn(kind, place, options)` puts a new wild creature into the world with the game's own
+spawn.
+
+- `kind` is a variant, such as `"Conifer_Wolf"` or `"Deer"`, or a kind that has only one. A kind with several
+  raises an error that lists them.
+- `place` is a position, an Instance or `game.Me`. Left out, the creature goes six metres in front of your
+  character.
+- Wax asks the game for ground a creature can walk on within 5 metres of the place. Where there is none, it
+  raises an error and nothing is spawned.
+- Inside a [task](/docs/tasks), such as a button's function, `Spawn` waits until the game has given the
+  creature its level. Anywhere else it answers at once, and `Level` and `Health` are right a few frames later.
+
+| Option | What it does | When left out |
+| --- | --- | --- |
+| `level` | The creature's level, from 1 to 120. | The middle level of the zone the place lies in. |
+| `variant` | Which variant, when `kind` names a kind that has several. | |
+| `facing` | Which way it looks, as `{ Yaw = 90 }`. | In front of you it looks at you. |
+| `behaviour` | The team to put it on. See `Behaviour` below. | |
+| `keep` | `false` takes the creature away again when your mod unloads. | `true`: it stays. |
+
+One spawn took 3 to 4 ms, and 18 ms once when the game had to load the kind first. A tamed animal cannot be
+spawned in this version.
+
+## Change a creature
+
+<NextVersion />
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Nearest creature", width = 280, height = 210 })
+
+local function nearest()
+    return (game.Creatures:GetNearest({ within = 50 }))
+end
+
+window:Button("Freeze or free it", function()
+    local creature = nearest()
+    if not creature then return end
+    if creature.IsFrozen then creature:Unfreeze() else creature:Freeze() end
+end)
+
+window:Button("Make it friendly", function()
+    local creature = nearest()
+    if creature then creature.Behaviour = "Friendly" end
+end)
+
+window:Button("Remove it", function()
+    local creature = nearest()
+    if creature then creature:Remove() end
+end)
+```
+
+| You write | What it does |
+| --- | --- |
+| `creature:SetLevel(level)` | Sets its level, from 1 to 120. Its health is full afterwards, so set the level first and `Health` after it. |
+| `creature:Freeze()`, `creature:Unfreeze()` | Holds it where it stands, and lets it go again. |
+| `creature:Attack(target)` | Makes a hunter angry at a player's character. `target` is that character or `game.Me`. |
+| `creature:Remove()` | Takes it out of the world, alive or dead, with nothing left behind. |
+| `creature.Behaviour = "Friendly"` | Puts it on another team: `"Default"`, `"Friendly"`, `"Tame"`, `"HostileToPlayers"`, `"HostileToAll"`, or a team's own name. |
+| `creature:Heal()`, `creature:Kill()`, `creature:Teleport(place)`, `creature.Health = 50` | What the host can do to [any character](/docs/character#what-the-host-can-change). |
+
+Things to know:
+
+- These are for wild animals. On a tamed animal and on the few bosses of the class `IcarusPawn`, each raises
+  an error that says so.
+- `Attack` works on animals the game gives aggression, the hunters. On a deer or a rabbit it raises an error.
+  Nothing calls an attack off again. `Remove` takes the animal away.
+- A new `Behaviour` counts from the next time the animal notices somebody. An animal that is already
+  attacking goes on attacking after `"Friendly"`.
+- `Remove` happens a moment later, not in the same frame. `creature:IsValid()` says when it is gone.
+- Nothing is undone when your mod unloads, apart from a creature spawned with `keep = false`.
+- Whether the other players in your session see a spawned creature and its changes has not been looked at.
 
 ## In someone else's game
 

@@ -75,7 +75,7 @@ const BUTTON =
   'rounded-lg border bg-fd-card px-3 py-1.5 text-sm font-medium transition-colors outline-none hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring disabled:pointer-events-none disabled:opacity-40';
 const CODE = 'rounded-md border bg-fd-background px-1 py-0.5 font-mono text-[0.85em]';
 const LIST = 'overflow-hidden rounded-xl border bg-fd-card';
-const MISSING = 'The list was read from the game at its title screen. Blueprint classes that only load inside a prospect are not in it.';
+const SOURCE = "The list is made from the game's own files and holds every class in them, whether it is loaded or not.";
 const BUILT_IN = new Set(['integer', 'number', 'boolean', 'string', 'table', 'any', 'nil', 'fun', 'self', 'delegate', 'function', 'thread']);
 const LUA_COLORS = {
   keyword: 'text-fd-primary',
@@ -1080,7 +1080,7 @@ function Missing({ name, inGame }: { name: string; inGame: boolean }) {
       <Back />
       <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Nothing by that name</h1>
       <Notice
-        text={`The Explorer has no entry named ${name.slice(0, 80)}.${inGame ? ` ${MISSING}` : ''}`}
+        text={`The Explorer has no entry named ${name.slice(0, 80)}.${inGame ? ` ${SOURCE}` : ''}`}
         action="Open the Explorer"
         onAction={() => go(null)}
       />
@@ -1245,7 +1245,7 @@ function GameBrowse(props: { nodes: Nodes; failed: boolean; retry: () => void; l
         <EntryLink open={{ source: 'wax', id: 'WaxInstance' }} className={`font-mono text-[13px] ${NAME}`}>
           WaxInstance
         </EntryLink>{' '}
-        has, and adds the properties and functions of its own class and of the classes that one is built on. {MISSING}
+        has, and adds the properties and functions of its own class and of the classes that one is built on. {SOURCE}
       </p>
       {props.failed ? (
         <Notice text="The list of the game's classes could not be loaded." action="Try again" onAction={props.retry} />
@@ -1607,7 +1607,7 @@ export function Explorer() {
                 {result.total > 0 ? (
                   <Results hits={result.hits} />
                 ) : waitingForGame || waitingForMembers ? null : (
-                  <Notice text={`Nothing has a name like that. ${inGame ? MISSING : ''}`.trim()} action="Clear the search" onAction={showAll} />
+                  <Notice text={`Nothing has a name like that. ${inGame ? SOURCE : ''}`.trim()} action="Clear the search" onAction={showAll} />
                 )}
                 {result.total > result.hits.length ? (
                   <div className="flex items-center justify-between gap-3">

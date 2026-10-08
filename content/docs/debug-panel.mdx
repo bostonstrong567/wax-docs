@@ -6,6 +6,13 @@ icon: Bug
 
 Wax comes with one window of its own, called **Wax**. Press **F8** and it is there. It has six pages.
 
+**F8** shows and hides this panel and nothing else. A mod's windows have a key of their own, which you
+find on the mod's card of the Mods page. **Escape** hides everything that is up.
+
+<NextVersion>In Wax 0.2.1, **F8** shows the panel together with every mod's windows. A card has no **Open
+key** and no **Auto Update** switch of its own, and it has up and down arrows in place of
+the six dots. The key setting is called **Menu key**.</NextVersion>
+
 The line along the bottom is always visible. It says how many mods loaded and whether there are errors. On
 the right it shows the frame rate and the time Wax uses per frame.
 
@@ -23,17 +30,54 @@ Every mod in the mods folder has a card here.
 | **Status** | `loaded`, `switched off` or `failed`. A failed mod shows its error in red underneath. |
 | **Load time** | How long the mod took to start. |
 | **Enabled** | Switches the mod off and on. Wax remembers the choice. |
+| **Auto Update** | Only on a mod that came from the catalogue. On, a newer version of that mod is put in by itself. Off, the card shows an **Update to** button when one is out. |
+| **Open key** | Only on a mod that has a window. The key that shows and hides that mod's windows. |
 | **Reload** | Starts the mod again from the top. |
-| Up and down arrows | Move the mod in the list. Mods load in this order. |
+| The six dots | At the left of the card's name. Hold them and drag the card to another place in the list. Mods load in this order. |
 | Bin | Removes the mod, after asking. Its folder is renamed, not erased. [Get mods](/docs/get-mods) says how to bring it back. |
+
+A card starts closed, unless its mod is new, has a problem or has an update to put in. Click its name to open
+or close it. A name too long for the card is cut short with three dots. Rest the mouse on it to read all of
+it.
+
+### Put the mods in another order
+
+<NextVersion>In Wax 0.2.1 the up and down arrows of a card move it.</NextVersion>
+
+Hold the six dots of a card and move the mouse up or down. The card follows the mouse and the other cards
+make room. Let go and the card stays there, and Wax remembers the order.
+
+- The card stays inside the list while you hold it.
+- Held near the top or the bottom of a long list, the list scrolls.
+- An open card folds to its name while you hold it, and opens again where you put it down.
+- **Escape** puts the card back where it was. So does letting go outside the list.
+- A mod that needs another mod still loads after it. If you put it before that mod, the card goes back and a
+  notification says why.
+- With a search typed, you move the cards that show.
 
 The search box filters the list. Type part of a name, or one of these words: `loaded`, `off`, `failed`, `new`.
 
 A mod Wax has not seen before is listed as **new** and switched off. Flip **Enabled** to load it. This is so
 whether the mod was added while the game ran or while it was closed.
 
-**Auto Update** and **Check now**, above the cards, are for mods that came from the catalogue.
-[Get mods](/docs/get-mods#updates) says what they do.
+**Look for updates** and **Check now**, above the cards, are for mods that came from the catalogue, and so is
+the **Auto Update** switch on such a mod's card. [Get mods](/docs/get-mods#updates) says what they do.
+
+### A key for each mod
+
+<NextVersion />
+
+Every mod that has a window has an **Open key** on its card. Press that key in the game to show the mod's
+windows, and press it again to hide them. The Wax panel and the windows of other mods stay as they are, so
+several can be up at once. The mouse is free while anything is up.
+
+- A mod can ask for a key. For a mod that asks for none, Wax picks the first of F6, F9, F10, F11, F5, F4, F3
+  and F2 that no window and no hotkey uses, and a notification tells you once which it is.
+- If a mod later makes a hotkey on a key that Wax picked, Wax picks another one and tells you.
+- To change it, click the key on the card and press the new one. A key can be held with Ctrl, Shift or Alt.
+  Wax remembers your choice.
+- A key that the Wax panel, another mod's windows or another mod's hotkey already uses is refused. A
+  notification says who has it, and the key stays what it was.
 
 ## Log
 
@@ -219,11 +263,11 @@ back.
 
 | Setting | What it does |
 | --- | --- |
-| **Menu key** | The key that opens the menu. Click it, then press a new key. |
+| **Wax panel key** | The key that shows and hides the Wax panel. Click it, then press a new key. It is **F8** until you change it. A mod's windows have their own key, on the mod's card of the [Mods](#mods) page. |
 | **Theme** | The colours of every window. See [Themes](/docs/gui/themes). |
 | **Accent colour** | The highlight colour. `From the theme` uses the theme's own. |
 | **Animations** | Switches the small movements on and off. |
-| **Interface size** | Makes everything larger or smaller. |
+| **Interface size** | Makes everything larger or smaller. The list holds the sizes that text can still be read at on your screen, so a small game window offers fewer of them. |
 
 These settings are remembered the next time you play.
 
@@ -252,5 +296,5 @@ Write `ui.Debug.Page` with a dot, not a colon.
 | Function | What it does |
 | --- | --- |
 | `ui.Debug.Page(name, options)` | Adds a page and returns it. Add controls to it as you would to a window. |
-| `ui.Debug.Show()` | Opens the menu and shows the Wax panel. |
+| `ui.Debug.Show()` | Shows the Wax panel and frees the mouse. Your own windows stay as they are. |
 | `ui.Debug.Window()` | The panel's window, or `nil` while the panel is not running. |

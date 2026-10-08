@@ -1,0 +1,125 @@
+---
+title: Stats and modifiers
+description: Read any stat the game keeps for a character, see the effects that are on it, and put one on as the host.
+icon: Activity
+---
+
+<NextVersion />
+
+The game keeps many numbers for a character besides its health: movement speed, weight capacity,
+resistances and so on. It calls them **stats**. The effects that food, weather, wounds and gear put on a
+character are **modifiers**.
+
+Both are on every character: `game.Me`, another player's character, and nearly every creature.
+
+## One stat
+
+`GetStat` gives the value of one stat. A stat is named as in the game's table `D_Stats`.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "My stats", width = 300, height = 190 })
+
+window:Button("Read them", function()
+    if not game.Me.Exists then return end
+    print("Most health:", game.Me:GetStat("MaximumHealth_+"))
+    print("Movement speed:", game.Me:GetStat("MovementSpeed_+"))
+    print("Weight capacity:", game.Me:GetStat("WeightCapacity_+"))
+end)
+```
+
+- Letter case does not matter. A name the game does not have raises an error that suggests the nearest ones.
+- The game itself is asked each time, so the answer is never out of date.
+- The answer is 0 for a stat the character has no value for.
+- One call took about 0.013 ms when it was measured. That is fine a few times a second, and too much for
+  hundreds of creatures every frame.
+
+`character.HealthRegen` and `character.StaminaRegen` are two stats with a field of their own.
+
+The names are the rows of the game's table. `game.Data:Table("Stats"):GetNames()` lists them all. See
+[The game's tables](/docs/tables).
+
+## Every stat at once
+
+`character.Stats` is a table of the stats the game lists on the character, as name and value.
+
+```lua
+for name, value in pairs(game.Me.Stats or {}) do
+    print(name, value)
+end
+```
+
+- It is a new table each time, and making it costs more than one `GetStat`. Do not read it every frame.
+- The game keeps some stats out of this list. `GetStat` answers for those too.
+- It is `nil` for a character with no stats.
+
+## Modifiers
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Effects", width = 320, height = 260 })
+local list = window:Console({ height = 150 })
+
+window:Button("Show my modifiers", function()
+    local lines = {}
+    for _, modifier in ipairs(game.Me:GetModifiers()) do
+        local left = modifier.Remaining and ("%.0f s left"):format(modifier.Remaining) or "no time limit"
+        lines[#lines + 1] = { modifier.DisplayName .. " (" .. left .. ")" }
+    end
+    list:SetLines(lines)
+end)
+```
+
+`GetModifiers()` gives a list, the modifier put on first at the front. Each entry is a table:
+
+| Field | What it is |
+| --- | --- |
+| `Name` | The modifier's row in the game's table `D_ModifierStates`, such as `"Dirty_Water"`. |
+| `DisplayName` | The name the game shows, such as `"Tainted Water"`. |
+| `Kind` | `"Buff"`, `"Debuff"`, `"Biome"`, `"Aura_Positive"`, `"Aura_Negative"`, `"Radiation"` or `"Item"`. |
+| `Id` | The number the game gave this one when it was put on. |
+| `Duration` | How long it lasts in all, in seconds. `nil` for one that lasts as long as its cause, such as a storm. |
+| `Remaining` | How long it still lasts. `nil` when `Duration` is. |
+
+`character:HasModifier("Berry")` is `true` while a modifier of that name is on the character.
+
+On your own character, `game.Me.ModifierAdded` and `game.Me.ModifierRemoved` fire when one comes or goes.
+They are looked at twice a second, so a modifier that comes and goes faster than that is not told.
+
+```lua title="init.lua"
+game.Me.ModifierAdded:Connect(function(modifier)
+    if modifier.Kind == "Debuff" then
+        ui.Notify(modifier.DisplayName, { title = "New debuff", kind = "warn" })
+    end
+end)
+```
+
+## Put one on or take it off
+
+Only the host can do this. In a game someone else hosts, both functions raise an error that says so. See
+[Multiplayer](/docs/multiplayer#host-and-guest).
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Regen", width = 280, height = 160 })
+
+window:Button("Health regen for a minute", function()
+    game.Me:AddModifier("Health_Regen", 60)
+end)
+
+window:Button("Take it off", function()
+    game.Me:RemoveModifier("Health_Regen")
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `character:AddModifier(name, seconds)` | Puts a modifier on for that many seconds. Gives back its `Id`, or `nil` when the game did not put it on. |
+| `character:RemoveModifier(name)` | Takes every modifier of that name off. Gives back how many. |
+| `character:RemoveModifier(modifier)` | Takes off the one entry that `GetModifiers` gave you. |
+
+- You have to say how long it stays. The game's table keeps no time of its own for a modifier.
+- It is on at once. `GetModifiers` and `HasModifier` say so in the same frame.
+- `AddModifier` has been tried on a player's character. The game's table marks some modifiers as not for
+  creatures.
+- One `AddModifier` took about 2 ms when it was measured, so do not call it every frame.
+- A modifier a mod put on stays for its time when the mod unloads.
+
+Every field and function is listed in the [Stats and modifiers reference](/docs/reference/stats).

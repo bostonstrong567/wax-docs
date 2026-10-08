@@ -120,4 +120,126 @@ window:Toggle("Show the overlay", settings.overlay, function(on)
 end)
 ```
 
+## Panels
+
+A **panel** is an overlay whose controls take the mouse. `ui.Panel` makes one. It has no title bar and the
+player does not drag it. Use it for something that stands beside the game's own screens, such as a list of
+items next to the inventory.
+
+```lua title="init.lua"
+local panel = ui.Panel({ anchor = "right", width = 220, when = "menu" })
+
+panel:Label("Shown with the Wax menu.")
+panel:Button("Say hi", function()
+    ui.Notify("Hi!")
+end)
+```
+
+A panel takes the options of an overlay, and these:
+
+| Option | What it does | When left out |
+| --- | --- | --- |
+| `when` | When it shows. `"cursor"`: while the Wax menu is open or one of the game's own screens has the mouse. `"menu"`: only with the Wax menu. `"always"`: whenever it is switched on. | `"cursor"` |
+| `padding` | The space between its edge and its controls. | 12 at the sides. |
+| `height` | A fixed height. | As tall as its controls. |
+| `zoom` | Draws everything in it this much larger. `1.25` is a quarter larger. Text stays sharp. | 1 |
+| `opacity` | How solid its background is, from 0 to 1. | 0.96 |
+| `visible` | `false` makes it hidden until `panel:SetVisible(true)`. | `true` |
+| `on_press` | A function that runs when the panel is pressed where it has no control. | Nothing. |
+| `place` | A function that says where the panel goes on a screen of a given size. See below. | The panel stays where its anchor puts it. |
+
+While the mouse is over a panel, the mouse wheel belongs to the panel and the game does not see it.
+`panel.Scrolled` fires with `1` when the wheel is turned down and `-1` when it is turned up.
+
+`ui.Open({ windows = false })` frees the mouse without bringing a window up. A mod that only has panels uses
+it to show them with its own key.
+
+### A panel that follows the screen
+
+<NextVersion />
+
+Give a panel a `place` function and it follows the game's window. The function gets the width and the height
+of the screen and returns a table with any of `x`, `y`, `width`, `height` and `zoom`. Wax asks it when the
+panel is made, and again in the same frame whenever the game's window changes size. The panel that exists is
+moved and sized. Nothing is built again.
+
+`panel.Resized` fires with the panel's new width and height when the answer gave it another size.
+
+```lua title="init.lua"
+local SIZE, GAP = 36, 2
+local width = 0
+
+-- a strip along the top, always as wide as the screen
+local strip = ui.Panel({
+    anchor = "top-left",
+    when = "menu",
+    place = function(screen_width)
+        width = screen_width - 16
+        return { x = 8, y = 8, width = width }
+    end,
+})
+
+local function columns_for(room)
+    return math.max(1, math.floor((room - 24 + GAP) / (SIZE + GAP)))
+end
+
+local slots = strip:Slots({ columns = columns_for(width), size = SIZE, gap = GAP })
+slots:Set({ { icon = "home", value = "home" }, { icon = "star", value = "star" } })
+
+strip.Resized:Connect(function(new_width)
+    slots:SetLayout(columns_for(new_width))
+end)
+```
+
+- The size a `place` function gets is the screen in the units the game lays its own menus out in. The panel's
+  `zoom` is used as it is. So such a panel keeps its size beside the game's menus whatever interface size the
+  player chose.
+- `slots:SetLayout(columns, size)` changes how many cells stand in a row and how large a cell is. The cells
+  that exist are kept, and missing ones are made over the next frames.
+
+### Slots
+
+`container:Slots(options)` adds a block of square cells that each show a picture, as an inventory does. It
+works in a panel and in a window. Each cell shows a **look**: a table with a picture or an icon, and what
+you want back when the cell is clicked.
+
+```lua title="init.lua"
+local panel = ui.Panel({ anchor = "right", width = 220, when = "menu" })
+local slots = panel:Slots({ columns = 5, rows = 2, size = 36 })
+
+slots:Set({
+    { icon = "axe", value = "axe", tip = "An axe" },
+    { icon = "apple", value = "apple", count = 12 },
+})
+
+slots.Activated:Connect(function(value)
+    ui.Notify("You clicked " .. tostring(value))
+end)
+```
+
+`ui.Hovered()` gives the value of the slot under the mouse, or nothing. The
+[reference](/docs/reference/controls#waxslots) lists everything a look can hold and every signal of a block.
+
+### Room beside the game's screens
+
+<NextVersion>`ui.GameScreenChanged` is the part that is new. In Wax 0.2.1, ask `ui.GameScreen()` a few times
+a second.</NextVersion>
+
+`ui.FitGame` draws the game's own menus smaller, which leaves room beside them for panels. `ui.GameScreen()`
+says which of the game's screens is showing, and `ui.GameScreenChanged` fires when that changes. Listen to the
+signal, and do not ask every frame.
+
+```lua title="init.lua"
+local panel = ui.Panel({ anchor = "right", width = 220, when = "always", visible = false })
+panel:Label("Beside the inventory.")
+
+local fit = ui.FitGame({ scale = 0.85, enabled = false })
+
+ui.GameScreenChanged:Connect(function(name)
+    local beside = name == "UMG_MainMenu"
+    panel:SetVisible(beside)
+    fit:SetEnabled(beside)
+end)
+```
+
 Every function is listed in the [ui reference](/docs/reference/ui#waxoverlay).

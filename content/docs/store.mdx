@@ -1,0 +1,168 @@
+---
+title: The store
+description: game.Workshop reads the store on the station, and changes its prices, the places of its nodes and what a node needs.
+icon: Store
+---
+
+<NextVersion />
+
+The game calls the store on the station the **Workshop**. `game.Workshop` reads it and can change parts of
+it.
+
+```lua title="init.lua"
+task.spawn(function()
+    game.Workshop:Load()
+
+    for _, category in ipairs(game.Workshop:GetCategories()) do
+        print(category.Name, #game.Workshop:GetNodes(category.Id), "nodes")
+    end
+end)
+```
+
+Nothing here buys, researches or makes anything for the player.
+
+## How the store is built
+
+- A **category** is one screen of the store, such as the axes. Its `Id` is a name like `"Workshop_Axes"`.
+- A **node** is one thing on that screen that can be researched and then made. Its `Id` is a name like
+  `"Workshop_Axe_Printed"`.
+- A node has two prices: `Research`, paid once, and `Replicate`, paid for each one made. A price is a table
+  from a currency to an amount, such as `{ Credits = 100 }`.
+- A node can come after other nodes. With several, one of them bought is enough.
+- A **joint** is a node of no size that shows nothing and sells nothing. It only joins lines.
+
+## Read it
+
+| Function | What it gives |
+| --- | --- |
+| `game.Workshop:Load()` | Reads the whole store ahead of time, a little each frame. Only inside a [task](/docs/tasks). |
+| `game.Workshop:GetCategories()` | The categories, in the game's order. |
+| `game.Workshop:GetNodes(category)` | The nodes of one category, or of every category when you name none. |
+| `game.Workshop:GetNode(id)` | One node, or `nil`. |
+| `game.Workshop:GetCurrencies()` | The game's currencies. |
+
+Call `Load` first. Without it, the first `GetNodes` reads the whole store in one call, which holds the game
+up. With it, the store was read over 8 frames.
+
+A node is a plain table. These are the fields you will use most:
+
+| Field | What it is |
+| --- | --- |
+| `Id`, `Category` | Its name, and the `Id` of its category. |
+| `Name`, `Icon` | The name of what it sells and the path of its picture. |
+| `Item` | The item that is handed over, as [`game.Items`](/docs/items) names it. |
+| `Research`, `Replicate` | Its two prices. |
+| `Needs` | The nodes it comes after. |
+| `At`, `Size` | The middle of the node on its category's screen, and how large it is. |
+| `Joint` | `true` for a joint. |
+
+`GetNodes` builds its list anew each time. Keep what it returns, and ask again when `game.Workshop.Changed`
+fires with `"store"`.
+
+### Where the player stands
+
+These answer while `game.Workshop:IsReady()` is `true`, which is in a prospect and not at the title screen.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Store", width = 320, height = 180 })
+local credits = window:Field("Credits", "")
+local axe = window:Field("Printed axe", "")
+
+local function show()
+    if not game.Workshop:IsReady() then return end
+    credits:Set(game.Workshop:GetBalance("Credits"))
+    axe:Set(game.Workshop:GetState("Workshop_Axe_Printed") or "?")
+end
+
+show()
+game.Workshop.Changed:Connect(show)
+```
+
+| Function | What it gives |
+| --- | --- |
+| `game.Workshop:GetState(id)` | `"bought"`, `"available"` or `"locked"` for a node. What it costs is not part of the answer. |
+| `game.Workshop:GetBalance(currency)` | How many of a currency the account holds. Without a name, a table of them all. |
+
+`game.Workshop.Changed` fires with `"player"` when the player's side changed, and with `"store"` when the
+store's tables may read differently. Each of these calls asks the game, so call them when something is shown
+or pressed, not every frame.
+
+## Change a node
+
+`game.Workshop:Node(id)` gives a node to change. `Set` takes a table with what should be different.
+
+```lua title="init.lua"
+local axe = game.Workshop:Node("Workshop_Axe_Printed")
+
+local warnings = axe:Set({
+    research = { Credits = 50 },
+    replicate = { Credits = 10 },
+})
+
+for _, warning in ipairs(warnings) do
+    print(warning.Text)
+end
+```
+
+| In the table | What it changes |
+| --- | --- |
+| `research` | What researching the node costs. `{}` is a price of nothing. |
+| `replicate` | What each one made costs. |
+| `needs` | The nodes it comes after: one name, or a list of which one bought is enough. |
+| `at` | The middle of the node, such as `{ 1000, 1150 }`. |
+| `line` | How the lines into the node are drawn: `"elbow"`, `"elbow-down"`, `"straight"` or `"none"`. |
+| `level` | The level the node asks of the player. |
+
+- Everything is checked first. A currency or a node the game does not have, or needs that could never be
+  met, raise an error, and nothing is written.
+- `Set` gives back a list of warnings: a node it now lies on, a place outside the heights that fit the
+  screen, and the like. An empty list when there is nothing.
+- The change belongs to your mod. It goes back when your mod unloads, or with `axe:Reset()`.
+  `game.Workshop:Reset()` takes back everything your mod changed in the store.
+
+### Lay a category out
+
+`game.Workshop:Category(id):Arrange(shape, options)` gives every node of a category a place in a shape:
+`"line"`, `"grid"`, `"ring"`, `"arc"`, `"spiral"`, `"tree"` or `"path"`.
+
+```lua title="init.lua"
+local warnings = game.Workshop:Category("Workshop_Farming"):Arrange("grid", { columns = 6 })
+print(#warnings, "warnings")
+```
+
+The store's screen pans sideways only. A category can be as wide as you like, and its height has to fit the
+screen. `game.Workshop.Layout` has the shapes and the measures by themselves, for working places out without
+writing them.
+
+## What is switched off in this version
+
+Each of these is there and raises an error that says so:
+
+- Adding a node or a category. `category:Add`, `game.Workshop:AddCategory` and `game.Workshop:Define`
+  do not put anything into the game yet. `game.Workshop:Check(store)` does check a store you describe and
+  returns what is wrong with it, so a description can be written and tested now.
+- Hiding a node. `node:Hide` and `node:Show`.
+- A node that needs all of several nodes. The game only knows "one of".
+
+## What cannot be undone
+
+<Callout type="warn" title="The store belongs to the account">
+  What a player researches in the store is saved in their account, not in a character or a prospect. Wax
+  pays nothing back and takes nothing away. If a player researches a node while your mod has made it cheap,
+  it stays researched when the price goes back.
+</Callout>
+
+So say plainly on your mod's page what it changes in the store.
+
+## What has been seen
+
+Prices, places, parents, line styles and levels were changed on the host of a prospect and read back from
+the game, and `GetState` followed a new parent and a new level from the next frame on. These have not been
+looked at yet:
+
+- The store's own screen with a change on it. It was never open while this was tried, so how new lines and
+  the styles `"straight"` and `"none"` draw there is not known.
+- A game someone else hosts. A change is made in the tables on your PC only. The store is paid from each
+  player's own account, so the other players are expected to keep their own store.
+
+Every function is listed in [The store reference](/docs/reference/workshop).
