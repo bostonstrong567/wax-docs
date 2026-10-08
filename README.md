@@ -6,8 +6,6 @@ a project site under the path `/wax-docs`.
 
 The live site is at https://wax-icarus.duckdns.org/.
 
-Wax is an early version. The site says so on the home page, on the first docs page and on the install page.
-
 ## Run it
 
 You need Node 20.9 or newer. The workflow uses Node 24.

@@ -1,0 +1,40 @@
+---
+title: Game updates
+description: How Wax keeps up with each new build of ICARUS, and where the classes of the game can be read.
+icon: RefreshCw
+---
+
+ICARUS is updated most weeks. Each update can add classes, rename a variable or change a table. A server reads every
+new build of the game by itself and writes down what is in it, so the [Explorer](/explorer) and the editor's
+completion follow the game without anyone doing it by hand.
+
+## The state right now
+
+<GameStatus />
+
+## What happens on an update
+
+1. The server asks Steam every ten minutes which build of the dedicated server is out.
+2. For a new build it downloads the game's program, its debug file and its content files. A DLC arrives the same
+   way, as more content files.
+3. It reads every class the program declares and every blueprint class in the content, each with its parent, its
+   variables and its functions. The game is never started.
+4. It writes the result to the [Icarus SDK repository](https://github.com/bostonstrong567/icarus-sdk) and sends the
+   new list of classes to the Explorer on this site.
+
+A whole run takes about half an hour.
+
+## What you can read
+
+The [Icarus SDK repository](https://github.com/bostonstrong567/icarus-sdk) holds, for the newest build:
+
+| Folder | What is in it |
+| --- | --- |
+| `cpp` | Every class and struct as a C++ header to read: what it derives from, each variable with its place, each function with its parameters |
+| `types/icarus` | The same classes as definitions for the Lua language server |
+| `model` | The whole model as one JSON file, for tools |
+| `changes` | What each update changed: classes, members and table rows |
+| `pipeline` | The scripts that make all of it |
+
+The dedicated server is read because Steam gives it to anyone. Its code is the game's own. A few classes that only
+the game's client has are missing.

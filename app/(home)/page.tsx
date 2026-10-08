@@ -105,7 +105,7 @@ export default function HomePage() {
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-14 md:py-20">
       <section className="flex flex-col items-start gap-6">
         <span className="rounded-full border bg-fd-card px-3 py-1 text-xs font-medium text-fd-muted-foreground">
-          Early version
+          For ICARUS on Steam
         </span>
         <h1 className="max-w-2xl text-4xl font-semibold tracking-tight md:text-5xl">
           Lua mods for <span className="text-fd-primary">ICARUS</span>
