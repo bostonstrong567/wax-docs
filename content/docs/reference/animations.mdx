@@ -118,7 +118,7 @@ game.Animations:StopAll()
 
 An animation that is playing.
 
-You get one from [`animation:Play`](/docs/reference/animations#animation-play). Below, `play` stands for one of these.
+You get one from [`model:Play`](/docs/reference/ui#model-play), [`animation:Play`](/docs/reference/animations#animation-play). Below, `play` stands for one of these.
 
 <InExplorer id="WaxAnimationPlay" />
 
@@ -254,9 +254,9 @@ What a key adds. Everything is an offset from where the bone or the thing is wit
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `Pitch` (optional) | `number` | Degrees. |
-| `Yaw` (optional) | `number` | Degrees. |
-| `Roll` (optional) | `number` | Degrees. |
+| `Pitch` (optional) | `number` | Degrees about the character's right: positive tips back, negative leans forward. |
+| `Yaw` (optional) | `number` | Degrees about up: positive turns to the right. |
+| `Roll` (optional) | `number` | Degrees about forward. |
 | `X` (optional) | `number` |  |
 | `Y` (optional) | `number` |  |
 | `Z` (optional) | `number` |  |
@@ -274,16 +274,35 @@ Used by [`game.Animations:Define`](/docs/reference/animations#game-animations-de
 | --- | --- | --- |
 | `tracks` | `table<string, WaxAnimationKey[]>` | What moves, by name: a bone ("RightShoulder", or the name its skeleton gives it), or Self for the thing as a whole. |
 | `third` (optional) | `table<string, WaxAnimationKey[]>` | Tracks for the player's body seen in third person, when they should differ from tracks. |
+| `reach` (optional) | `table<string, WaxAnimationKey[]\|WaxReach>` | Where the end of a limb goes: RightHand, LeftHand, RightFoot or LeftFoot. The two bones above it are bent to get it there. |
+| `reach_from` (optional) | `"hand"` \| `"shoulder"` | "hand" (when omitted): a reach key adds to where the limb's end is. "shoulder": a key says where it is, forward, right and up of the limb's root, and the reach comes in from the game's pose and goes back to it. |
+| `reach_blend` (optional) | `number` \| `number[]` | With reach_from = "shoulder": the seconds a reach takes to come in from the game's pose, and to go back. One number for both, or \{ in, out \}. 0.15 when omitted. |
 | `length` (optional) | `number` | How long it runs, in seconds. The time of the last key when omitted. |
 | `loop` (optional) | `boolean` | True starts it again when it ends. |
 | `ease` (optional) | `"linear"` \| `"smooth"` \| `"in"` \| `"out"` \| `"snap"` | How keys are eased when a key does not say. "smooth" when omitted. |
 | `events` (optional) | `{ [1]: number, [2]: fun(play: WaxAnimationPlay) }[]` | Functions that run when the animation passes a time. |
 
+## WaxReach [#waxreach]
+
+A reach that also turns the end of the limb.
+
+<InExplorer id="WaxReach" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `keys` | [`WaxAnimationKey[]`](/docs/reference/animations#waxanimationkey) | X, Y and Z say where the end goes. Pitch, Yaw and Roll say how it is turned. |
+| `pin` (optional) | `boolean` | True holds the limb's end where the game has it, in place and in turn, whatever the bones above it do: a foot stays flat on the ground while the hips sink and turn. Keys are not needed then. |
+| `bend` (optional) | `{ X: number, Y: number, Z: number }` \| `number[]` | Which way the elbow or the knee points: forward, right and up. |
+| `bones` (optional) | `string[]` | The limb's own three bones, from its root to its end, for a skeleton that is not a person's. |
+| `straight` (optional) | `boolean` | True moves the end in straight lines between keys. When omitted it moves on a curve through them. |
+| `from` (optional) | `"hand"` \| `"shoulder"` | What this limb's keys are measured from, when it differs from the animation's reach_from. |
+| `turn` (optional) | `boolean` | True uses Pitch, Yaw and Roll: with reach_from = "shoulder" they are the turn of what the hand holds, as the character stands. Otherwise they are added. |
+
 ## WaxAnimationPlayOptions [#waxanimationplayoptions]
 
 What animation:Play takes besides the target.
 
-Used by [`animation:Play`](/docs/reference/animations#animation-play).
+Used by [`model:Play`](/docs/reference/ui#model-play), [`animation:Play`](/docs/reference/animations#animation-play).
 
 <InExplorer id="WaxAnimationPlayOptions" />
 
@@ -294,6 +313,7 @@ Used by [`animation:Play`](/docs/reference/animations#animation-play).
 | `weight` | `number` | How much of the movement is added. 1 when omitted. |
 | `keep` | `boolean` | True leaves a thing where its Self track put it when the animation ends. |
 | `done` | `fun(play: WaxAnimationPlay)` | Runs when the animation has run to its end. Not when it is stopped. |
+| `view` | `"first"` \| `"third"` | On the player's own character: the one view it shows in. Both when omitted. |
 
 ## WaxClipOptions [#waxclipoptions]
 
@@ -310,3 +330,5 @@ Used by [`game.Animations:Play`](/docs/reference/animations#game-animations-play
 | `start` | `number` | Where in the clip it starts, in seconds. |
 | `slot` | `string` | The slot a single sequence plays in. "DefaultSlot" when omitted. |
 | `loops` | `integer` | How often a single sequence plays. 1 when omitted. |
+| `part` | `string` \| `{ first?: string, third?: string }` | The part of a montage to play, by its name in the game, such as "Action_0". |
+| `match` | `boolean` | With first and third given: false lets each clip run at its own length. When omitted the body's clip is paced to last as long as the arms'. |

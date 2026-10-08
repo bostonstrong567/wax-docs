@@ -1616,6 +1616,40 @@ model:SetAnimation(animation: "walk"|"idle"|"blueprint"|string|false, speed?: nu
 
 <InExplorer id="WaxModel.SetAnimation" />
 
+### `model:Attach(shape, options?)` [#model-attach]
+
+Puts a shape from [`game.Assets:Mesh`](/docs/reference/assets#game-assets-mesh) or [`game.Assets:Model`](/docs/reference/assets#game-assets-model) on a socket or a bone of the model that shows: a tool in a hand, a hat on a head. The model has to be in the picture: wait for Loaded. It goes when another model is shown.
+
+```lua
+model:Attach(shape: WaxMesh, options?: { socket?: string, at?: table, turn?: table, scale?: number, material?: any })
+```
+
+| Parameter | Type |
+| --- | --- |
+| `shape` | [`WaxMesh`](/docs/reference/assets#waxmesh) |
+| `options` (optional) | `{ socket?: string, at?: table, turn?: table, scale?: number, material?: any }` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxModel.Attach" />
+
+### `model:Play(animation, options?)` [#model-play]
+
+Plays an animation from [`game.Animations:Define`](/docs/reference/animations#game-animations-define) on the model that shows, so it can be looked at from every side before it is used in the world. The model has to be in the picture: wait for Loaded. Give the look `facing = 0` for a mesh that faces along its own X, as the player's body does.
+
+```lua
+model:Play(animation: WaxAnimation, options?: WaxAnimationPlayOptions): WaxAnimationPlay
+```
+
+| Parameter | Type |
+| --- | --- |
+| `animation` | [`WaxAnimation`](/docs/reference/animations#waxanimation) |
+| `options` (optional) | [`WaxAnimationPlayOptions`](/docs/reference/animations#waxanimationplayoptions) |
+
+**Returns** [`WaxAnimationPlay`](/docs/reference/animations#waxanimationplay)
+
+<InExplorer id="WaxModel.Play" />
+
 ### `model:IsLoaded()` [#model-isloaded]
 
 True once the model given at the start or to Show is in the picture.
@@ -1759,6 +1793,7 @@ Used by [`ui.Window`](/docs/reference/ui#ui-window).
 | `nav` | [`WaxNav`](/docs/reference/ui#waxnav) | Gives the window pages, listed down the side or along the top. |
 | `nav_width` | `number` | Width of the side navigation column. |
 | `remember` | `boolean` | False stops Wax remembering the window's position and size between sessions. |
+| `pinned` | `boolean` | True keeps the window on the screen while the player plays, with the menu closed. It takes no clicks then, so the mouse stays with the game. With a menu open it is a window like any other. |
 | `key` | `string` | The key that shows and hides your mod's windows, such as "F6" or "Ctrl+K". The first window a mod makes decides. Without it Wax gives the mod a key, and the player can choose another on the mod's card of the Mods page. |
 
 ## WaxPageOptions [#waxpageoptions]

@@ -142,11 +142,36 @@ writing them.
 
 Each of these is there and raises an error that says so:
 
-- Adding a node or a category. `category:Add`, `game.Workshop:AddCategory` and `game.Workshop:Define`
-  do not put anything into the game yet. `game.Workshop:Check(store)` does check a store you describe and
-  returns what is wrong with it, so a description can be written and tested now.
+- A category of your own. `game.Workshop:AddCategory` raises an error that says so. A node in one of the
+  game's categories does work: see "A node of your own" below.
 - Hiding a node. `node:Hide` and `node:Show`.
 - A node that needs all of several nodes. The game only knows "one of".
+
+## A node of your own
+
+<Since version="0.3.8" />
+
+`game.Workshop:Define` puts nodes into the game's categories. This one sells an item the mod added, under the
+sickles, after the Larkwell sickle:
+
+```lua
+game.Workshop:Define({ categories = { { into = "Workshop_Sickles", nodes = { {
+    id = "Scythe",
+    gives = { item = "MyMod_Scythe" },          -- a row of D_ItemsStatic
+    needs = "Workshop_Sickle_Larkwell",
+    at = { 1550, 1150 }, line = "elbow",
+    research = { Credits = 500, Exotic1 = 750 },
+    replicate = { Credits = 200, Exotic1 = 250 },
+} } } } })
+```
+
+- The node shows with the item's own name and picture, its price, its lock and its line.
+- The game makes its store when the player arrives on the station and keeps the nodes it found then. When a
+  node joins or leaves while the player is there, Wax has the game make its store again, so the node can be
+  bought at once, and it is gone when the mod is switched off. The screen goes back to the category that was open.
+- What a player has researched is kept by the game, in the account, under the node's row name
+  (`<ModId>_<id>`). So never change an `id`.
+- `game.Workshop:Check(store)` returns what is wrong with a description without putting anything in.
 
 ## What cannot be undone
 

@@ -165,11 +165,11 @@ size and the checksum the text gives.
 Nothing checks the first Wax you download, unless you do. This is how.
 
 From the [release page](https://github.com/bostonstrong567/icarus-wax/releases/latest), download three files
-into one folder: `Wax-0.3.6.zip`, `Wax-0.3.6.manifest` and `Wax-0.3.6.manifest.sig`. Open PowerShell in that
+into one folder: `Wax-0.3.8.zip`, `Wax-0.3.8.manifest` and `Wax-0.3.8.manifest.sig`. Open PowerShell in that
 folder and paste this. Change the version in the first line to the one you downloaded.
 
 ```powershell
-$version = '0.3.6'
+$version = '0.3.8'
 $key = '8b37ac88ea0d9e8a8d239b731f1ba1d12fe163c605f6fe3c3933253e36421a953c5d04fdcb94e3934223e41aeb511593788140a7865c00ab2f6ad67746900d62'
 
 $point = [byte[]]($key -split '(..)' -ne '' | ForEach-Object { [Convert]::ToByte($_, 16) })

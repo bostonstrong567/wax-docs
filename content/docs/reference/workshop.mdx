@@ -591,7 +591,7 @@ One category of a described store. With `id` and `name` it is a new category. Wi
 
 ## WaxStoreSpec [#waxstorespec]
 
-A store as a mod describes it. This version of Wax checks such a description with [`game.Workshop:Check`](/docs/reference/workshop#game-workshop-check) and does not put it into the game: Define takes the same table and, in this version, ends in an error that says adding rows is not switched on.
+A store as a mod describes it. [`game.Workshop:Check`](/docs/reference/workshop#game-workshop-check) says what is wrong with it, and [`game.Workshop:Define`](/docs/reference/workshop#game-workshop-define) puts it into the game. A node added to one of the game's categories (`into`) shows there with its picture, price and line. When that happens while the player stands in the store, Wax has the game build its store again, so the node can be bought at once, and it goes again when the mod is switched off. What the account has researched is kept by the game under the node's row name, so it is still there after the mod was off for a while. A new category of a mod's own is not switched on in this version.
 
 Used by [`game.Workshop:Check`](/docs/reference/workshop#game-workshop-check), [`game.Workshop:Define`](/docs/reference/workshop#game-workshop-define).
 

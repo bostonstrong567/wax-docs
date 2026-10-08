@@ -82,6 +82,8 @@
    "text": "The fields of a creature, spawning one, and what the tables of the game say about a kind.",
    "types": [
     "WaxCreatureMembers",
+    "WaxCreatureModelSwap",
+    "WaxMountOptions",
     "WaxSpawnOptions",
     "WaxCreatureInfo",
     "WaxCreatureTameRule",
@@ -208,6 +210,7 @@
     "WaxAnimationKey",
     "WaxAnimationValues",
     "WaxAnimationSpec",
+    "WaxReach",
     "WaxAnimationPlayOptions",
     "WaxClipOptions"
    ],
@@ -504,6 +507,8 @@
   "Model:SetView": "WaxModel.SetView",
   "Model:Reset": "WaxModel.Reset",
   "Model:SetAnimation": "WaxModel.SetAnimation",
+  "Model:Attach": "WaxModel.Attach",
+  "Model:Play": "WaxModel.Play",
   "Model:IsLoaded": "WaxModel.IsLoaded",
   "Control:Destroy": "WaxControl.Destroy",
   "Control:SetVisible": "WaxControl.SetVisible",
@@ -638,6 +643,7 @@
   "game.Creatures:GetModel": "game.Creatures.GetModel",
   "game.Creatures:GetSaddles": "game.Creatures.GetSaddles",
   "game.Creatures:Spawn": "game.Creatures.Spawn",
+  "game.Creatures:SpawnMount": "game.Creatures.SpawnMount",
   "Look:Set": "WaxHighlightLook.Set",
   "Mark:Remove": "WaxHighlightMark.Remove",
   "Mark:Set": "WaxHighlightMark.Set",
@@ -713,6 +719,9 @@
   "PlayerItems:List": "WaxPlayerItems.List",
   "PlayerItems:Give": "WaxPlayerItems.Give",
   "PlayerItems:Take": "WaxPlayerItems.Take",
+  "Creature:SetModel": "WaxCreatureMembers.SetModel",
+  "Creature:ResetModel": "WaxCreatureMembers.ResetModel",
+  "Creature:Strike": "WaxCreatureMembers.Strike",
   "Creature:SetLevel": "WaxCreatureMembers.SetLevel",
   "Creature:Freeze": "WaxCreatureMembers.Freeze",
   "Creature:Unfreeze": "WaxCreatureMembers.Unfreeze",
@@ -1497,6 +1506,14 @@
      "optional": true,
      "text": "False stops Wax remembering the window's position and size between sessions.",
      "use": "local window = ui.Window({ remember = true })"
+    },
+    {
+     "id": "WaxWindowOptions.pinned",
+     "name": "pinned",
+     "type": "boolean",
+     "optional": true,
+     "text": "True keeps the window on the screen while the player plays, with the menu closed. It takes no clicks then, so the mouse stays with the game. With a menu open it is a window like any other.",
+     "use": "local window = ui.Window({ pinned = true })"
     },
     {
      "id": "WaxWindowOptions.key",
@@ -4549,6 +4566,49 @@
      "text": "Changes what plays: \"walk\", \"idle\", \"blueprint\", the game path of an animation, or false to stand still.",
      "ref": "/docs/reference/ui#model-setanimation",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nmodel:SetAnimation(animation, speed)"
+    },
+    {
+     "id": "WaxModel.Attach",
+     "name": "Attach",
+     "call": "model:Attach",
+     "params": [
+      {
+       "name": "shape",
+       "type": "WaxMesh"
+      },
+      {
+       "name": "options",
+       "type": "{ socket?: string, at?: table, turn?: table, scale?: number, material?: any }",
+       "optional": true
+      }
+     ],
+     "text": "Puts a shape from game.Assets:Mesh or game.Assets:Model on a socket or a bone of the model that shows: a tool in a hand, a hat on a head. The model has to be in the picture: wait for Loaded. It goes when another model is shown.",
+     "ref": "/docs/reference/ui#model-attach",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nmodel:Attach(shape, options)"
+    },
+    {
+     "id": "WaxModel.Play",
+     "name": "Play",
+     "call": "model:Play",
+     "params": [
+      {
+       "name": "animation",
+       "type": "WaxAnimation"
+      },
+      {
+       "name": "options",
+       "type": "WaxAnimationPlayOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxAnimationPlay"
+      }
+     ],
+     "text": "Plays an animation from game.Animations:Define on the model that shows, so it can be looked at from every side before it is used in the world. The model has to be in the picture: wait for Loaded. Give the look `facing = 0` for a mesh that faces along its own X, as the player's body does.",
+     "ref": "/docs/reference/ui#model-play",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)"
     },
     {
      "id": "WaxModel.IsLoaded",
@@ -9722,6 +9782,38 @@
      "text": "Puts a new wild creature into the world with the game's own spawn, for the host only: in someone else's game it raises an error that says so. kind is a variant such as \"Conifer_Wolf\" or \"Deer\", or a kind that has one variant. A kind with several raises an error that lists them. place is a position, an actor or game.Me. When it is omitted the creature goes six metres in front of your character, and the options may stand in its place. Wax asks the game for ground a creature can walk on near the place, within 5 metres to the sides and at any height, and puts the creature a little above it. Where the game has none it raises an error and nothing is spawned. Inside a task Spawn waits until the game has given the creature its level, two seconds at most, and then answers the creature. Outside a task it answers at once, and Level and Health are right a few frames later. It answers nil and the reason when the creature left the world before it was finished. A tamed variant is refused in this version of Wax. The game's call took 3 to 4 ms when it was timed, and 18 ms once: a kind that is not in memory is loaded by the game inside the call. What is spawned stays when the mod unloads, unless the option keep is false.",
      "ref": "/docs/reference/game#game-creatures-spawn",
      "use": "local creature, result = game.Creatures:Spawn(kind, place, options)"
+    },
+    {
+     "id": "game.Creatures.SpawnMount",
+     "name": "SpawnMount",
+     "call": "game.Creatures:SpawnMount",
+     "params": [
+      {
+       "name": "kind",
+       "type": "string"
+      },
+      {
+       "name": "place",
+       "type": "WaxInstance|WaxMe|{ X: number, Y: number, Z: number }",
+       "optional": true
+      },
+      {
+       "name": "options",
+       "type": "WaxMountOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxCreature?"
+      },
+      {
+       "type": "string?"
+      }
+     ],
+     "text": "Puts a tamed animal into the world that is yours and can be ridden at once, for the host only. kind is its set-up row such as \"Mount_Moa\" or \"Mount_Horse\", or a kind such as \"Moa\". It is made with the game's own spawn, named, given to you, and a saddle is put in its saddle slot, which is what makes the game give it a seat: after that the game's own \"ride\" works on it. place is a position or an actor. When it is omitted the mount comes a few metres in front of you, and the options may stand in its place. Where the game knows no ground to walk on under the place, as on a platform a mod built, the mount is made on the ground below and brought up. Inside a task it answers once the saddle is on, with the reason as a second value when the saddle did not go on. Outside a task it answers at once and finishes a moment later. The mount is saved with the prospect like any other.",
+     "ref": "/docs/reference/game#game-creatures-spawnmount",
+     "use": "local creature, result = game.Creatures:SpawnMount(kind, place, options)"
     }
    ]
   },
@@ -13617,9 +13709,72 @@
      "type": "boolean?",
      "text": "True while the creature is held frozen, by Freeze or by the game itself. nil on a creature whose class has no such flag.",
      "use": "local creature = game.Creatures:GetNearest()\nprint(creature.IsFrozen)"
+    },
+    {
+     "id": "WaxCreatureMembers.HasModel",
+     "name": "HasModel",
+     "type": "boolean",
+     "text": "True while the creature wears a model that SetModel gave it.",
+     "use": "local creature = game.Creatures:GetNearest()\nprint(creature.HasModel)"
     }
    ],
    "funcs": [
+    {
+     "id": "WaxCreatureMembers.SetModel",
+     "name": "SetModel",
+     "call": "creature:SetModel",
+     "params": [
+      {
+       "name": "model",
+       "type": "WaxCreatureModelSwap"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "worn",
+       "text": "Always true."
+      }
+     ],
+     "text": "Gives the creature another body: a skeletal mesh of the game or of your mod's own content, with its materials. It goes on moving as before, because the new body is on the same skeleton: a mesh on another skeleton raises an error that names both. The game writes a mount's own skin again now and then, so Wax looks once a second and puts the model back. When your mod unloads, or on ResetModel, the creature has its own body again. It works for the host and for a client alike, and each player only sees it in their own game.",
+     "ref": "/docs/reference/creature#creature-setmodel",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal worn = creature:SetModel(model)"
+    },
+    {
+     "id": "WaxCreatureMembers.ResetModel",
+     "name": "ResetModel",
+     "call": "creature:ResetModel",
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "changed",
+       "text": "False when it wore no model."
+      }
+     ],
+     "text": "Gives the creature the body it had before SetModel.",
+     "ref": "/docs/reference/creature#creature-resetmodel",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal changed = creature:ResetModel()"
+    },
+    {
+     "id": "WaxCreatureMembers.Strike",
+     "name": "Strike",
+     "call": "creature:Strike",
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "started",
+       "text": "False when the mount is in the middle of another move, or the game gives its kind no attack."
+      },
+      {
+       "type": "string?",
+       "name": "why",
+       "text": "The reason, when it did not start."
+      }
+     ],
+     "text": "Makes a mount attack, for the host only, as the game does when its rider attacks: it plays the mount's own attack, takes the stamina that costs, and hits what stands in front of it at the strike. The game keeps this for mounts with the talent for it. Strike asks for no talent.",
+     "ref": "/docs/reference/creature#creature-strike",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal started, why = creature:Strike()"
+    },
     {
      "id": "WaxCreatureMembers.SetLevel",
      "name": "SetLevel",
@@ -13708,6 +13863,101 @@
      "text": "Takes the creature out of the world, for the host only, alive or dead, with nothing left behind. The game does it a moment later, not in the same frame: IsValid() says when it is gone. The game replaces a dead creature by a corpse a few seconds after its death, one to three seconds when it was timed. The corpse is no creature: it is not in game.Creatures, and Remove raises an error on the creature it was, which is gone by then. A dead creature that was removed before that left no corpse.",
      "ref": "/docs/reference/creature#creature-remove",
      "use": "local creature = game.Creatures:GetNearest()\nlocal asked = creature:Remove()"
+    }
+   ]
+  },
+  {
+   "id": "WaxCreatureModelSwap",
+   "name": "WaxCreatureModelSwap",
+   "title": "WaxCreatureModelSwap",
+   "kind": "data",
+   "group": "creature",
+   "text": "What creature:SetModel takes: the body the creature is to wear in place of its own.",
+   "ref": "/docs/reference/creature#waxcreaturemodelswap",
+   "guide": {
+    "href": "/docs/creatures",
+    "title": "Creatures"
+   },
+   "users": [
+    "WaxCreatureMembers.SetModel"
+   ],
+   "props": [
+    {
+     "id": "WaxCreatureModelSwap.mesh",
+     "name": "mesh",
+     "type": "SkeletalMesh|string",
+     "text": "The skeletal mesh to wear: one from game.Assets:Load or mod.Content:Load, or its path. It has to be built on the same skeleton as the creature's own mesh, or the creature's animations would stop.",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal worn = creature:SetModel({ mesh = value })"
+    },
+    {
+     "id": "WaxCreatureModelSwap.materials",
+     "name": "materials",
+     "type": "table<integer, MaterialInterface|string>",
+     "optional": true,
+     "text": "Materials by slot, 1 first: from game.Assets, mod.Content or game.Assets:Material, or their paths. A slot that is left out shows what the mesh itself names.",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal worn = creature:SetModel({ materials = value })"
+    },
+    {
+     "id": "WaxCreatureModelSwap.fur",
+     "name": "fur",
+     "type": "boolean",
+     "optional": true,
+     "text": "False hides the creature's coat of fur or feathers, which the game grows on a body of its own and would draw over the new one. Left as it is when omitted.",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal worn = creature:SetModel({ fur = true })"
+    },
+    {
+     "id": "WaxCreatureModelSwap.saddle",
+     "name": "saddle",
+     "type": "boolean",
+     "optional": true,
+     "text": "False hides the saddle the game shows on a mount, for a model that has one of its own. The rider still sits on it. Left as it is when omitted.",
+     "use": "local creature = game.Creatures:GetNearest()\nlocal worn = creature:SetModel({ saddle = true })"
+    }
+   ]
+  },
+  {
+   "id": "WaxMountOptions",
+   "name": "WaxMountOptions",
+   "title": "WaxMountOptions",
+   "kind": "data",
+   "group": "creature",
+   "text": "What game.Creatures:SpawnMount takes besides the kind and the place.",
+   "ref": "/docs/reference/creature#waxmountoptions",
+   "users": [
+    "game.Creatures.SpawnMount"
+   ],
+   "props": [
+    {
+     "id": "WaxMountOptions.name",
+     "name": "name",
+     "type": "string",
+     "optional": true,
+     "text": "The mount's name, as the player sees it.",
+     "use": "local creature, result = game.Creatures:SpawnMount(kind, place, { name = \"text\" })"
+    },
+    {
+     "id": "WaxMountOptions.saddle",
+     "name": "saddle",
+     "type": "string|false",
+     "optional": true,
+     "text": "The saddle item it wears, such as \"Saddle_Standard\". The game only lets a mount with a saddle be ridden. \"Saddle_Standard\" when omitted, false for none.",
+     "use": "local creature, result = game.Creatures:SpawnMount(kind, place, { saddle = value })"
+    },
+    {
+     "id": "WaxMountOptions.owner",
+     "name": "owner",
+     "type": "boolean",
+     "optional": true,
+     "text": "False leaves it with no owner, to be claimed in the game. Yours when omitted.",
+     "use": "local creature, result = game.Creatures:SpawnMount(kind, place, { owner = true })"
+    },
+    {
+     "id": "WaxMountOptions.facing",
+     "name": "facing",
+     "type": "{ Yaw: number }",
+     "optional": true,
+     "text": "Which way it looks. Toward you when omitted.",
+     "use": "local creature, result = game.Creatures:SpawnMount(kind, place, { facing = value })"
     }
    ]
   },
@@ -16897,7 +17147,7 @@
    "title": "WaxStoreSpec",
    "kind": "data",
    "group": "workshop",
-   "text": "A store as a mod describes it. This version of Wax checks such a description with game.Workshop:Check and does not put it into the game: Define takes the same table and, in this version, ends in an error that says adding rows is not switched on.",
+   "text": "A store as a mod describes it. game.Workshop:Check says what is wrong with it, and game.Workshop:Define puts it into the game. A node added to one of the game's categories (`into`) shows there with its picture, price and line. When that happens while the player stands in the store, Wax has the game build its store again, so the node can be bought at once, and it goes again when the mod is switched off. What the account has researched is kept by the game under the node's row name, so it is still there after the mod was off for a while. A new category of a mod's own is not switched on in this version.",
    "ref": "/docs/reference/workshop#waxstorespec",
    "guide": {
     "href": "/docs/store",
@@ -18781,21 +19031,21 @@
      "name": "Pitch",
      "type": "number",
      "optional": true,
-     "text": "Degrees."
+     "text": "Degrees about the character's right: positive tips back, negative leans forward."
     },
     {
      "id": "WaxAnimationValues.Yaw",
      "name": "Yaw",
      "type": "number",
      "optional": true,
-     "text": "Degrees."
+     "text": "Degrees about up: positive turns to the right."
     },
     {
      "id": "WaxAnimationValues.Roll",
      "name": "Roll",
      "type": "number",
      "optional": true,
-     "text": "Degrees."
+     "text": "Degrees about forward."
     },
     {
      "id": "WaxAnimationValues.X",
@@ -18852,6 +19102,30 @@
      "use": "local animation = game.Animations:Define(name, { third = value })"
     },
     {
+     "id": "WaxAnimationSpec.reach",
+     "name": "reach",
+     "type": "table<string, WaxAnimationKey[]|WaxReach>",
+     "optional": true,
+     "text": "Where the end of a limb goes: RightHand, LeftHand, RightFoot or LeftFoot. The two bones above it are bent to get it there.",
+     "use": "local animation = game.Animations:Define(name, { reach = value })"
+    },
+    {
+     "id": "WaxAnimationSpec.reach_from",
+     "name": "reach_from",
+     "type": "\"hand\"|\"shoulder\"",
+     "optional": true,
+     "text": "\"hand\" (when omitted): a reach key adds to where the limb's end is. \"shoulder\": a key says where it is, forward, right and up of the limb's root, and the reach comes in from the game's pose and goes back to it.",
+     "use": "local animation = game.Animations:Define(name, { reach_from = \"hand\" })"
+    },
+    {
+     "id": "WaxAnimationSpec.reach_blend",
+     "name": "reach_blend",
+     "type": "number|number[]",
+     "optional": true,
+     "text": "With reach_from = \"shoulder\": the seconds a reach takes to come in from the game's pose, and to go back. One number for both, or { in, out }. 0.15 when omitted.",
+     "use": "local animation = game.Animations:Define(name, { reach_blend = value })"
+    },
+    {
      "id": "WaxAnimationSpec.length",
      "name": "length",
      "type": "number",
@@ -18886,6 +19160,65 @@
    ]
   },
   {
+   "id": "WaxReach",
+   "name": "WaxReach",
+   "title": "WaxReach",
+   "kind": "data",
+   "group": "animations",
+   "text": "A reach that also turns the end of the limb.",
+   "ref": "/docs/reference/animations#waxreach",
+   "props": [
+    {
+     "id": "WaxReach.keys",
+     "name": "keys",
+     "type": "WaxAnimationKey[]",
+     "text": "X, Y and Z say where the end goes. Pitch, Yaw and Roll say how it is turned."
+    },
+    {
+     "id": "WaxReach.pin",
+     "name": "pin",
+     "type": "boolean",
+     "optional": true,
+     "text": "True holds the limb's end where the game has it, in place and in turn, whatever the bones above it do: a foot stays flat on the ground while the hips sink and turn. Keys are not needed then."
+    },
+    {
+     "id": "WaxReach.bend",
+     "name": "bend",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "Which way the elbow or the knee points: forward, right and up."
+    },
+    {
+     "id": "WaxReach.bones",
+     "name": "bones",
+     "type": "string[]",
+     "optional": true,
+     "text": "The limb's own three bones, from its root to its end, for a skeleton that is not a person's."
+    },
+    {
+     "id": "WaxReach.straight",
+     "name": "straight",
+     "type": "boolean",
+     "optional": true,
+     "text": "True moves the end in straight lines between keys. When omitted it moves on a curve through them."
+    },
+    {
+     "id": "WaxReach.from",
+     "name": "from",
+     "type": "\"hand\"|\"shoulder\"",
+     "optional": true,
+     "text": "What this limb's keys are measured from, when it differs from the animation's reach_from."
+    },
+    {
+     "id": "WaxReach.turn",
+     "name": "turn",
+     "type": "boolean",
+     "optional": true,
+     "text": "True uses Pitch, Yaw and Roll: with reach_from = \"shoulder\" they are the turn of what the hand holds, as the character stands. Otherwise they are added."
+    }
+   ]
+  },
+  {
    "id": "WaxAnimationPlayOptions",
    "name": "WaxAnimationPlayOptions",
    "title": "WaxAnimationPlayOptions",
@@ -18894,6 +19227,7 @@
    "text": "What animation:Play takes besides the target.",
    "ref": "/docs/reference/animations#waxanimationplayoptions",
    "users": [
+    "WaxModel.Play",
     "WaxAnimation.Play"
    ],
    "props": [
@@ -18903,7 +19237,7 @@
      "type": "number",
      "optional": true,
      "text": "How fast it runs. 1 when omitted.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { rate = 1 })"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { rate = 1 })"
     },
     {
      "id": "WaxAnimationPlayOptions.loop",
@@ -18911,7 +19245,7 @@
      "type": "boolean",
      "optional": true,
      "text": "Overrides the animation's own loop.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { loop = true })"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { loop = true })"
     },
     {
      "id": "WaxAnimationPlayOptions.weight",
@@ -18919,7 +19253,7 @@
      "type": "number",
      "optional": true,
      "text": "How much of the movement is added. 1 when omitted.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { weight = 1 })"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { weight = 1 })"
     },
     {
      "id": "WaxAnimationPlayOptions.keep",
@@ -18927,7 +19261,7 @@
      "type": "boolean",
      "optional": true,
      "text": "True leaves a thing where its Self track put it when the animation ends.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { keep = true })"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { keep = true })"
     },
     {
      "id": "WaxAnimationPlayOptions.done",
@@ -18935,7 +19269,15 @@
      "type": "fun(play: WaxAnimationPlay)",
      "optional": true,
      "text": "Runs when the animation has run to its end. Not when it is stopped.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { done = function(play) end })"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { done = function(play) end })"
+    },
+    {
+     "id": "WaxAnimationPlayOptions.view",
+     "name": "view",
+     "type": "\"first\"|\"third\"",
+     "optional": true,
+     "text": "On the player's own character: the one view it shows in. Both when omitted.",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, { view = \"first\" })"
     }
    ]
   },
@@ -18948,16 +19290,17 @@
    "text": "An animation that is playing.",
    "ref": "/docs/reference/animations#waxanimationplay",
    "makers": [
+    "WaxModel.Play",
     "WaxAnimation.Play"
    ],
-   "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)",
+   "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)",
    "props": [
     {
      "id": "WaxAnimationPlay.Animation",
      "name": "Animation",
      "type": "WaxAnimation",
      "text": "An animation written as keys, as game.Animations:Define gives it. It can play on any number of targets at once.",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nprint(play.Animation)"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)\nprint(play.Animation)"
     }
    ],
    "funcs": [
@@ -18967,7 +19310,7 @@
      "call": "play:Stop",
      "text": "Stops it now. A thing moved by a Self track goes back to where it was.",
      "ref": "/docs/reference/animations#play-stop",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nplay:Stop()"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)\nplay:Stop()"
     },
     {
      "id": "WaxAnimationPlay.IsPlaying",
@@ -18979,7 +19322,7 @@
       }
      ],
      "ref": "/docs/reference/animations#play-isplaying",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nlocal result = play:IsPlaying()"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)\nlocal result = play:IsPlaying()"
     },
     {
      "id": "WaxAnimationPlay.GetTime",
@@ -18992,7 +19335,7 @@
       }
      ],
      "ref": "/docs/reference/animations#play-gettime",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nlocal seconds = play:GetTime()"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)\nlocal seconds = play:GetTime()"
     },
     {
      "id": "WaxAnimationPlay.SetRate",
@@ -19006,7 +19349,7 @@
       }
      ],
      "ref": "/docs/reference/animations#play-setrate",
-     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nplay:SetRate(rate)"
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal model = window:Model(options)\nlocal play = model:Play(animation, options)\nplay:SetRate(rate)"
     }
    ]
   },
@@ -19124,6 +19467,22 @@
      "optional": true,
      "text": "How often a single sequence plays. 1 when omitted.",
      "use": "local result = game.Animations:Play(target, clip, { loops = 1 })"
+    },
+    {
+     "id": "WaxClipOptions.part",
+     "name": "part",
+     "type": "string|{ first?: string, third?: string }",
+     "optional": true,
+     "text": "The part of a montage to play, by its name in the game, such as \"Action_0\".",
+     "use": "local result = game.Animations:Play(target, clip, { part = value })"
+    },
+    {
+     "id": "WaxClipOptions.match",
+     "name": "match",
+     "type": "boolean",
+     "optional": true,
+     "text": "With first and third given: false lets each clip run at its own length. When omitted the body's clip is paced to last as long as the arms'.",
+     "use": "local result = game.Animations:Play(target, clip, { match = true })"
     }
    ]
   },
@@ -19623,6 +19982,46 @@
      "optional": true,
      "text": "How long it runs. Until it is stopped when omitted.",
      "use": "local trail = game.Effects:Trail(on, { life = 1 })"
+    },
+    {
+     "id": "WaxTrailOptions.width",
+     "name": "width",
+     "type": "number",
+     "optional": true,
+     "text": "Makes it a streak this wide along the middle of the edge, always turned to face the view. Without it the ribbon lies between the edge's two ends, and a cut that comes straight at the view shows it from the side, as a line.",
+     "use": "local trail = game.Effects:Trail(on, { width = 1 })"
+    },
+    {
+     "id": "WaxTrailOptions.with_view",
+     "name": "with_view",
+     "type": "boolean",
+     "optional": true,
+     "text": "True keeps the trail with the view, as the arms of first person are, instead of leaving it behind in the world. For something held in first person.",
+     "use": "local trail = game.Effects:Trail(on, { with_view = true })"
+    },
+    {
+     "id": "WaxTrailOptions.delay",
+     "name": "delay",
+     "type": "number",
+     "optional": true,
+     "text": "It starts this many seconds from now. A swing winds up first, and a trail that only runs during the cut is one clean arc. `life` counts from when it starts.",
+     "use": "local trail = game.Effects:Trail(on, { delay = 1 })"
+    },
+    {
+     "id": "WaxTrailOptions.embers",
+     "name": "embers",
+     "type": "number|{ rate?: number, size?: number, life?: number, speed?: number, rise?: number }",
+     "optional": true,
+     "text": "Small glowing bits that come off the edge while it moves: how many a second, or a table. They drift, rise and shrink to nothing. None when omitted.",
+     "use": "local trail = game.Effects:Trail(on, { embers = value })"
+    },
+    {
+     "id": "WaxTrailOptions.material",
+     "name": "material",
+     "type": "WaxInstance",
+     "optional": true,
+     "text": "A material of your own in place of the plain glowing one, from game.Assets:Material. A thing held in first person is drawn bent toward the screen by its material, and a trail only lies on it when its material bends the same way.",
+     "use": "local trail = game.Effects:Trail(on, { material = value })"
     }
    ]
   },

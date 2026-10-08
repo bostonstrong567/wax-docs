@@ -30,6 +30,50 @@ Below, `creature` stands for one of these.
 | `IsTamed` | `boolean` | True for an animal that has been tamed: a mount, a pet or livestock. The game makes these from classes built on [`IcarusMountCharacter`](/explorer?game=IcarusMountCharacter), and that is what is looked at. A speeder bike counts as one, because the game builds it the same way. |
 | `CanBeTamed` | `boolean?` | True when a taming rule of the game names its variant, as the young animal or as the grown one, and it is not tamed already. It says what the game's data has, not whether a taming would work right now. nil when the game's tables cannot be read. |
 | `IsFrozen` | `boolean?` | True while the creature is held frozen, by Freeze or by the game itself. nil on a creature whose class has no such flag. |
+| `HasModel` | `boolean` | True while the creature wears a model that SetModel gave it. |
+
+### `creature:SetModel(model)` [#creature-setmodel]
+
+Gives the creature another body: a skeletal mesh of the game or of your mod's own content, with its materials. It goes on moving as before, because the new body is on the same skeleton: a mesh on another skeleton raises an error that names both. The game writes a mount's own skin again now and then, so Wax looks once a second and puts the model back. When your mod unloads, or on ResetModel, the creature has its own body again. It works for the host and for a client alike, and each player only sees it in their own game.
+
+```lua
+creature:SetModel(model: WaxCreatureModelSwap): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `model` | [`WaxCreatureModelSwap`](/docs/reference/creature#waxcreaturemodelswap) |
+
+**Returns** `boolean` (`worn`) Always true.
+
+<InExplorer id="WaxCreatureMembers.SetModel" />
+
+### `creature:ResetModel()` [#creature-resetmodel]
+
+Gives the creature the body it had before SetModel.
+
+```lua
+creature:ResetModel(): boolean
+```
+
+**Returns** `boolean` (`changed`) False when it wore no model.
+
+<InExplorer id="WaxCreatureMembers.ResetModel" />
+
+### `creature:Strike()` [#creature-strike]
+
+Makes a mount attack, for the host only, as the game does when its rider attacks: it plays the mount's own attack, takes the stamina that costs, and hits what stands in front of it at the strike. The game keeps this for mounts with the talent for it. Strike asks for no talent.
+
+```lua
+creature:Strike(): boolean, string?
+```
+
+**Returns**
+
+- `boolean` (`started`) False when the mount is in the middle of another move, or the game gives its kind no attack.
+- `string?` (`why`) The reason, when it did not start.
+
+<InExplorer id="WaxCreatureMembers.Strike" />
 
 ### `creature:SetLevel(level)` [#creature-setlevel]
 
@@ -98,6 +142,36 @@ creature:Remove(): boolean
 **Returns** `boolean` (`asked`) Always true.
 
 <InExplorer id="WaxCreatureMembers.Remove" />
+
+## WaxCreatureModelSwap [#waxcreaturemodelswap]
+
+What creature:SetModel takes: the body the creature is to wear in place of its own.
+
+Used by [`creature:SetModel`](/docs/reference/creature#creature-setmodel).
+
+<InExplorer id="WaxCreatureModelSwap" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `mesh` | [`SkeletalMesh`](/explorer?game=SkeletalMesh) \| `string` | The skeletal mesh to wear: one from [`game.Assets:Load`](/docs/reference/assets#game-assets-load) or mod.Content:Load, or its path. It has to be built on the same skeleton as the creature's own mesh, or the creature's animations would stop. |
+| `materials` (optional) | `table<integer, MaterialInterface\|string>` | Materials by slot, 1 first: from game.Assets, mod.Content or [`game.Assets:Material`](/docs/reference/assets#game-assets-material), or their paths. A slot that is left out shows what the mesh itself names. |
+| `fur` (optional) | `boolean` | False hides the creature's coat of fur or feathers, which the game grows on a body of its own and would draw over the new one. Left as it is when omitted. |
+| `saddle` (optional) | `boolean` | False hides the saddle the game shows on a mount, for a model that has one of its own. The rider still sits on it. Left as it is when omitted. |
+
+## WaxMountOptions [#waxmountoptions]
+
+What [`game.Creatures:SpawnMount`](/docs/reference/game#game-creatures-spawnmount) takes besides the kind and the place.
+
+Used by [`game.Creatures:SpawnMount`](/docs/reference/game#game-creatures-spawnmount).
+
+<InExplorer id="WaxMountOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | The mount's name, as the player sees it. |
+| `saddle` | `string` \| `false` | The saddle item it wears, such as "Saddle_Standard". The game only lets a mount with a saddle be ridden. "Saddle_Standard" when omitted, false for none. |
+| `owner` | `boolean` | False leaves it with no owner, to be claimed in the game. Yours when omitted. |
+| `facing` | `{ Yaw: number }` | Which way it looks. Toward you when omitted. |
 
 ## WaxSpawnOptions [#waxspawnoptions]
 

@@ -35,6 +35,7 @@
     "assets",
     "blueprints",
     "animations",
+    "mounts",
     "---Running code---",
     "tasks",
     "signals",

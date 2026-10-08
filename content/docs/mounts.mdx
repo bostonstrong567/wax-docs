@@ -1,0 +1,159 @@
+---
+title: Mounts and creature models
+description: Call a mount that is yours and can be ridden at once, give a creature another body, and make a mount strike.
+icon: Bird
+---
+
+<Since version="0.3.8" />
+
+Three things for mods that deal with animals you ride: a mount made in one call, a creature that wears another
+model, and a mount that attacks when you tell it to. Together they are what a mod needs to add a mount of its own
+to the game.
+
+```lua title="init.lua"
+task.spawn(function()
+    local mount, why = game.Creatures:SpawnMount("Mount_Moa", { name = "Dusty" })
+    if not mount then
+        print("No mount:", why)
+        return
+    end
+    print("Your mount is here. Walk up to it and ride.")
+end)
+```
+
+## A mount in one call
+
+`game.Creatures:SpawnMount(kind, place, options)` puts a tamed animal into the world, for the host of a session.
+`kind` is the animal's set-up row, such as `"Mount_Moa"` or `"Mount_Horse"`, or a kind such as `"Moa"`.
+
+It does what the game does when a taming ends, and then the two things a player would do by hand:
+
+1. The animal is made with the game's own spawn, a few metres in front of you or at the place you give.
+2. It gets its name and you become its owner.
+3. A saddle goes into its saddle slot. That is what makes the game give a mount its seat. Without a saddle the
+   game does not offer to ride it.
+
+After that it is an ordinary mount of the game: the game's own prompt to ride it works, it follows you, and it is
+saved with the prospect.
+
+| Option | What it does |
+| --- | --- |
+| `name` | The mount's name. |
+| `saddle` | The saddle item it wears. `"Saddle_Standard"` when left out, `false` for none. |
+| `owner` | `false` leaves it with no owner, to be claimed in the game. |
+| `facing` | Which way it looks, as `{ Yaw = 90 }`. Toward you when left out. |
+
+Inside a task the call answers once the saddle is on. When the saddle did not go on, the mount still comes back,
+with the reason as a second value. Outside a task it answers at once and finishes a moment later.
+
+Where the game knows no ground to walk on, as on a platform a mod built high in the air, the mount is made on the
+ground below and brought up to the place.
+
+## Another body
+
+`creature:SetModel(model)` gives a creature another skeletal mesh to wear, with its materials. The creature goes
+on walking, running and being ridden as before.
+
+```lua
+local content = mod.Content
+
+local function dress(creature)
+    creature:SetModel({
+        mesh = content:Load("SK_Strider"),
+        materials = { [1] = content:Load("M_Strider") },
+        fur = false,
+        saddle = false,
+    })
+end
+
+for _, creature in ipairs(game.Creatures:GetTamed("Moa")) do
+    if not creature.HasModel then dress(creature) end
+end
+```
+
+| Field | What it is |
+| --- | --- |
+| `mesh` | The skeletal mesh: from `game.Assets:Load`, from `mod.Content:Load`, or a path. |
+| `materials` | Materials by slot, 1 first. A slot you leave out shows what the mesh itself names. |
+| `fur` | `false` hides the creature's coat of fur or feathers. The game grows it on a body of its own and would draw it over the new one. |
+| `saddle` | `false` hides the saddle the game shows on a mount, for a model that has one of its own. The rider still sits on it. |
+
+Three rules keep this safe:
+
+- **The mesh has to be on the creature's own skeleton.** A creature's animations belong to one skeleton. A mesh
+  built on another one would stand still, so `SetModel` refuses it and names both skeletons.
+- **Wax puts the model back.** The game writes a mount's own skin again now and then, a second after it appears
+  and whenever its looks are worked out again. Wax looks once a second and puts your model back on.
+- **It undoes itself.** When your mod unloads, or on `creature:ResetModel()`, the creature has its own body
+  again. `creature.HasModel` says whether it wears one.
+
+`SetModel` works for a client as well as for the host. Each player sees it only in their own game, so everybody
+who should see the model needs the mod.
+
+## A mount that strikes
+
+`mount:Strike()` makes a mount attack, for the host. It is what the game does when the rider of a mount attacks:
+the mount plays its own attack, pays the stamina for it, and hits what stands in front of it at the strike. The
+game keeps that for mounts with the talent for it. `Strike` asks for no talent.
+
+```lua
+local mine = nil    -- the mount you ride, kept by your mod
+
+ui.Hotkey("LeftMouseButton", function()
+    if ui.IsOpen() or not mine or not mine:IsValid() then return end
+    local started, why = mine:Strike()
+    if not started then print("Not now:", why) end
+end)
+```
+
+It answers `false` and the reason while the mount is in the middle of another move, and for a kind of mount the
+game gives no attack.
+
+## A model of your own
+
+The mesh for `SetModel` comes from a pak made with the Unreal editor ([Game content of your own](/docs/game-content)).
+A model from a 3D program has no bones the game knows, so it has to be bound to the skeleton of the animal it
+replaces. These are the steps the Strider, the example mount, was made with:
+
+1. **Pick the animal.** Take one whose shape is close: two legs for two legs, four for four. Its skeleton decides
+   which bones your model can move, and its set-up row is what you pass to `SpawnMount`.
+2. **Place the joints.** For each bone of that skeleton, mark where the same joint is in your model: hips, knees,
+   ankles, the line of the spine, the neck, the head. Lay them through the model as the animal stands in the
+   game, not as its skeleton lies at rest.
+3. **Reshape to the bone lengths.** The game's animations carry the animal's own bone lengths. A leg that is
+   longer or shorter than the animal's gets pushed out at its joints. So stretch each part of the model evenly
+   between its two joints until the joints sit where the animal's are, and bind that shape.
+4. **Bind and export.** Give every point of the model its bones, with a soft blend at each joint, and write an FBX
+   whose bones have the names and the turns of the game's skeleton.
+5. **Import onto the game's skeleton.** In the Unreal project, import the FBX as a skeletal mesh and choose the
+   game's own skeleton asset for it. A copy of the skeleton in your mod's folder does not work: the creature's
+   animations only run on the one the game has.
+6. **Use the game's creature material.** A material built in the stock editor draws grey in ICARUS. Make yours a
+   material instance of the game's creature material and set its three pictures: `Color`, `Normal` and `MRO`.
+7. **Cook and load.** Build the pak, then `mod.Content:Load` and `SetModel`.
+
+To look at the result before it walks around, show it in a window with the animal's own animations:
+
+```lua
+local content = mod.Content
+content:Load("SK_Strider")
+
+local window = ui.Window({ title = "Strider", width = 344, height = 420 })
+local view = window:Model({ size = 300, backdrop = true })
+view:Show({
+    mesh = content:Path("SK_Strider"),
+    idle = "/Game/ASS/CRE/Moa/Anims/Moa_Idle_01",
+    walk = "/Game/ASS/CRE/Moa/Anims/Moa_Walk",
+    animation = "walk",
+})
+```
+
+Load the mesh with `mod.Content:Load` before you show it by its path.
+
+## What it does not do
+
+- Parts of the model with no bone in the animal's skeleton stay stiff. A Moa has no wing bones, so wings on a
+  model bound to it do not flap.
+- The mount keeps the animal's own stats, sounds and talents. To change numbers, change the animal's rows
+  ([Tables](/docs/tables)).
+- `SpawnMount` and `Strike` are for the host. In somebody else's game they raise an error that says so.

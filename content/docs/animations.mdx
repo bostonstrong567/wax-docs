@@ -30,6 +30,8 @@ end)
 
 - A **track** says what moves. It is named by a bone, or `Self` for the thing as a whole.
 - A track is a list of **keys**: a time in seconds, then what is added at that time.
+- A turn is about the character's own directions, whichever way the bone points: `Yaw` about up (positive
+  turns right), `Pitch` about the character's right (negative leans forward), `Roll` about forward.
 - What a key adds is an offset: `Pitch`, `Yaw`, `Roll` in degrees, `X`, `Y`, `Z`, and `Scale`. A key of `{}`
   means "as the game has it". So an animation that starts and ends with `{}` blends in and out by itself.
 - Between two keys the values are eased. `ease` is `"smooth"` when omitted. The others are `"linear"`,
@@ -39,6 +41,8 @@ end)
 | --- | --- |
 | `tracks` | What moves, by name. |
 | `third` | Tracks for the player's body in third person, when they should differ from `tracks`. |
+| `reach` | Where a hand or a foot goes. See below. |
+| `reach_from` | `"hand"` or `"shoulder"`: what a reach key is measured from. |
 | `length` | How long it runs. The time of the last key when omitted. |
 | `loop` | `true` starts it again when it ends. |
 | `ease` | How keys are eased when a key does not say. |
@@ -52,10 +56,98 @@ write works while the character walks, and a creature keeps breathing under it.
 These names fit the player's arms in first person and the body in third:
 
 `RightClavicle`, `RightShoulder`, `RightElbow`, `RightWrist`, `RightHand`, and the same with `Left`. On the
-body there are also `Head`, `Neck`, `Chest`, `Waist`, `Hips`, `RightThigh` and `LeftThigh`.
+body there are also `Head`, `Neck`, `Chest`, `Spine`, `Waist`, `Hips`, `RightThigh`, `LeftThigh`, `RightKnee`,
+`LeftKnee`, `RightFoot` and `LeftFoot`.
 
 Any other bone goes by the name its skeleton gives it. `game.Animations:GetBones(target)` lists them, and a
 name the skeleton does not have raises an error that suggests the nearest.
+
+### Reaching: a hand or a foot goes somewhere
+
+<Since version="0.3.7" />
+
+Turning a shoulder and an elbow by hand until the hand is where you want it is slow work. A **reach** says
+where the end of a limb goes, and Wax bends the two bones above it to get it there. The limbs are `RightHand`,
+`LeftHand`, `RightFoot` and `LeftFoot`. `X` is forward, `Y` to the right and `Z` up, as the character stands.
+
+```lua title="init.lua"
+local salute = game.Animations:Define("Salute", {
+    length = 1.6,
+    reach_from = "shoulder",
+    reach = {
+        RightHand = { { 0, { X = 25, Y = 5, Z = 22 } }, { 1.6, { X = 25, Y = 5, Z = 22 } } },
+    },
+    third = { Head = { { 0, {} }, { 0.4, { Yaw = 30 } }, { 1.6, {} } } },
+})
+
+local window = ui.Window({ title = "Salute", width = 260, height = 110 })
+window:Button("Salute", function()
+    if game.Me.Exists then salute:Play(game.Me, { view = "third" }) end
+end)
+```
+
+- `reach_from = "hand"`, when omitted: a key adds to where the hand is in the game's own pose.
+- `reach_from = "shoulder"`: a key says where the hand is, measured from the shoulder (for a foot, from the
+  hip). The reach comes in from the game's pose over the first moments and goes back at the end, so the keys
+  need no `{}` at the ends. An arm is about 60 long and a leg about 90. A place further off is reached as far
+  as the limb goes.
+- To turn the hand as well, give the limb a table: `RightHand = { turn = true, keys = { ... } }`. With
+  `"shoulder"`, the `Pitch`, `Yaw` and `Roll` of a key are then how the thing in the hand is turned, as the
+  character stands: all three 0 points it the way the character faces.
+- The elbow or the knee stays on the side it is on in the game's pose.
+- One limb can differ from the rest: `LeftHand = { from = "hand", keys = { ... } }` adds to the game's pose
+  while the other limbs of the animation are placed from the shoulder.
+- `reach_blend` is how long a reach from the shoulder takes to come in and to go back: `0.2`, or `{ 0.1, 0.4 }`.
+
+When these were tried on the player's body, the hand, the foot and the turn of the held thing each came out
+where they were asked for, to the unit and to the degree.
+
+### Look at it before you use it
+
+<Since version="0.3.7" />
+
+A [model view](/docs/gui/model) can play your animation on a mesh in a window, where you can turn it and see it
+from every side. `view:Play(animation, options)` takes the same options as `animation:Play`.
+
+```lua title="init.lua"
+local wave = game.Animations:Define("PreviewWave", {
+    length = 1.5,
+    reach_from = "shoulder",
+    reach = { RightHand = { { 0, { X = 20, Y = 25, Z = 25 } }, { 1.5, { X = 20, Y = 25, Z = 25 } } } },
+})
+
+local window = ui.Window({ title = "Preview", width = 340, height = 420 })
+local view = window:Model({
+    size = 300, spin = false, facing = 0, animation = "idle",
+    mesh = "/Game/ASS/CHA/Human/3RD/CHA_Suit_Variation/SK_CHA_3RD_MAL_V5",
+    idle = "/Game/ASS/CHA/Human/3RD/Animations/3RD_CHA_MAL_1HWeaponIdle",
+})
+window:Button("Play", function()
+    if view:IsLoaded() then view:Play(wave, { rate = 0.5 }) end
+end)
+```
+
+- `facing = 0` says the mesh faces along its own X, as the player's body does. Left out, a look faces the way
+  the game's creatures do.
+- `rate = 0.2` plays it in slow motion, which is the easy way to see where a limb goes.
+- `view:Attach(shape, { socket = "R_prop_00", at = , turn = , material = })` puts a shape of your own in the
+  model's hand, so a tool is seen through the swing. With no turn, find out which way it points first.
+- `view = "third"` in the options plays the tracks under `third`, as the player's body does.
+
+### A movement that looks alive
+
+A hand that follows a path while the rest stands still looks like a puppet. When a swing for the player's body
+was first made here that way, it was plainly wrong. What made it read as a swing:
+
+- **Key poses, not a path.** A wind-up, the cut, the follow-through and a settle, each a whole pose.
+- **The body leads.** Hips, waist and chest turn through the cut, each a little more than the one below. The
+  head turns the other way, so the eyes stay on what is hit.
+- **The other arm moves against it**, and a step or a sinking of the hips goes with a heavy blow.
+- **Uneven timing.** Slow into the wind-up (`"out"`), fast through the cut (`"in"`), slow to settle.
+- **The tool leads with its edge.** Give the hand a turn at every key, so the blade is ahead of the handle the
+  whole way.
+
+Hold one pose at a time in a model view, look from the front, the side and above, and only then join them.
 
 ### Play it
 
@@ -74,6 +166,7 @@ name the skeleton does not have raises an error that suggests the nearest.
 | `weight` | How much of the movement is added. `0.5` is half. |
 | `keep` | `true` leaves a thing where its `Self` track put it. |
 | `done` | A function that runs when it has run to its end. |
+| `view` | `"first"` or `"third"`: on the player, the one view it shows in. |
 
 A play has `Stop()`, `IsPlaying()`, `GetTime()` and `SetRate(rate)`.
 
@@ -118,6 +211,9 @@ game.Animations:Play(game.Me, {
 - The player's arms and body are two skeletons with clips of their own, so give `first` and `third`. For a
   creature give one path.
 - Options: `rate`, `blend` (seconds in and out), `start`, and for a single sequence `slot` and `loops`.
+- `part` plays one named part of a montage, such as `"Action_0"`, or `{ first = name, third = name }`.
+- With both `first` and `third`, the body's clip is paced to last as long as the arms'. `match = false`
+  lets each run at its own length.
 - `game.Animations:Find("1st sledge montage")` gives the paths that hold every word. The game has 4,091.
 - A clip only moves a skeleton it was made for.
 
@@ -152,8 +248,52 @@ end)
   a light `SetColor` and `SetIntensity`.
 - Everything your mod started is taken away when the mod unloads.
 - At most 64 effects are alive at once for all mods. A new one past that takes the oldest away.
-- A trail is drawn in the world, not bent toward the screen as things held in first person are. On a tool in
-  the first-person hand it sits a little off the blade.
+
+### A slash off a blade
+
+<Since version="0.3.8" />
+
+A trail is laid on a curve through the places the edge was at, so a fast swing leaves an arc, not corners. It
+keeps the edge's outer end (`to`) and closes in on it toward its old end, which gives a crescent.
+
+```lua
+-- thing is a blade your mod spawned with game.Blueprints; the edge runs along its tip
+game.Effects:Trail(thing, {
+    from = { -16, 0, 38 }, to = { 5, 0, 52 },
+    color = "Orange",
+    delay = 0.36,       -- the swing winds up first: start with the cut
+    life = 0.3,
+    seconds = 0.14,
+    embers = 110,       -- small glowing bits that come off the edge, a second
+})
+```
+
+| Option | What it does |
+| --- | --- |
+| `delay` | Starts this many seconds from now. A trail that also runs during the wind-up doubles back on itself. `life` counts from the start. |
+| `embers` | Small glowing bits that come off the edge while it moves, drift, rise and shrink: how many a second, or `{ rate, size, life, speed, rise }`. A trail has 60 at a time at most. |
+| `width` | Makes it a streak this wide along the middle of the edge, always turned to face the view. Without it a cut that comes straight at the view shows the ribbon from its side, as a line. |
+| `with_view` | `true` keeps the trail with the view, as the arms of first person are, instead of leaving it behind in the world. For something held in first person. |
+| `material` | A material of your own from `game.Assets:Material` in place of the plain glowing one. |
+
+### In first person
+
+The game draws what is held in first person bent toward the screen, and it does that in the item's material
+(the number `PaniniScale`, 1 in first person and 0 in third). A trail with the plain glowing material is drawn
+where the blade really is, which is a little off where the blade shows. So give it a material of the game's
+item kind with that number set, and `with_view = true`:
+
+```lua
+local glow = game.Assets:Material("/Game/ASS/ORB/ICARUS_STATION/MI_ORB_Light", {
+    textures = { ["Albedo [ITM]"] = game.Assets:Texture("black.png"), ["Emissive [ITM]"] = game.Assets:Texture("orange.png") },
+    numbers = { PaniniScale = 1, ["Emissive Intensity"] = 2 },
+})
+game.Effects:Trail(thing, { to = { 5, 0, 52 }, with_view = true, material = glow })
+```
+
+`MI_ORB_Light` is one of the game's item materials that glow. The plain item material
+(`/Game/ASS/MAT/MA_ITM`) takes the same textures and stays dark whatever `Emissive Intensity` says.
+At an intensity of 14 orange turns yellow; 2 to 4 keeps the colour of the picture.
 
 ## Sounds
 
@@ -173,6 +313,7 @@ of the game, an animation of keys on the arms and on the body with the clothing 
 turning with a trail behind it. These have not been looked at yet:
 
 - An animation of keys on a creature.
+- A reach on the arms seen in first person. On the body it was measured.
 - Particle effects of the older kind (`ParticleSystem`), and `Set` on any effect.
 - A sound that comes from a thing.
 - What other players of a session see. Expect them to see none of it: it is made on your PC.
