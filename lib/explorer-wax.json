@@ -645,6 +645,7 @@
   "Inventory:Refresh": "WaxInventory.Refresh",
   "Inventory:Give": "WaxInventory.Give",
   "Inventory:Take": "WaxInventory.Take",
+  "Inventory:Resize": "WaxInventory.Resize",
   "PlayerItems:Count": "WaxPlayerItems.Count",
   "PlayerItems:Has": "WaxPlayerItems.Has",
   "PlayerItems:List": "WaxPlayerItems.List",
@@ -10678,7 +10679,7 @@
    "title": "mod",
    "kind": "namespace",
    "group": "mod",
-   "text": "What a mod knows about itself. Every Lua file and folder of the mod is a field too: `mod.Utils` is Utils.lua and `mod.extras.Utils` is extras/Utils.lua. A file called id, name, version, dir or Reload has to be required by its name instead.",
+   "text": "What a mod knows about itself. Every Lua file and folder of the mod is a field too: `mod.Utils` is Utils.lua and `mod.extras.Utils` is extras/Utils.lua. A file called id, name, version, dir, Reload or OnUnload has to be required by its name instead.",
    "ref": "/docs/reference/mods#mod",
    "guide": {
     "href": "/docs/mods",
@@ -10717,6 +10718,13 @@
      "type": "fun()",
      "text": "Loads the mod again at the start of the next frame, as a saved file does.",
      "use": "print(mod.Reload)"
+    },
+    {
+     "id": "mod.OnUnload",
+     "name": "OnUnload",
+     "type": "fun(fn: fun(why: \"reload\"|\"off\"|\"removed\"|\"failed\"|\"shutdown\")): fun()",
+     "text": "Runs `fn` once when the mod is about to unload, before anything of the mod is taken away: its windows, tasks, connections and table changes are all still there. `why` is \"reload\" when the mod loads again straight after, \"off\" when the player switched it off, \"removed\" when its folder went, \"failed\" when the mod raised an error while it loaded, and \"shutdown\" when Wax itself stops. Several run newest first, and one that raises an error is logged and stops none of the others. `fn` must return at once: it cannot wait. Use it for what Wax cannot undo for you, such as a change made to the world. It does not run when the game closes or the map changes. Returns a function that takes `fn` off again.",
+     "use": "print(mod.OnUnload)"
     }
    ]
   },
@@ -12629,6 +12637,33 @@
      "text": "Takes items out of the inventory, for the host only. They are gone, not dropped, and the last stack of the item goes first. It has been tried on a player's backpack and hotbar.",
      "ref": "/docs/reference/items#inventory-take",
      "use": "local backpack = game.Me.Backpack\nlocal taken, why = backpack:Take(item, count)"
+    },
+    {
+     "id": "WaxInventory.Resize",
+     "name": "Resize",
+     "call": "inventory:Resize",
+     "params": [
+      {
+       "name": "slots",
+       "type": "integer",
+       "text": "How many slots it should have, from 1 to 500."
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer",
+       "name": "size",
+       "text": "How many it has now."
+      },
+      {
+       "type": "string?",
+       "name": "why",
+       "text": "Why not what was asked, in plain words: \"slot 31 holds something, so 31 slots stay\"."
+      }
+     ],
+     "text": "Gives the inventory this many slots, for the host only. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.",
+     "ref": "/docs/reference/items#inventory-resize",
+     "use": "local backpack = game.Me.Backpack\nlocal size, why = backpack:Resize(slots)"
     }
    ]
   },

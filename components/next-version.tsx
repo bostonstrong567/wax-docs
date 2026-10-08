@@ -20,6 +20,25 @@ export function NextVersion({ children }: { children?: ReactNode }) {
   );
 }
 
+function newer(version: string, than: string) {
+  const a = version.split('.').map(Number);
+  const b = than.split('.').map(Number);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0);
+  }
+  return false;
+}
+
+// The line on a section that needs a named version of Wax. It goes away by itself once RELEASED reaches that version.
+export function Since({ version }: { version: string }) {
+  if (!newer(version, RELEASED)) return null;
+  return (
+    <Callout>
+      This comes with Wax {version}. It is not in Wax {RELEASED}, the version you can download today.
+    </Callout>
+  );
+}
+
 const MARK = 'inline-block whitespace-nowrap rounded-full border px-1.5 py-px align-middle font-sans text-[11px] font-normal leading-4 text-fd-muted-foreground';
 
 // The small mark on one entry of a list that is newer than the released Wax: a function, a field, an option.

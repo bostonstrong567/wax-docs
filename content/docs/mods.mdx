@@ -75,6 +75,8 @@ print(mod.version)  -- the version from mod.lua
 print(mod.dir)      -- the path of the mod's folder
 ```
 
+`mod.OnUnload(fn)` runs a function just before your mod unloads. See [When your mod unloads](#when-your-mod-unloads).
+
 `mod.Reload()` loads your mod again at the start of the next frame, as saving one of its files does. Use it
 when something your mod worked out at load has changed, such as the size of the screen:
 
@@ -133,7 +135,8 @@ print(Utils.shout("hello"))   -- HELLO!
 - In VS Code, `mod.` lists your files and folders, and what a file returns completes too.
 
 The name in quotes works as well, with dots for folders: `require("Utils")`, `require("extras.Maths")`. You need
-that form for a file whose name has a dash in it, or is called `id`, `name`, `version`, `dir` or `Reload`.
+that form for a file whose name has a dash in it, or is called `id`, `name`, `version`, `dir`, `Reload` or
+`OnUnload`.
 
 Saving any `.lua` file of the mod reloads the whole mod.
 
@@ -194,6 +197,48 @@ Good to know:
 
 Everything a mod sets up belongs to that mod: its windows, overlays, hotkeys, tasks and signal connections.
 When the mod reloads or is switched off, Wax removes all of it. You don't write clean-up code.
+
+Changes to the game's tables go back the same way. What you change in the world itself does not: for that,
+see the next section.
+
+## When your mod unloads
+
+<Since version="0.3.1" />
+
+Some things Wax cannot undo for you: a value you wrote on the character, slots you added to an inventory,
+anything else you changed in the world. `mod.OnUnload` runs a function of yours just before the mod goes, so
+you can put them back.
+
+```lua title="MyMod\init.lua"
+local character = game.Character
+if character then character:Set("JumpMaxCount", 3) end
+
+mod.OnUnload(function(why)
+    local now = game.Character
+    if now then now:Set("JumpMaxCount", 1) end
+end)
+```
+
+Your function gets one value that says why the mod unloads:
+
+| `why` | When |
+| --- | --- |
+| `"reload"` | The mod loads again straight after, because a file was saved or `mod.Reload()` was called. |
+| `"off"` | The player switched the mod off. |
+| `"removed"` | The mod's folder was removed. |
+| `"failed"` | The mod raised an error while it was loading. What it set up before the error is still undone. |
+| `"shutdown"` | Wax itself stops. |
+
+Good to know:
+
+- It runs **before** anything of the mod is taken away. Your windows, tasks, connections and table changes are
+  all still there, so `game.Data:Changes()` still tells what a field was.
+- Several functions run newest first. One that raises an error is logged, and the others still run.
+- The function must return at once. It cannot wait.
+- It does not run when the game closes, and not on a map change. A mod stays loaded across maps.
+- `mod.OnUnload` gives back a function. Call it to take your function off again.
+- When the mod only reloads, you can often skip the work: check for `why == "reload"` and let the new load
+  put things right.
 
 ## Functions that are blocked
 

@@ -188,6 +188,30 @@ end)
 - Both were tried on a player's backpack. One call took 0.6 to 2.3 ms.
 - What a mod gave stays when the mod unloads.
 
+## More or fewer slots
+
+<Since version="0.3.1" />
+
+`inventory:Resize(slots)` gives an inventory that many slots. Only the host can do this.
+
+```lua title="init.lua"
+local pack = game.Me and game.Me.Backpack
+if pack then
+    local size, why = pack:Resize(40)
+    print("The backpack has", size, "slots", why or "")
+end
+```
+
+- Slots are added and taken at the end of the inventory.
+- A slot that holds something is never taken, nor any slot before it. The inventory then keeps as many slots
+  as it needs, and the second value says so: `"slot 31 holds something, so 31 slots stay"`.
+- `Size`, `List` and the others follow in the same frame.
+- It lasts as long as the inventory does. One the game makes anew, as after a map change, has the number of
+  its row in `D_InventoryInfo` again. Change `StartingSlots` there with [`game.Data`](/docs/tables) to cover
+  those.
+- The new size stays when your mod unloads. Put it back in [`mod.OnUnload`](/docs/mods#when-your-mod-unloads).
+- It was tried on the station's loadout, from 15 slots to 50 and back.
+
 Signals for items that come and go are on [Events of the game](/docs/events#items).
 
 Every field and function is listed in the [Items and inventories reference](/docs/reference/items).
