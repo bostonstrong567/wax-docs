@@ -1,0 +1,134 @@
+---
+title: Game content of your own
+description: Bring models, textures, materials and blueprints made in the Unreal editor into a mod, and change them while the game runs.
+icon: PackagePlus
+---
+
+<Since version="0.3.2" />
+
+A mod can bring **game content** of its own: meshes, textures, materials, sounds and blueprints made in the
+Unreal editor. They travel in one file in the mod's folder, `content/<Id>.pak`. Wax checks that file, hands it to
+the running game and your Lua then loads from it by name. The game is not restarted, and no file of the game is
+replaced.
+
+```lua title="init.lua"
+local content = mod.Content
+print("Game content:", content.State)
+
+local class, why = content:LoadClass("BP_Lantern")
+if not class then
+    print("Not loaded:", why)
+    return
+end
+
+local lantern = game.Blueprints:Define("Lantern", { base = content:ClassPath("BP_Lantern") })
+print("Defined", lantern.Name)
+```
+
+## What a mod with content looks like
+
+```text
+MyMod/
+  mod.lua
+  init.lua
+  content/
+    MyMod.pak
+```
+
+The pak is named after the mod's id. Everything in it lives under `/Game/Mods/MyMod/` in the game, and nowhere
+else: a mod's content can add files there and cannot replace anything the game or another mod has.
+
+## mod.Content
+
+`mod.Content` is `nil` for a mod without a pak.
+
+| Member | What it gives |
+| --- | --- |
+| `content.State` | `"ready"`, `"restart"` or `"off"` |
+| `content.Reason` | Why the state is `"off"` or `"restart"` |
+| `content.Files` | The files in the pak |
+| `content:Load(name)` | An asset by its name, such as `"T_Icon"` or `"Meshes/Rock"`, as [game.Assets](/docs/assets) loads it |
+| `content:LoadClass(name)` | The class of a blueprint, such as `"BP_Lantern"` |
+| `content:Path(name)` | The game's path of an asset: `/Game/Mods/MyMod/T_Icon.T_Icon` |
+| `content:ClassPath(name)` | The game's path of a blueprint's class, which `base` of [game.Blueprints](/docs/blueprints) takes |
+| `content:Has(name)` | `true` when the pak holds an asset of that name |
+
+What `Load` and `LoadClass` give is kept for your mod and let go of when the mod unloads.
+
+## Changing content while the game runs
+
+When the pak changes and the mod reloads, Wax hands the newer pak to the game and asks it to let go of the
+older one. Assets that nothing uses any more are then read from the newer pak, so the change shows without a
+restart.
+
+An asset the game still uses at that moment keeps its older look: a thing in the world that was spawned from a
+blueprint, for example. `content.State` is then `"restart"` and `content.Reason` names those assets. Remove what
+you spawned in `mod.OnUnload`, and the next reload takes the newer copy.
+
+The **Mods** page of the [Wax panel](/docs/debug-panel) shows the state on the mod's card, and its **Reload**
+button takes up a changed pak. The **Log** page has a **Game content** switch that shows or hides these lines.
+In the command bar, `content.List()` lists the mods with content and `content.Reload("MyMod")` reloads one.
+
+## Making the pak
+
+Assets are made in the Unreal editor, version 4.27, the version the game is built with. The Wax source folder
+has a project for it and the tools that turn its assets into a pak the game can read.
+
+<Steps>
+<Step>
+
+### Make the assets folder
+
+```text
+node wax/cli/content.mjs new MyMod
+```
+
+That makes `unreal/Icarus/Content/Mods/MyMod`, which the game sees as `/Game/Mods/MyMod`. Open the project with
+`scripts\Open-UnrealProject.ps1` and save your assets in that folder.
+
+</Step>
+<Step>
+
+### Build
+
+```text
+node wax/cli/content.mjs build MyMod
+```
+
+The assets are cooked and checked: every game file they refer to has to exist in the game, because the game stops
+on one that does not. The pak is then put in the mod, and a running game reloads the mod and takes the pak.
+
+</Step>
+<Step>
+
+### Or let it build by itself
+
+```text
+node wax/cli/content.mjs watch MyMod
+```
+
+While this runs, saving an asset in the editor builds the content again and the game takes it.
+
+</Step>
+</Steps>
+
+In VS Code the same is **Wax: Build Game Content** and **Wax: Open the Unreal Project**, and the setting
+**Wax: Content: Auto Build** builds whenever an asset is saved. A build takes a few minutes, most of it the
+editor starting.
+
+## Rules for the pak
+
+Wax refuses a pak that could stop the game, and says why on the mod's card:
+
+- pak version 11, not compressed and not encrypted
+- its mount point is `../../../Icarus/Content/Mods/<Id>/`, with the mod's own id
+- its index and every file in it lie inside the file and match their checksums
+
+The build above makes such a pak. The mod catalogue does not take a mod with a pak yet, so share such a mod as
+a folder for now. Content is cooked for one build of the game. After a [game update](/docs/game-updates)
+build it again, so that it is checked against the new game.
+
+## What it costs
+
+Checking and handing over a small pak takes a few milliseconds, once, when the mod loads. Loading a blueprint's
+class from it took about one millisecond. A pak the game already has is not handed over again.
