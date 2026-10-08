@@ -186,6 +186,27 @@ What to know about a change:
 
 `game.Data.Patched` fires for each field of a row that was written, with the table, the row and the field.
 
+### A row of your own
+
+<Since version="0.3.6" />
+
+`table:Add(name, values, { like = row })` adds a row: a copy of the row named in `like`, with your values
+written over it. This is how a mod makes an item of its own.
+
+```lua title="init.lua"
+local tools = game.Data:Table("ToolDamage")
+tools:Add(mod.id .. "_Axe", { Felling_Damage = 100 }, { like = "Stone_Axe" })
+```
+
+- The name begins with your mod's id and an underscore, so two mods never add the same row.
+- It is there at once. When your mod unloads the row stays in the table, and a recipe row is switched off.
+- Only the host can add rows.
+- A whole item is a row in several tables that point at each other: `ItemsStatic`, `Itemable`, `ItemTemplate`,
+  and the ones for what it does, such as `ToolDamage` and `Durable`. A recipe that makes it is a row of
+  `ProcessorRecipes` whose output names your `ItemTemplate` row.
+- This was tried once: six rows for a new tool, which was then given, held and used. It has not been tried
+  across a save and a restart. An item of a row that is gone, because the mod is off, has not been looked at.
+
 ### What cannot be changed in this version
 
 - Text, references to assets, maps and a few rarer kinds of field. `Set` raises an error that says which.
@@ -193,8 +214,7 @@ What to know about a change:
   before and after, and its entries hold no strings, text or lists of their own. Any other list keeps its
   length: its entries can be changed where they are.
 - A row handle cannot be pointed at another table than the one it names now.
-- Adding a row is not possible yet. `table:Add` is there and raises an error that says it is switched
-  off. A row of the game is never removed.
+- A row of the game is never removed.
 - A table's meta table can be read, not changed.
 
 A change that is refused raises an error that says so, and changes nothing.

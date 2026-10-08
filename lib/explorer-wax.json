@@ -197,6 +197,40 @@
    "members": []
   },
   {
+   "id": "animations",
+   "title": "Animations",
+   "text": "game.Animations: clips of the game and animations written as keys, on characters, creatures and things.",
+   "types": [
+    "game.Animations",
+    "WaxAnimationPlay",
+    "WaxAnimation",
+    "WaxClipPlay",
+    "WaxAnimationKey",
+    "WaxAnimationValues",
+    "WaxAnimationSpec",
+    "WaxAnimationPlayOptions",
+    "WaxClipOptions"
+   ],
+   "members": []
+  },
+  {
+   "id": "effects",
+   "title": "Effects",
+   "text": "game.Effects and game.Sounds: particles, lights, trails, shakes and sounds.",
+   "types": [
+    "game.Effects",
+    "game.Sounds",
+    "WaxParticles",
+    "WaxLight",
+    "WaxTrail",
+    "WaxParticleOptions",
+    "WaxLightOptions",
+    "WaxTrailOptions",
+    "WaxSoundOptions"
+   ],
+   "members": []
+  },
+  {
    "id": "ui",
    "title": "ui",
    "text": "The menu, windows, overlays, notifications, tags, hotkeys and themes.",
@@ -798,6 +832,36 @@
   "game.Blueprints:Define": "game.Blueprints.Define",
   "game.Blueprints:Get": "game.Blueprints.Get",
   "game.Blueprints:GetThings": "game.Blueprints.GetThings",
+  "Play:Stop": "WaxAnimationPlay.Stop",
+  "Play:IsPlaying": "WaxAnimationPlay.IsPlaying",
+  "Play:GetTime": "WaxAnimationPlay.GetTime",
+  "Play:SetRate": "WaxAnimationPlay.SetRate",
+  "Animation:Play": "WaxAnimation.Play",
+  "Clip:Stop": "WaxClipPlay.Stop",
+  "Clip:IsPlaying": "WaxClipPlay.IsPlaying",
+  "game.Animations:Play": "game.Animations.Play",
+  "game.Animations:Define": "game.Animations.Define",
+  "game.Animations:Get": "game.Animations.Get",
+  "game.Animations:GetBones": "game.Animations.GetBones",
+  "game.Animations:Find": "game.Animations.Find",
+  "game.Animations:StopAll": "game.Animations.StopAll",
+  "Particles:Set": "WaxParticles.Set",
+  "Particles:Stop": "WaxParticles.Stop",
+  "Particles:IsAlive": "WaxParticles.IsAlive",
+  "Light:Stop": "WaxLight.Stop",
+  "Light:IsAlive": "WaxLight.IsAlive",
+  "Light:SetColor": "WaxLight.SetColor",
+  "Light:SetIntensity": "WaxLight.SetIntensity",
+  "Trail:Stop": "WaxTrail.Stop",
+  "Trail:IsAlive": "WaxTrail.IsAlive",
+  "game.Effects:Particles": "game.Effects.Particles",
+  "game.Effects:Light": "game.Effects.Light",
+  "game.Effects:Trail": "game.Effects.Trail",
+  "game.Effects:Shake": "game.Effects.Shake",
+  "game.Effects:Find": "game.Effects.Find",
+  "game.Effects:FindShakes": "game.Effects.FindShakes",
+  "game.Sounds:Play": "game.Sounds.Play",
+  "game.Sounds:Find": "game.Sounds.Find",
   "game.Frame:Connect": "game.Frame.Connect",
   "game.Frame:Once": "game.Frame.Once",
   "game.Frame:Wait": "game.Frame.Wait",
@@ -10114,6 +10178,27 @@
      "use": "print(game.Blueprints)"
     },
     {
+     "id": "game.Animations",
+     "name": "Animations",
+     "type": "WaxAnimations",
+     "text": "The game's own clips on anything with a skeleton, and animations written as keys in Lua for bones and for things.",
+     "use": "print(game.Animations)"
+    },
+    {
+     "id": "game.Effects",
+     "name": "Effects",
+     "type": "WaxEffects",
+     "text": "The game's particle effects, lights, glowing trails and camera shakes, on anything.",
+     "use": "print(game.Effects)"
+    },
+    {
+     "id": "game.Sounds",
+     "name": "Sounds",
+     "type": "WaxSounds",
+     "text": "The game's own sounds.",
+     "use": "print(game.Sounds)"
+    },
+    {
      "id": "game.Time",
      "name": "Time",
      "type": "WaxTime",
@@ -18063,7 +18148,6 @@
    "kind": "data",
    "group": "assets",
    "text": "What game.Assets:Model takes besides the file.",
-   "next": true,
    "ref": "/docs/reference/assets#waxmodelfileoptions",
    "guide": {
     "href": "/docs/gui/model",
@@ -18079,7 +18163,6 @@
      "type": "number",
      "optional": true,
      "text": "How much larger the model is made. 100 when omitted, which fits a model made in metres: the game counts in centimetres.",
-     "next": true,
      "use": "local mesh = game.Assets:Model(file, { scale = 1 })"
     },
     {
@@ -18088,7 +18171,6 @@
      "type": "\"y\"|\"z\"",
      "optional": true,
      "text": "Which way is up in the file. \"y\" when omitted, as most programs save an .obj. \"z\" for a file saved with Z up.",
-     "next": true,
      "use": "local mesh = game.Assets:Model(file, { up = \"y\" })"
     },
     {
@@ -18097,7 +18179,6 @@
      "type": "boolean",
      "optional": true,
      "text": "True turns every triangle round. For a model that shows inside out.",
-     "next": true,
      "use": "local mesh = game.Assets:Model(file, { flip = true })"
     },
     {
@@ -18106,7 +18187,6 @@
      "type": "boolean",
      "optional": true,
      "text": "True makes things stop at the shape. False when omitted.",
-     "next": true,
      "use": "local mesh = game.Assets:Model(file, { collision = true })"
     }
    ]
@@ -18661,6 +18741,1181 @@
      "text": "Every thing in the world that was spawned from a blueprint, of every mod, oldest first.",
      "ref": "/docs/reference/blueprints#game-blueprints-getthings",
      "use": "local things = game.Blueprints:GetThings()"
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimationKey",
+   "name": "WaxAnimationKey",
+   "title": "WaxAnimationKey",
+   "kind": "data",
+   "group": "animations",
+   "text": "One moment of a track. The first entry is the time in seconds, the second what is added at that time, the third how the way there is eased: \"linear\", \"smooth\", \"in\", \"out\" or \"snap\".",
+   "ref": "/docs/reference/animations#waxanimationkey",
+   "props": [
+    {
+     "id": "WaxAnimationKey.[1]",
+     "name": "[1]",
+     "type": "number",
+     "text": "The time, in seconds from the start."
+    },
+    {
+     "id": "WaxAnimationKey.[2]",
+     "name": "[2]",
+     "type": "WaxAnimationValues",
+     "text": "What is added to the bone or the thing at that time."
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimationValues",
+   "name": "WaxAnimationValues",
+   "title": "WaxAnimationValues",
+   "kind": "data",
+   "group": "animations",
+   "text": "What a key adds. Everything is an offset from where the bone or the thing is without the animation, so a key of {} means \"as the game has it\".",
+   "ref": "/docs/reference/animations#waxanimationvalues",
+   "props": [
+    {
+     "id": "WaxAnimationValues.Pitch",
+     "name": "Pitch",
+     "type": "number",
+     "optional": true,
+     "text": "Degrees."
+    },
+    {
+     "id": "WaxAnimationValues.Yaw",
+     "name": "Yaw",
+     "type": "number",
+     "optional": true,
+     "text": "Degrees."
+    },
+    {
+     "id": "WaxAnimationValues.Roll",
+     "name": "Roll",
+     "type": "number",
+     "optional": true,
+     "text": "Degrees."
+    },
+    {
+     "id": "WaxAnimationValues.X",
+     "name": "X",
+     "type": "number",
+     "optional": true
+    },
+    {
+     "id": "WaxAnimationValues.Y",
+     "name": "Y",
+     "type": "number",
+     "optional": true
+    },
+    {
+     "id": "WaxAnimationValues.Z",
+     "name": "Z",
+     "type": "number",
+     "optional": true
+    },
+    {
+     "id": "WaxAnimationValues.Scale",
+     "name": "Scale",
+     "type": "number",
+     "optional": true,
+     "text": "1 leaves the size as it is."
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimationSpec",
+   "name": "WaxAnimationSpec",
+   "title": "WaxAnimationSpec",
+   "kind": "data",
+   "group": "animations",
+   "text": "What game.Animations:Define makes an animation from.",
+   "ref": "/docs/reference/animations#waxanimationspec",
+   "users": [
+    "game.Animations.Define"
+   ],
+   "props": [
+    {
+     "id": "WaxAnimationSpec.tracks",
+     "name": "tracks",
+     "type": "table<string, WaxAnimationKey[]>",
+     "text": "What moves, by name: a bone (\"RightShoulder\", or the name its skeleton gives it), or Self for the thing as a whole.",
+     "use": "local animation = game.Animations:Define(name, { tracks = value })"
+    },
+    {
+     "id": "WaxAnimationSpec.third",
+     "name": "third",
+     "type": "table<string, WaxAnimationKey[]>",
+     "optional": true,
+     "text": "Tracks for the player's body seen in third person, when they should differ from tracks.",
+     "use": "local animation = game.Animations:Define(name, { third = value })"
+    },
+    {
+     "id": "WaxAnimationSpec.length",
+     "name": "length",
+     "type": "number",
+     "optional": true,
+     "text": "How long it runs, in seconds. The time of the last key when omitted.",
+     "use": "local animation = game.Animations:Define(name, { length = 1 })"
+    },
+    {
+     "id": "WaxAnimationSpec.loop",
+     "name": "loop",
+     "type": "boolean",
+     "optional": true,
+     "text": "True starts it again when it ends.",
+     "use": "local animation = game.Animations:Define(name, { loop = true })"
+    },
+    {
+     "id": "WaxAnimationSpec.ease",
+     "name": "ease",
+     "type": "\"linear\"|\"smooth\"|\"in\"|\"out\"|\"snap\"",
+     "optional": true,
+     "text": "How keys are eased when a key does not say. \"smooth\" when omitted.",
+     "use": "local animation = game.Animations:Define(name, { ease = \"linear\" })"
+    },
+    {
+     "id": "WaxAnimationSpec.events",
+     "name": "events",
+     "type": "{ [1]: number, [2]: fun(play: WaxAnimationPlay) }[]",
+     "optional": true,
+     "text": "Functions that run when the animation passes a time.",
+     "use": "local animation = game.Animations:Define(name, { events = value })"
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimationPlayOptions",
+   "name": "WaxAnimationPlayOptions",
+   "title": "WaxAnimationPlayOptions",
+   "kind": "data",
+   "group": "animations",
+   "text": "What animation:Play takes besides the target.",
+   "ref": "/docs/reference/animations#waxanimationplayoptions",
+   "users": [
+    "WaxAnimation.Play"
+   ],
+   "props": [
+    {
+     "id": "WaxAnimationPlayOptions.rate",
+     "name": "rate",
+     "type": "number",
+     "optional": true,
+     "text": "How fast it runs. 1 when omitted.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { rate = 1 })"
+    },
+    {
+     "id": "WaxAnimationPlayOptions.loop",
+     "name": "loop",
+     "type": "boolean",
+     "optional": true,
+     "text": "Overrides the animation's own loop.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { loop = true })"
+    },
+    {
+     "id": "WaxAnimationPlayOptions.weight",
+     "name": "weight",
+     "type": "number",
+     "optional": true,
+     "text": "How much of the movement is added. 1 when omitted.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { weight = 1 })"
+    },
+    {
+     "id": "WaxAnimationPlayOptions.keep",
+     "name": "keep",
+     "type": "boolean",
+     "optional": true,
+     "text": "True leaves a thing where its Self track put it when the animation ends.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { keep = true })"
+    },
+    {
+     "id": "WaxAnimationPlayOptions.done",
+     "name": "done",
+     "type": "fun(play: WaxAnimationPlay)",
+     "optional": true,
+     "text": "Runs when the animation has run to its end. Not when it is stopped.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, { done = function(play) end })"
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimationPlay",
+   "name": "WaxAnimationPlay",
+   "title": "WaxAnimationPlay",
+   "kind": "object",
+   "group": "animations",
+   "text": "An animation that is playing.",
+   "ref": "/docs/reference/animations#waxanimationplay",
+   "makers": [
+    "WaxAnimation.Play"
+   ],
+   "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)",
+   "props": [
+    {
+     "id": "WaxAnimationPlay.Animation",
+     "name": "Animation",
+     "type": "WaxAnimation",
+     "text": "An animation written as keys, as game.Animations:Define gives it. It can play on any number of targets at once.",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nprint(play.Animation)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxAnimationPlay.Stop",
+     "name": "Stop",
+     "call": "play:Stop",
+     "text": "Stops it now. A thing moved by a Self track goes back to where it was.",
+     "ref": "/docs/reference/animations#play-stop",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nplay:Stop()"
+    },
+    {
+     "id": "WaxAnimationPlay.IsPlaying",
+     "name": "IsPlaying",
+     "call": "play:IsPlaying",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/animations#play-isplaying",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nlocal result = play:IsPlaying()"
+    },
+    {
+     "id": "WaxAnimationPlay.GetTime",
+     "name": "GetTime",
+     "call": "play:GetTime",
+     "returns": [
+      {
+       "type": "number",
+       "name": "seconds"
+      }
+     ],
+     "ref": "/docs/reference/animations#play-gettime",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nlocal seconds = play:GetTime()"
+    },
+    {
+     "id": "WaxAnimationPlay.SetRate",
+     "name": "SetRate",
+     "call": "play:SetRate",
+     "params": [
+      {
+       "name": "rate",
+       "type": "number",
+       "text": "More than 0."
+      }
+     ],
+     "ref": "/docs/reference/animations#play-setrate",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)\nplay:SetRate(rate)"
+    }
+   ]
+  },
+  {
+   "id": "WaxAnimation",
+   "name": "WaxAnimation",
+   "title": "WaxAnimation",
+   "kind": "object",
+   "group": "animations",
+   "text": "An animation written as keys, as game.Animations:Define gives it. It can play on any number of targets at once.",
+   "ref": "/docs/reference/animations#waxanimation",
+   "makers": [
+    "game.Animations.Define",
+    "game.Animations.Get"
+   ],
+   "use": "local animation = game.Animations:Define(name, spec)",
+   "props": [
+    {
+     "id": "WaxAnimation.Name",
+     "name": "Name",
+     "type": "string",
+     "use": "local animation = game.Animations:Define(name, spec)\nprint(animation.Name)"
+    },
+    {
+     "id": "WaxAnimation.Length",
+     "name": "Length",
+     "type": "number",
+     "text": "Seconds.",
+     "use": "local animation = game.Animations:Define(name, spec)\nprint(animation.Length)"
+    },
+    {
+     "id": "WaxAnimation.Loop",
+     "name": "Loop",
+     "type": "boolean",
+     "use": "local animation = game.Animations:Define(name, spec)\nprint(animation.Loop)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxAnimation.Play",
+     "name": "Play",
+     "call": "animation:Play",
+     "params": [
+      {
+       "name": "target",
+       "type": "any",
+       "optional": true,
+       "text": "A character, a creature, a thing of a blueprint or a part. game.Me when omitted."
+      },
+      {
+       "name": "options",
+       "type": "WaxAnimationPlayOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxAnimationPlay"
+      }
+     ],
+     "text": "Plays the animation. On a character or a creature its bone tracks move the bones, added to whatever the game is animating at that moment. On a thing of a blueprint or a part, its Self track moves the thing as a whole. On the player's own character it shows on the arms in first person and on the body in third. It costs nothing while nothing plays, and it stops when your mod unloads.",
+     "ref": "/docs/reference/animations#animation-play",
+     "use": "local animation = game.Animations:Define(name, spec)\nlocal play = animation:Play(target, options)"
+    }
+   ]
+  },
+  {
+   "id": "WaxClipOptions",
+   "name": "WaxClipOptions",
+   "title": "WaxClipOptions",
+   "kind": "data",
+   "group": "animations",
+   "text": "What game.Animations:Play takes besides the clip.",
+   "ref": "/docs/reference/animations#waxclipoptions",
+   "users": [
+    "game.Animations.Play"
+   ],
+   "props": [
+    {
+     "id": "WaxClipOptions.rate",
+     "name": "rate",
+     "type": "number",
+     "optional": true,
+     "text": "How fast it plays. 1 when omitted.",
+     "use": "local result = game.Animations:Play(target, clip, { rate = 1 })"
+    },
+    {
+     "id": "WaxClipOptions.blend",
+     "name": "blend",
+     "type": "number",
+     "optional": true,
+     "text": "Seconds to blend in and out. 0.15 when omitted.",
+     "use": "local result = game.Animations:Play(target, clip, { blend = 1 })"
+    },
+    {
+     "id": "WaxClipOptions.start",
+     "name": "start",
+     "type": "number",
+     "optional": true,
+     "text": "Where in the clip it starts, in seconds.",
+     "use": "local result = game.Animations:Play(target, clip, { start = 1 })"
+    },
+    {
+     "id": "WaxClipOptions.slot",
+     "name": "slot",
+     "type": "string",
+     "optional": true,
+     "text": "The slot a single sequence plays in. \"DefaultSlot\" when omitted.",
+     "use": "local result = game.Animations:Play(target, clip, { slot = \"text\" })"
+    },
+    {
+     "id": "WaxClipOptions.loops",
+     "name": "loops",
+     "type": "integer",
+     "optional": true,
+     "text": "How often a single sequence plays. 1 when omitted.",
+     "use": "local result = game.Animations:Play(target, clip, { loops = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxClipPlay",
+   "name": "WaxClipPlay",
+   "title": "WaxClipPlay",
+   "kind": "object",
+   "group": "animations",
+   "text": "One of the game's clips that was started.",
+   "ref": "/docs/reference/animations#waxclipplay",
+   "makers": [
+    "game.Animations.Play"
+   ],
+   "use": "local clip = game.Animations:Play(target, clip, options)",
+   "funcs": [
+    {
+     "id": "WaxClipPlay.Stop",
+     "name": "Stop",
+     "call": "clip:Stop",
+     "params": [
+      {
+       "name": "blend",
+       "type": "number",
+       "optional": true,
+       "text": "Seconds to blend out."
+      }
+     ],
+     "ref": "/docs/reference/animations#clip-stop",
+     "use": "local clip = game.Animations:Play(target, clip, options)\nclip:Stop(blend)"
+    },
+    {
+     "id": "WaxClipPlay.IsPlaying",
+     "name": "IsPlaying",
+     "call": "clip:IsPlaying",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/animations#clip-isplaying",
+     "use": "local clip = game.Animations:Play(target, clip, options)\nlocal result = clip:IsPlaying()"
+    }
+   ]
+  },
+  {
+   "id": "game.Animations",
+   "name": "WaxAnimations",
+   "title": "game.Animations",
+   "kind": "namespace",
+   "group": "animations",
+   "text": "game.Animations: the game's own clips on anything with a skeleton, and animations written as keys in Lua.",
+   "ref": "/docs/reference/animations#game-animations",
+   "funcs": [
+    {
+     "id": "game.Animations.Play",
+     "name": "Play",
+     "call": "game.Animations:Play",
+     "params": [
+      {
+       "name": "target",
+       "type": "any",
+       "optional": true,
+       "text": "A character or a creature. game.Me when omitted."
+      },
+      {
+       "name": "clip",
+       "type": "string|{ first?: string, third?: string }",
+       "text": "The path of a montage or a sequence of the game."
+      },
+      {
+       "name": "options",
+       "type": "WaxClipOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxClipPlay"
+      }
+     ],
+     "text": "Plays one of the game's own montages or sequences on a character or a creature. For the player's own character give { first = path, third = path }: the arms and the body are two skeletons with clips of their own.",
+     "ref": "/docs/reference/animations#game-animations-play",
+     "use": "local result = game.Animations:Play(target, clip, options)"
+    },
+    {
+     "id": "game.Animations.Define",
+     "name": "Define",
+     "call": "game.Animations:Define",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      },
+      {
+       "name": "spec",
+       "type": "WaxAnimationSpec"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxAnimation"
+      }
+     ],
+     "text": "Makes an animation from keys. Nothing is asked of the game until it plays.",
+     "ref": "/docs/reference/animations#game-animations-define",
+     "use": "local animation = game.Animations:Define(name, spec)"
+    },
+    {
+     "id": "game.Animations.Get",
+     "name": "Get",
+     "call": "game.Animations:Get",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxAnimation?"
+      }
+     ],
+     "text": "The animation of that name, or nil.",
+     "ref": "/docs/reference/animations#game-animations-get",
+     "use": "local animation = game.Animations:Get(name)"
+    },
+    {
+     "id": "game.Animations.GetBones",
+     "name": "GetBones",
+     "call": "game.Animations:GetBones",
+     "params": [
+      {
+       "name": "target",
+       "type": "any",
+       "optional": true,
+       "text": "game.Me when omitted."
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]"
+      }
+     ],
+     "text": "The names of the bones of a target's skeleton, for writing tracks.",
+     "ref": "/docs/reference/animations#game-animations-getbones",
+     "use": "local list = game.Animations:GetBones(target)"
+    },
+    {
+     "id": "game.Animations.Find",
+     "name": "Find",
+     "call": "game.Animations:Find",
+     "params": [
+      {
+       "name": "text",
+       "type": "string",
+       "text": "Words such as \"1st sledge montage\"."
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]",
+       "name": "paths"
+      },
+      {
+       "type": "integer",
+       "name": "total"
+      }
+     ],
+     "text": "The paths of the game's montages and sequences whose path holds every word given. At most 200, then how many there were.",
+     "ref": "/docs/reference/animations#game-animations-find",
+     "use": "local paths, total = game.Animations:Find(text)"
+    },
+    {
+     "id": "game.Animations.StopAll",
+     "name": "StopAll",
+     "call": "game.Animations:StopAll",
+     "text": "Stops every animation your mod is playing.",
+     "ref": "/docs/reference/animations#game-animations-stopall",
+     "use": "game.Animations:StopAll()"
+    }
+   ]
+  },
+  {
+   "id": "WaxParticleOptions",
+   "name": "WaxParticleOptions",
+   "title": "WaxParticleOptions",
+   "kind": "data",
+   "group": "effects",
+   "text": "What game.Effects:Particles takes besides the path.",
+   "ref": "/docs/reference/effects#waxparticleoptions",
+   "guide": {
+    "href": "/docs/blueprints",
+    "title": "Blueprints"
+   },
+   "users": [
+    "game.Effects.Particles"
+   ],
+   "props": [
+    {
+     "id": "WaxParticleOptions.on",
+     "name": "on",
+     "type": "any",
+     "optional": true,
+     "text": "What it hangs on: a character, a creature, a thing of a blueprint or a part. game.Me when omitted.",
+     "use": "local particles = game.Effects:Particles(path, { on = value })"
+    },
+    {
+     "id": "WaxParticleOptions.socket",
+     "name": "socket",
+     "type": "string",
+     "optional": true,
+     "text": "A bone or socket of what it hangs on, such as \"bn_Prop_R_1\" for the right hand of the player's arms.",
+     "use": "local particles = game.Effects:Particles(path, { socket = \"text\" })"
+    },
+    {
+     "id": "WaxParticleOptions.at",
+     "name": "at",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "Where it sits, measured from what it hangs on.",
+     "use": "local particles = game.Effects:Particles(path, { at = value })"
+    },
+    {
+     "id": "WaxParticleOptions.turn",
+     "name": "turn",
+     "type": "{ Pitch?: number, Yaw?: number, Roll?: number }",
+     "optional": true,
+     "text": "How it is turned, in degrees.",
+     "use": "local particles = game.Effects:Particles(path, { turn = value })"
+    },
+    {
+     "id": "WaxParticleOptions.seconds",
+     "name": "seconds",
+     "type": "number|false",
+     "optional": true,
+     "text": "How long it stays. 3 when omitted. False keeps it until it is stopped.",
+     "use": "local particles = game.Effects:Particles(path, { seconds = value })"
+    },
+    {
+     "id": "WaxParticleOptions.set",
+     "name": "set",
+     "type": "table<string, number|string|table>",
+     "optional": true,
+     "text": "Parameters of the effect, by name: a number, a colour, or three numbers.",
+     "use": "local particles = game.Effects:Particles(path, { set = value })"
+    }
+   ]
+  },
+  {
+   "id": "WaxParticles",
+   "name": "WaxParticles",
+   "title": "WaxParticles",
+   "kind": "object",
+   "group": "effects",
+   "text": "A particle effect that was started.",
+   "ref": "/docs/reference/effects#waxparticles",
+   "guide": {
+    "href": "/docs/blueprints",
+    "title": "Blueprints"
+   },
+   "makers": [
+    "game.Effects.Particles"
+   ],
+   "use": "local particles = game.Effects:Particles(path, options)",
+   "funcs": [
+    {
+     "id": "WaxParticles.Set",
+     "name": "Set",
+     "call": "particles:Set",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      },
+      {
+       "name": "value",
+       "type": "number|string|table"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxParticles"
+      }
+     ],
+     "text": "Sets a parameter of the effect: a number, a colour (\"Red\", \"#rrggbb\", { R = , G = , B = }) or three numbers. The names belong to the effect. A name it does not have changes nothing.",
+     "ref": "/docs/reference/effects#particles-set",
+     "use": "local particles = game.Effects:Particles(path, options)\nlocal result = particles:Set(name, value)"
+    },
+    {
+     "id": "WaxParticles.Stop",
+     "name": "Stop",
+     "call": "particles:Stop",
+     "ref": "/docs/reference/effects#particles-stop",
+     "use": "local particles = game.Effects:Particles(path, options)\nparticles:Stop()"
+    },
+    {
+     "id": "WaxParticles.IsAlive",
+     "name": "IsAlive",
+     "call": "particles:IsAlive",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/effects#particles-isalive",
+     "use": "local particles = game.Effects:Particles(path, options)\nlocal result = particles:IsAlive()"
+    }
+   ]
+  },
+  {
+   "id": "WaxLightOptions",
+   "name": "WaxLightOptions",
+   "title": "WaxLightOptions",
+   "kind": "data",
+   "group": "effects",
+   "text": "What game.Effects:Light takes.",
+   "ref": "/docs/reference/effects#waxlightoptions",
+   "users": [
+    "game.Effects.Light"
+   ],
+   "props": [
+    {
+     "id": "WaxLightOptions.on",
+     "name": "on",
+     "type": "any",
+     "optional": true,
+     "text": "What it hangs on. game.Me when omitted.",
+     "use": "local light = game.Effects:Light({ on = value })"
+    },
+    {
+     "id": "WaxLightOptions.socket",
+     "name": "socket",
+     "type": "string",
+     "optional": true,
+     "text": "A bone or socket of what it hangs on.",
+     "use": "local light = game.Effects:Light({ socket = \"text\" })"
+    },
+    {
+     "id": "WaxLightOptions.at",
+     "name": "at",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "Where it sits, measured from what it hangs on.",
+     "use": "local light = game.Effects:Light({ at = value })"
+    },
+    {
+     "id": "WaxLightOptions.color",
+     "name": "color",
+     "type": "string|table",
+     "optional": true,
+     "text": "\"Red\", \"#rrggbb\" or { R = , G = , B = }. Red when omitted.",
+     "use": "local light = game.Effects:Light({ color = value })"
+    },
+    {
+     "id": "WaxLightOptions.intensity",
+     "name": "intensity",
+     "type": "number",
+     "optional": true,
+     "text": "How bright. 5000 when omitted.",
+     "use": "local light = game.Effects:Light({ intensity = 1 })"
+    },
+    {
+     "id": "WaxLightOptions.radius",
+     "name": "radius",
+     "type": "number",
+     "optional": true,
+     "text": "How far it reaches. 400 when omitted, which is four metres.",
+     "use": "local light = game.Effects:Light({ radius = 1 })"
+    },
+    {
+     "id": "WaxLightOptions.seconds",
+     "name": "seconds",
+     "type": "number|false",
+     "optional": true,
+     "text": "How long it stays. 3 when omitted. False keeps it until it is stopped.",
+     "use": "local light = game.Effects:Light({ seconds = value })"
+    },
+    {
+     "id": "WaxLightOptions.fade",
+     "name": "fade",
+     "type": "number",
+     "optional": true,
+     "text": "Seconds over which it dims at the end.",
+     "use": "local light = game.Effects:Light({ fade = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxLight",
+   "name": "WaxLight",
+   "title": "WaxLight",
+   "kind": "object",
+   "group": "effects",
+   "text": "A light that was made.",
+   "ref": "/docs/reference/effects#waxlight",
+   "makers": [
+    "game.Effects.Light"
+   ],
+   "use": "local light = game.Effects:Light(options)",
+   "funcs": [
+    {
+     "id": "WaxLight.Stop",
+     "name": "Stop",
+     "call": "light:Stop",
+     "ref": "/docs/reference/effects#light-stop",
+     "use": "local light = game.Effects:Light(options)\nlight:Stop()"
+    },
+    {
+     "id": "WaxLight.IsAlive",
+     "name": "IsAlive",
+     "call": "light:IsAlive",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/effects#light-isalive",
+     "use": "local light = game.Effects:Light(options)\nlocal result = light:IsAlive()"
+    },
+    {
+     "id": "WaxLight.SetColor",
+     "name": "SetColor",
+     "call": "light:SetColor",
+     "params": [
+      {
+       "name": "color",
+       "type": "string|table"
+      }
+     ],
+     "ref": "/docs/reference/effects#light-setcolor",
+     "use": "local light = game.Effects:Light(options)\nlight:SetColor(color)"
+    },
+    {
+     "id": "WaxLight.SetIntensity",
+     "name": "SetIntensity",
+     "call": "light:SetIntensity",
+     "params": [
+      {
+       "name": "intensity",
+       "type": "number"
+      }
+     ],
+     "ref": "/docs/reference/effects#light-setintensity",
+     "use": "local light = game.Effects:Light(options)\nlight:SetIntensity(intensity)"
+    }
+   ]
+  },
+  {
+   "id": "WaxTrailOptions",
+   "name": "WaxTrailOptions",
+   "title": "WaxTrailOptions",
+   "kind": "data",
+   "group": "effects",
+   "text": "What game.Effects:Trail takes besides what it follows.",
+   "ref": "/docs/reference/effects#waxtrailoptions",
+   "users": [
+    "game.Effects.Trail"
+   ],
+   "props": [
+    {
+     "id": "WaxTrailOptions.from",
+     "name": "from",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "One end of the edge that leaves the trail, measured from what it follows.",
+     "use": "local trail = game.Effects:Trail(on, { from = value })"
+    },
+    {
+     "id": "WaxTrailOptions.to",
+     "name": "to",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "The other end. { 0, 0, 50 } when omitted.",
+     "use": "local trail = game.Effects:Trail(on, { to = value })"
+    },
+    {
+     "id": "WaxTrailOptions.color",
+     "name": "color",
+     "type": "string|table",
+     "optional": true,
+     "text": "Red when omitted.",
+     "use": "local trail = game.Effects:Trail(on, { color = value })"
+    },
+    {
+     "id": "WaxTrailOptions.seconds",
+     "name": "seconds",
+     "type": "number",
+     "optional": true,
+     "text": "How long the ribbon is, in time. 0.25 when omitted.",
+     "use": "local trail = game.Effects:Trail(on, { seconds = 1 })"
+    },
+    {
+     "id": "WaxTrailOptions.life",
+     "name": "life",
+     "type": "number",
+     "optional": true,
+     "text": "How long it runs. Until it is stopped when omitted.",
+     "use": "local trail = game.Effects:Trail(on, { life = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxTrail",
+   "name": "WaxTrail",
+   "title": "WaxTrail",
+   "kind": "object",
+   "group": "effects",
+   "text": "A trail that is running.",
+   "ref": "/docs/reference/effects#waxtrail",
+   "makers": [
+    "game.Effects.Trail"
+   ],
+   "use": "local trail = game.Effects:Trail(on, options)",
+   "funcs": [
+    {
+     "id": "WaxTrail.Stop",
+     "name": "Stop",
+     "call": "trail:Stop",
+     "text": "Stops it growing. What is left of the ribbon runs out and is taken away.",
+     "ref": "/docs/reference/effects#trail-stop",
+     "use": "local trail = game.Effects:Trail(on, options)\ntrail:Stop()"
+    },
+    {
+     "id": "WaxTrail.IsAlive",
+     "name": "IsAlive",
+     "call": "trail:IsAlive",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "ref": "/docs/reference/effects#trail-isalive",
+     "use": "local trail = game.Effects:Trail(on, options)\nlocal result = trail:IsAlive()"
+    }
+   ]
+  },
+  {
+   "id": "game.Effects",
+   "name": "WaxEffects",
+   "title": "game.Effects",
+   "kind": "namespace",
+   "group": "effects",
+   "text": "game.Effects: the game's particle effects, lights, glowing trails and camera shakes, on anything. Everything a mod started is taken away when the mod unloads. Nothing costs anything while no effect is alive.",
+   "ref": "/docs/reference/effects#game-effects",
+   "funcs": [
+    {
+     "id": "game.Effects.Particles",
+     "name": "Particles",
+     "call": "game.Effects:Particles",
+     "params": [
+      {
+       "name": "path",
+       "type": "string",
+       "text": "The path of a particle effect of the game. game.Effects:Find looks for one."
+      },
+      {
+       "name": "options",
+       "type": "WaxParticleOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxParticles"
+      }
+     ],
+     "text": "Starts one of the game's particle effects on something.",
+     "ref": "/docs/reference/effects#game-effects-particles",
+     "use": "local particles = game.Effects:Particles(path, options)"
+    },
+    {
+     "id": "game.Effects.Light",
+     "name": "Light",
+     "call": "game.Effects:Light",
+     "params": [
+      {
+       "name": "options",
+       "type": "WaxLightOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxLight"
+      }
+     ],
+     "text": "Makes a point light on something.",
+     "ref": "/docs/reference/effects#game-effects-light",
+     "use": "local light = game.Effects:Light(options)"
+    },
+    {
+     "id": "game.Effects.Trail",
+     "name": "Trail",
+     "call": "game.Effects:Trail",
+     "params": [
+      {
+       "name": "on",
+       "type": "any",
+       "text": "A thing of a blueprint, a part, a character or a creature."
+      },
+      {
+       "name": "options",
+       "type": "WaxTrailOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxTrail"
+      }
+     ],
+     "text": "Leaves a glowing ribbon behind an edge of something that moves, such as a blade.",
+     "ref": "/docs/reference/effects#game-effects-trail",
+     "use": "local trail = game.Effects:Trail(on, options)"
+    },
+    {
+     "id": "game.Effects.Shake",
+     "name": "Shake",
+     "call": "game.Effects:Shake",
+     "params": [
+      {
+       "name": "scale",
+       "type": "number",
+       "optional": true,
+       "text": "How strong. 1 when omitted."
+      },
+      {
+       "name": "path",
+       "type": "string",
+       "optional": true,
+       "text": "The path of a camera shake of the game. A footstep of a mammoth when omitted."
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "shaken"
+      }
+     ],
+     "text": "Shakes the player's view with one of the game's camera shakes.",
+     "ref": "/docs/reference/effects#game-effects-shake",
+     "use": "local shaken = game.Effects:Shake(scale, path)"
+    },
+    {
+     "id": "game.Effects.Find",
+     "name": "Find",
+     "call": "game.Effects:Find",
+     "params": [
+      {
+       "name": "text",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]",
+       "name": "paths"
+      },
+      {
+       "type": "integer",
+       "name": "total"
+      }
+     ],
+     "text": "The paths of the game's particle effects whose path holds every word given. At most 200, then how many there were.",
+     "ref": "/docs/reference/effects#game-effects-find",
+     "use": "local paths, total = game.Effects:Find(text)"
+    },
+    {
+     "id": "game.Effects.FindShakes",
+     "name": "FindShakes",
+     "call": "game.Effects:FindShakes",
+     "params": [
+      {
+       "name": "text",
+       "type": "string",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]",
+       "name": "paths"
+      },
+      {
+       "type": "integer",
+       "name": "total"
+      }
+     ],
+     "text": "The paths of the game's camera shakes whose path holds every word given.",
+     "ref": "/docs/reference/effects#game-effects-findshakes",
+     "use": "local paths, total = game.Effects:FindShakes(text)"
+    }
+   ]
+  },
+  {
+   "id": "WaxSoundOptions",
+   "name": "WaxSoundOptions",
+   "title": "WaxSoundOptions",
+   "kind": "data",
+   "group": "effects",
+   "text": "What game.Sounds:Play takes besides the path.",
+   "ref": "/docs/reference/effects#waxsoundoptions",
+   "users": [
+    "game.Sounds.Play"
+   ],
+   "props": [
+    {
+     "id": "WaxSoundOptions.on",
+     "name": "on",
+     "type": "any",
+     "optional": true,
+     "text": "What the sound comes from. When omitted it is heard everywhere at the same loudness.",
+     "use": "local played = game.Sounds:Play(path, { on = value })"
+    },
+    {
+     "id": "WaxSoundOptions.socket",
+     "name": "socket",
+     "type": "string",
+     "optional": true,
+     "text": "A bone or socket of what it comes from.",
+     "use": "local played = game.Sounds:Play(path, { socket = \"text\" })"
+    },
+    {
+     "id": "WaxSoundOptions.at",
+     "name": "at",
+     "type": "{ X: number, Y: number, Z: number }|number[]",
+     "optional": true,
+     "text": "Where it comes from, measured from that.",
+     "use": "local played = game.Sounds:Play(path, { at = value })"
+    }
+   ]
+  },
+  {
+   "id": "game.Sounds",
+   "name": "WaxSounds",
+   "title": "game.Sounds",
+   "kind": "namespace",
+   "group": "effects",
+   "text": "game.Sounds: the game's own sounds.",
+   "ref": "/docs/reference/effects#game-sounds",
+   "funcs": [
+    {
+     "id": "game.Sounds.Play",
+     "name": "Play",
+     "call": "game.Sounds:Play",
+     "params": [
+      {
+       "name": "path",
+       "type": "string",
+       "text": "The path of a sound of the game. game.Sounds:Find looks for one."
+      },
+      {
+       "name": "options",
+       "type": "WaxSoundOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "played"
+      }
+     ],
+     "text": "Plays one of the game's sounds.",
+     "ref": "/docs/reference/effects#game-sounds-play",
+     "use": "local played = game.Sounds:Play(path, options)"
+    },
+    {
+     "id": "game.Sounds.Find",
+     "name": "Find",
+     "call": "game.Sounds:Find",
+     "params": [
+      {
+       "name": "text",
+       "type": "string",
+       "text": "Words such as \"whoosh bear\"."
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]",
+       "name": "paths"
+      },
+      {
+       "type": "integer",
+       "name": "total"
+      }
+     ],
+     "text": "The paths of the game's sounds whose path holds every word given. At most 200, then how many there were.",
+     "ref": "/docs/reference/effects#game-sounds-find",
+     "use": "local paths, total = game.Sounds:Find(text)"
     }
    ]
   },

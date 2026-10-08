@@ -1,0 +1,181 @@
+---
+title: Animations, effects and sounds
+description: Play the game's own clips, write animations as keys in Lua for anything, and add particles, lights, trails, shakes and sounds.
+icon: Clapperboard
+---
+
+<Since version="0.3.6" />
+
+Three names work together here. `game.Animations` moves things: bones of a character or a creature, or a thing
+as a whole. `game.Effects` adds what is seen around it, and `game.Sounds` what is heard. None of them needs the
+Unreal editor or a pak.
+
+```lua title="init.lua"
+local wave = game.Animations:Define("Wave", {
+    length = 1.2,
+    tracks = {
+        RightShoulder = { { 0, {} }, { 0.4, { Pitch = 60 } }, { 0.8, { Pitch = 60, Yaw = 30 } }, { 1.2, {} } },
+    },
+})
+
+local window = ui.Window({ title = "Wave", width = 260, height = 110 })
+window:Button("Wave", function()
+    if game.Me.Exists then wave:Play(game.Me) end
+end)
+```
+
+## An animation written as keys
+
+`game.Animations:Define(name, spec)` makes an animation. It is plain Lua until it plays.
+
+- A **track** says what moves. It is named by a bone, or `Self` for the thing as a whole.
+- A track is a list of **keys**: a time in seconds, then what is added at that time.
+- What a key adds is an offset: `Pitch`, `Yaw`, `Roll` in degrees, `X`, `Y`, `Z`, and `Scale`. A key of `{}`
+  means "as the game has it". So an animation that starts and ends with `{}` blends in and out by itself.
+- Between two keys the values are eased. `ease` is `"smooth"` when omitted. The others are `"linear"`,
+  `"in"`, `"out"` and `"snap"`. A key can name its own as its third entry.
+
+| In the spec | What it is |
+| --- | --- |
+| `tracks` | What moves, by name. |
+| `third` | Tracks for the player's body in third person, when they should differ from `tracks`. |
+| `length` | How long it runs. The time of the last key when omitted. |
+| `loop` | `true` starts it again when it ends. |
+| `ease` | How keys are eased when a key does not say. |
+| `events` | `{ { seconds, function } }`: functions that run when the animation passes a time. |
+
+### Bones
+
+A bone is added to, not replaced: the game goes on animating, and your offsets come on top. So a swing you
+write works while the character walks, and a creature keeps breathing under it.
+
+These names fit the player's arms in first person and the body in third:
+
+`RightClavicle`, `RightShoulder`, `RightElbow`, `RightWrist`, `RightHand`, and the same with `Left`. On the
+body there are also `Head`, `Neck`, `Chest`, `Waist`, `Hips`, `RightThigh` and `LeftThigh`.
+
+Any other bone goes by the name its skeleton gives it. `game.Animations:GetBones(target)` lists them, and a
+name the skeleton does not have raises an error that suggests the nearest.
+
+### Play it
+
+`animation:Play(target, options)` plays it and gives you the play.
+
+| Target | What moves |
+| --- | --- |
+| `game.Me` | The arms in first person and the body in third. It follows when the player changes view. |
+| A creature or another character | Its body. |
+| A thing of a [blueprint](/docs/blueprints), or a part | The thing as a whole, by its `Self` track. |
+
+| Option | What it does |
+| --- | --- |
+| `rate` | How fast it runs. `1` when omitted. |
+| `loop` | Overrides the animation's own. |
+| `weight` | How much of the movement is added. `0.5` is half. |
+| `keep` | `true` leaves a thing where its `Self` track put it. |
+| `done` | A function that runs when it has run to its end. |
+
+A play has `Stop()`, `IsPlaying()`, `GetTime()` and `SetRate(rate)`.
+
+```lua title="init.lua"
+local spin = game.Animations:Define("Spin", {
+    length = 2,
+    loop = true,
+    ease = "linear",
+    tracks = { Self = { { 0, { Yaw = 0 } }, { 2, { Yaw = 360 } } } },
+})
+
+local cube = game.Blueprints:Define("SpinCube", {
+    parts = { Body = { mesh = "/Engine/BasicShapes/Cube.Cube", root = true, scale = 0.4, collision = "none" } },
+})
+
+local window = ui.Window({ title = "Cube", width = 260, height = 110 })
+window:Button("Spawn a spinning cube", function()
+    if not game.IsHost or not game.Me.Exists then return end
+    local me = game.Me.Position
+    spin:Play(cube:Spawn({ X = me.X + 250, Y = me.Y, Z = me.Z + 40 }))
+end)
+```
+
+### How bones are moved
+
+The game gives no way to set a bone of a mesh it animates. So while an animation plays, Wax shows a copy of
+the mesh that it can pose: the copy takes the game's own pose every frame, your keys are added, and the real
+mesh is hidden. What hangs on the mesh, such as a held tool or clothing, is moved over to the copy and back.
+When nothing has played for ten seconds the copy is taken away. While nothing plays, it costs nothing.
+
+## The game's own clips
+
+`game.Animations:Play(target, clip, options)` plays one of the game's montages or sequences.
+
+```lua
+game.Animations:Play(game.Me, {
+    first = "/Game/ASS/CHA/1ST/1ST_NewRig/1ST_CHA_Sledge_Hit_Montage",
+    third = "/Game/ASS/CHA/Human/3RD/Animations/3RD_CHA_SledgeHit_Montage",
+})
+```
+
+- The player's arms and body are two skeletons with clips of their own, so give `first` and `third`. For a
+  creature give one path.
+- Options: `rate`, `blend` (seconds in and out), `start`, and for a single sequence `slot` and `loops`.
+- `game.Animations:Find("1st sledge montage")` gives the paths that hold every word. The game has 4,091.
+- A clip only moves a skeleton it was made for.
+
+## Effects
+
+Everything here hangs on something: `on` is a character, a creature, a thing or a part, and `game.Me` when
+omitted. `socket` names a bone or socket of it, and `at` is measured from there.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Effects", width = 260, height = 190 })
+
+window:Button("Sparks", function()
+    game.Effects:Particles("/Game/ASS/VFX/FRE/NS_Sparks_AnvilT4", { on = game.Me, seconds = 2 })
+end)
+window:Button("Red light", function()
+    game.Effects:Light({ on = game.Me, color = "Red", intensity = 20000, radius = 600, seconds = 2, fade = 1 })
+end)
+window:Button("Shake", function()
+    game.Effects:Shake(1.5)
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `game.Effects:Particles(path, options)` | Starts one of the game's particle effects. `seconds` is how long it stays, `3` when omitted, `false` for until `Stop`. `set` gives parameters of the effect. |
+| `game.Effects:Light(options)` | A point light: `color`, `intensity`, `radius`, `seconds`, `fade`. |
+| `game.Effects:Trail(on, options)` | A glowing ribbon behind an edge that moves: `from` and `to` are the ends of the edge, `seconds` how long the ribbon is in time, `life` how long it runs. |
+| `game.Effects:Shake(scale, path)` | Shakes the player's view with one of the game's camera shakes. |
+| `game.Effects:Find(text)` | Paths of the game's 554 particle effects. `FindShakes` does the same for its 78 shakes. |
+
+- What `Particles`, `Light` and `Trail` give has `Stop()` and `IsAlive()`. Particles have `Set(name, value)`,
+  a light `SetColor` and `SetIntensity`.
+- Everything your mod started is taken away when the mod unloads.
+- At most 64 effects are alive at once for all mods. A new one past that takes the oldest away.
+- A trail is drawn in the world, not bent toward the screen as things held in first person are. On a tool in
+  the first-person hand it sits a little off the blade.
+
+## Sounds
+
+```lua
+game.Sounds:Play("/Game/FMOD/Events/SFX/Creatures/Movement/SFX_CRE_BEAR_WHOOSH")
+```
+
+- With nothing else it is heard everywhere. With `on` it comes from that thing: `{ on = creature }`.
+- `game.Sounds:Find("whoosh bear")` gives the paths that hold every word. The game has 5,515 sounds.
+- Only the game's own sounds can be played. A sound file of your own is not possible yet.
+- A sound cannot be stopped once it plays.
+
+## What has been seen
+
+All of it was run on the host of a prospect: a sound, a shake, sparks and a light on the player's hand, a clip
+of the game, an animation of keys on the arms and on the body with the clothing following, and a spawned cube
+turning with a trail behind it. These have not been looked at yet:
+
+- An animation of keys on a creature.
+- Particle effects of the older kind (`ParticleSystem`), and `Set` on any effect.
+- A sound that comes from a thing.
+- What other players of a session see. Expect them to see none of it: it is made on your PC.
+
+Every function is listed in the [Animations reference](/docs/reference/animations) and the
+[Effects reference](/docs/reference/effects).

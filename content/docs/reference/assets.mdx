@@ -8,8 +8,6 @@ icon: Boxes
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
-<NextLegend />
-
 ## `game.Assets` [#game-assets]
 
 The game's assets by path, pictures from a mod's own files, materials made from the game's, and shapes made of numbers. What Load, Texture and Material give is kept in memory for the mod that asked: the game frees an asset nothing uses within minutes, and using it after that crashes. When the mod unloads, everything it asked for is let go. Nothing here runs between calls, so it costs nothing a frame. While Wax's interface is not running nothing can be kept. The log says so once, and what you get may then be freed within minutes: ask for it again right before each use.
@@ -216,8 +214,6 @@ Used by [`mesh:Apply`](/docs/reference/assets#mesh-apply).
 | `collision` | `boolean` | Whether things stop at the shape here. The shape's own answer when omitted. |
 
 ## WaxModelFileOptions [#waxmodelfileoptions]
-
-<NextMark block />
 
 What [`game.Assets:Model`](/docs/reference/assets#game-assets-model) takes besides the file.
 
