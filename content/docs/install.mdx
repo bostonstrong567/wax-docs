@@ -11,12 +11,12 @@ download.
 
 ## Download
 
-Download `Wax-0.3.9.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
+Download `Wax-0.3.10.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
 The number in the file name is the version. Extract the whole zip before you run anything in it.
 
 The same page has the VS Code extension as a `.vsix` file. The [editor page](/docs/editor) says what it is for.
 
-It also has `Wax-0.3.9.manifest` and `Wax-0.3.9.manifest.sig`. They are the signed list of the release's
+It also has `Wax-0.3.10.manifest` and `Wax-0.3.10.manifest.sig`. They are the signed list of the release's
 files. You don't need them to install. [Check a download by hand](/docs/security#check-a-download-by-hand)
 says how to use them.
 
@@ -36,7 +36,7 @@ Inside `game`:
 | --- | --- |
 | `dwmapi.dll` and the `ue4ss` folder | UE4SS. |
 | `ue4ss\Mods\Wax` | Wax. |
-| `ue4ss\Mods\Wax\mods\RecipeBrowser` | Prospector's Codex, the mod that comes with Wax. It was called Recipe Browser before Wax 0.3.0, and its folder kept that name. |
+| `ue4ss\Mods\Wax\mods` | Your mods. It is empty after a new install. |
 
 [Security](/docs/security) says what each part does on your PC and how to remove it.
 
@@ -116,7 +116,7 @@ Start ICARUS the way you always do. Nothing else has to run next to it.
 ### Press F8
 
 The menu opens and you see the Wax panel. Its **Mods** page lists every mod Wax found. After a new install
-that is Prospector's Codex, the mod that comes with Wax.
+it is empty: the **Browse** page beside it has mods to add.
 
 </Step>
 <Step>
@@ -131,7 +131,7 @@ The bottom of the panel says how many mods loaded, and whether there were errors
 <Shot
   src="panel-mods.png"
   alt="The Mods page of the Wax panel. Under a search box are a Look for updates switch, a Check now button and two cards. The card of Entity ESP 1.0.0 is open: Status loaded, Load time 4.2 ms, an Enabled switch and an Auto Update switch that are on, Open key F6, a Reload button and a bin. The card of Recipe Browser 0.9.2 is closed. Each card has six dots at its left. The line along the bottom reads 2 of 2 mods loaded, no errors."
-  caption="Here with two mods. A new install lists one, Prospector's Codex, which comes with Wax. The picture shows it under its earlier name, Recipe Browser."
+  caption="Here with two mods. A new install lists none. The picture shows Prospector's Codex under its earlier name, Recipe Browser."
 />
 
 <NextVersion>The picture shows the panel of the next version. In Wax 0.2.1 a card has up and down arrows in place of the six dots, and no **Open key** or **Auto Update** switch of its own.</NextVersion>
@@ -196,11 +196,8 @@ the **Add to game** button the way you set it.
 Download the newest zip and copy the contents of `game` into `Win64` again. Say yes when Windows asks to
 replace files.
 
-Your own mods and your settings are not in the zip, so they stay. Two things are replaced by the copies from
-the zip:
-
-- the mod that comes with Wax, `mods\RecipeBrowser`
-- the UE4SS settings files `UE4SS-settings.ini`, `mods.txt` and `mods.json`
+Your own mods and your settings are not in the zip, so they stay. The UE4SS settings files `UE4SS-settings.ini`,
+`mods.txt` and `mods.json` are replaced by the copies from the zip.
 
 ### Updates in the game
 
