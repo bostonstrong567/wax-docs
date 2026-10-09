@@ -93,9 +93,23 @@ state.Health = "full"            -- an error: Health expects a whole number
 ```
 
 <Callout title="The game can change the value again">
-  Writing a property changes the value the game holds. The game may change it again on its next update. In
-  multiplayer the host decides what counts.
+  Writing a property changes the value the game holds. The game may change it again on its next update.
 </Callout>
+
+### Position and Rotation
+
+Every actor, and every part of one that has a place, has `Position` and `Rotation`. Read them, or assign to
+move the thing at once.
+
+```lua
+local thing = game.Character
+
+print(thing.Position.X, thing.Rotation.Yaw)
+thing.Position = { 5, 5, 5 }               -- or { X = 5, Y = 5, Z = 5 }
+thing.Rotation = { Yaw = 90 }
+```
+
+A class of the game that has a member of its own by one of these names keeps it.
 
 ## What you get back
 

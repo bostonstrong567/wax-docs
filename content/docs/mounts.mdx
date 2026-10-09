@@ -23,7 +23,7 @@ end)
 
 ## A mount in one call
 
-`game.Creatures:SpawnMount(kind, place, options)` puts a tamed animal into the world, for the host of a session.
+`game.Creatures:SpawnMount(kind, place, options)` puts a tamed animal into the world.
 `kind` is the animal's set-up row, such as `"Mount_Moa"` or `"Mount_Horse"`, or a kind such as `"Moa"`.
 
 It does what the game does when a taming ends, and then the two things a player would do by hand:
@@ -92,7 +92,7 @@ who should see the model needs the mod.
 
 ## A mount that strikes
 
-`mount:Strike()` makes a mount attack, for the host. It is what the game does when the rider of a mount attacks:
+`mount:Strike()` makes a mount attack. It is what the game does when the rider of a mount attacks:
 the mount plays its own attack, pays the stamina for it, and hits what stands in front of it at the strike. The
 game keeps that for mounts with the talent for it. `Strike` asks for no talent.
 
@@ -156,4 +156,3 @@ Load the mesh with `mod.Content:Load` before you show it by its path.
   model bound to it do not flap.
 - The mount keeps the animal's own stats, sounds and talents. To change numbers, change the animal's rows
   ([Tables](/docs/tables)).
-- `SpawnMount` and `Strike` are for the host. In somebody else's game they raise an error that says so.

@@ -1,6 +1,6 @@
 ---
 title: Your character
-description: game.Me gives your character's health, food, level and place by name, tells you when they change, and lets the host change them.
+description: game.Me gives your character's health, food, level and place by name, tells you when they change, and lets you change them.
 icon: User
 ---
 
@@ -118,20 +118,14 @@ end
 An Instance of a character has `Damaged` and `Died` too. The other signals in the table above belong to
 `game.Me`. To follow another value of any object, see [Watching a value](/docs/watching).
 
-## What the host can change
+## What you can change
 
-These work when you play alone or host the game. In a game someone else hosts, each of them raises an error
-that says only the host can. `game.IsHost` tells you which you are. See
-[Multiplayer](/docs/multiplayer#host-and-guest).
+Each of these is the game's own call.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Helper", width = 280, height = 200 })
 
 window:Button("Heal me", function()
-    if not game.IsHost then
-        ui.Notify("Only the host can do this.", { kind = "warn" })
-        return
-    end
     game.Me:Heal()
     game.Me.Food = game.Me.MaxFood
     game.Me.Water = game.Me.MaxWater
@@ -146,6 +140,8 @@ end)
 | `character:Heal(amount)` | Gives health back. Without an amount, all of it. It does not bring a dead character back. |
 | `character:Kill()` | Kills a creature at once. On a player's character it raises an error in this version. |
 | `character:Teleport(place, facing)` | Moves the character at once. `place` is a position, an Instance or `game.Me`. |
+| `character.Position = { 5, 5, 5 }` | The same, by assigning. `{ X = , Y = , Z = }`, an Instance and `game.Me` work too. |
+| `character.Rotation = { Yaw = 90 }` | Turns it. What you leave out stays as it is. |
 
 - `Teleport` puts the character exactly where you say. Above the ground, it falls and can take damage.
 - No other field can be assigned.

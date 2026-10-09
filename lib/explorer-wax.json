@@ -9779,7 +9779,7 @@
        "type": "string?"
       }
      ],
-     "text": "Puts a new wild creature into the world with the game's own spawn, for the host only: in someone else's game it raises an error that says so. kind is a variant such as \"Conifer_Wolf\" or \"Deer\", or a kind that has one variant. A kind with several raises an error that lists them. place is a position, an actor or game.Me. When it is omitted the creature goes six metres in front of your character, and the options may stand in its place. Wax asks the game for ground a creature can walk on near the place, within 5 metres to the sides and at any height, and puts the creature a little above it. Where the game has none it raises an error and nothing is spawned. Inside a task Spawn waits until the game has given the creature its level, two seconds at most, and then answers the creature. Outside a task it answers at once, and Level and Health are right a few frames later. It answers nil and the reason when the creature left the world before it was finished. A tamed variant is refused in this version of Wax. The game's call took 3 to 4 ms when it was timed, and 18 ms once: a kind that is not in memory is loaded by the game inside the call. What is spawned stays when the mod unloads, unless the option keep is false.",
+     "text": "Puts a new wild creature into the world with the game's own spawn. kind is a variant such as \"Conifer_Wolf\" or \"Deer\", or a kind that has one variant. A kind with several raises an error that lists them. place is a position, an actor or game.Me. When it is omitted the creature goes six metres in front of your character, and the options may stand in its place. Wax asks the game for ground a creature can walk on near the place, within 5 metres to the sides and at any height, and puts the creature a little above it. Where the game has none it raises an error and nothing is spawned. Inside a task Spawn waits until the game has given the creature its level, two seconds at most, and then answers the creature. Outside a task it answers at once, and Level and Health are right a few frames later. It answers nil and the reason when the creature left the world before it was finished. A tamed variant is refused in this version of Wax. The game's call took 3 to 4 ms when it was timed, and 18 ms once: a kind that is not in memory is loaded by the game inside the call. What is spawned stays when the mod unloads, unless the option keep is false.",
      "ref": "/docs/reference/game#game-creatures-spawn",
      "use": "local creature, result = game.Creatures:Spawn(kind, place, options)"
     },
@@ -9811,7 +9811,7 @@
        "type": "string?"
       }
      ],
-     "text": "Puts a tamed animal into the world that is yours and can be ridden at once, for the host only. kind is its set-up row such as \"Mount_Moa\" or \"Mount_Horse\", or a kind such as \"Moa\". It is made with the game's own spawn, named, given to you, and a saddle is put in its saddle slot, which is what makes the game give it a seat: after that the game's own \"ride\" works on it. place is a position or an actor. When it is omitted the mount comes a few metres in front of you, and the options may stand in its place. Where the game knows no ground to walk on under the place, as on a platform a mod built, the mount is made on the ground below and brought up. Inside a task it answers once the saddle is on, with the reason as a second value when the saddle did not go on. Outside a task it answers at once and finishes a moment later. The mount is saved with the prospect like any other.",
+     "text": "Puts a tamed animal into the world that is yours and can be ridden at once. kind is its set-up row such as \"Mount_Moa\" or \"Mount_Horse\", or a kind such as \"Moa\". It is made with the game's own spawn, named, given to you, and a saddle is put in its saddle slot, which is what makes the game give it a seat: after that the game's own \"ride\" works on it. place is a position or an actor. When it is omitted the mount comes a few metres in front of you, and the options may stand in its place. Where the game knows no ground to walk on under the place, as on a platform a mod built, the mount is made on the ground below and brought up. Inside a task it answers once the saddle is on, with the reason as a second value when the saddle did not go on. Outside a task it answers at once and finishes a moment later. The mount is saved with the prospect like any other.",
      "ref": "/docs/reference/game#game-creatures-spawnmount",
      "use": "local creature, result = game.Creatures:SpawnMount(kind, place, options)"
     }
@@ -10266,7 +10266,7 @@
      "id": "game.Blueprints",
      "name": "Blueprints",
      "type": "WaxBlueprints",
-     "text": "Things described in Lua and spawned by the host: an actor of a class the game has, with parts, assets and functions of your own. The game does not save them.",
+     "text": "Things described in Lua and spawned: an actor of a class the game has, with parts, assets and functions of your own. The game does not save them.",
      "use": "print(game.Blueprints)"
     },
     {
@@ -11740,7 +11740,7 @@
    "title": "WaxCharacter",
    "kind": "object",
    "group": "character",
-   "text": "What Wax adds to every character, a player's and a creature's: every Instance whose class is IcarusCharacter or is built on it. Each field asks the game when it is read. A field is nil when the character has no such value. The host can assign Health and Stamina and call Heal, Kill and Teleport. They act on the machine that runs them, so in someone else's game each of them raises an error that says only the host can. game.IsHost says which you are. No other field can be assigned.",
+   "text": "What Wax adds to every character, a player's and a creature's: every Instance whose class is IcarusCharacter or is built on it. Each field asks the game when it is read. A field is nil when the character has no such value. Health and Stamina can be assigned, and Heal, Kill and Teleport called. They are the game's own calls. No other field can be assigned.",
    "parents": [
     "WaxCharacterStats"
    ],
@@ -11755,7 +11755,7 @@
      "id": "WaxCharacter.Health",
      "name": "Health",
      "type": "integer?",
-     "text": "Its health now. The host can assign it: the number is rounded, and no more than MaxHealth is set. Below 1 raises an error, because Kill is what kills, and so does assigning it on a character that is dead.",
+     "text": "Its health now. It can be assigned: the number is rounded, and no more than MaxHealth is set. Below 1 raises an error, because Kill is what kills, and so does assigning it on a character that is dead.",
      "use": "local character = game.Character\nprint(character.Health)"
     },
     {
@@ -11790,7 +11790,7 @@
      "id": "WaxCharacter.Stamina",
      "name": "Stamina",
      "type": "integer?",
-     "text": "Its stamina now. The host can assign it: the number is rounded and brought between 0 and MaxStamina.",
+     "text": "Its stamina now. It can be assigned: the number is rounded and brought between 0 and MaxStamina.",
      "use": "local character = game.Character\nprint(character.Stamina)"
     },
     {
@@ -11832,14 +11832,14 @@
      "id": "WaxCharacter.Position",
      "name": "Position",
      "type": "{ X: number, Y: number, Z: number }",
-     "text": "Where it is, in the engine's units: 100 is one metre.",
+     "text": "Where it is, in the engine's units: 100 is one metre. Assign a place to move it there at once: { X = 0, Y = 0, Z = 0 }, { 0, 0, 0 }, an actor or game.Me. When the game finds no room there it raises an error that says so.",
      "use": "local character = game.Character\nprint(character.Position)"
     },
     {
      "id": "WaxCharacter.Rotation",
      "name": "Rotation",
      "type": "{ Pitch: number, Yaw: number, Roll: number }",
-     "text": "Which way its body is turned, in degrees.",
+     "text": "Which way its body is turned, in degrees. Assign { Yaw = 90 } or { 0, 90, 0 } to turn it. What is left out stays as it is.",
      "use": "local character = game.Character\nprint(character.Rotation)"
     },
     {
@@ -11877,7 +11877,7 @@
      "name": "Damaged",
      "type": "WaxSignal<fun(who: WaxCharacter, amount: integer, info: WaxDamageInfo)>",
      "receives": "who: WaxCharacter, amount: integer, info: WaxDamageInfo",
-     "text": "Fires when the game says this character took damage: the character, the damage of the hit, and what the game knows of it. The game tells it itself, so nothing is looked at meanwhile, and the handler runs in the same frame or the next one. Health that goes down with no hit, as when the host assigns Health, is not damage. Seen on the host of a session. On another player's machine it has not been tried.",
+     "text": "Fires when the game says this character took damage: the character, the damage of the hit, and what the game knows of it. The game tells it itself, so nothing is looked at meanwhile, and the handler runs in the same frame or the next one. Health that goes down with no hit, as when a mod assigns Health, is not damage. Seen on the host of a session. On another player's machine it has not been tried.",
      "use": "local character = game.Character\ncharacter.Damaged:Connect(function(who, amount, info)\n    print(who, amount, info)\nend)"
     },
     {
@@ -11929,7 +11929,7 @@
        "text": "Its health afterwards."
       }
      ],
-     "text": "Gives health back, for the host only. With an amount, that much and never past MaxHealth. Without one, all of it. A character that is dead is not brought back: that raises an error.",
+     "text": "Gives health back. With an amount, that much and never past MaxHealth. Without one, all of it. A character that is dead is not brought back: that raises an error.",
      "ref": "/docs/reference/character#character-heal",
      "use": "local character = game.Character\nlocal health = character:Heal(amount)"
     },
@@ -11944,7 +11944,7 @@
        "text": "True when it was alive and is dead now. False when it was dead already."
       }
      ],
-     "text": "Kills the character at once, for the host only. A creature killed this way became a corpse one to three seconds later when it was timed. A player's character is refused in this version of Wax: the game's call has only been made on creatures.",
+     "text": "Kills the character at once. A creature killed this way became a corpse one to three seconds later when it was timed. A player's character is refused in this version of Wax: the game's call has only been made on creatures.",
      "ref": "/docs/reference/character#character-kill",
      "use": "local character = game.Character\nlocal killed = character:Kill()"
     },
@@ -11971,7 +11971,7 @@
        "name": "moved"
       }
      ],
-     "text": "Moves the character at once with the engine's own teleport, for the host only. Nothing holds it up afterwards: put above the ground it falls. It answers false when the game did not move it.",
+     "text": "Moves the character at once with the engine's own teleport. Nothing holds it up afterwards: put above the ground it falls. It answers false when the game did not move it.",
      "ref": "/docs/reference/character#character-teleport",
      "use": "local character = game.Character\nlocal moved = character:Teleport(place, facing)"
     }
@@ -12083,7 +12083,7 @@
    "title": "WaxPlayerCharacter",
    "kind": "object",
    "group": "character",
-   "text": "What Wax adds to a player's character, on top of what every character has: every Instance whose class is IcarusPlayerCharacter or is built on it. The host can assign Food, Water and Oxygen as well. In someone else's game that raises an error, as it does for Health.",
+   "text": "What Wax adds to a player's character, on top of what every character has: every Instance whose class is IcarusPlayerCharacter or is built on it. Food, Water and Oxygen can be assigned as well.",
    "parents": [
     "WaxCharacter",
     "WaxPlayerItems"
@@ -12099,7 +12099,7 @@
      "id": "WaxPlayerCharacter.Food",
      "name": "Food",
      "type": "integer?",
-     "text": "How much food it has left. The host can assign it: the number is rounded and brought between 0 and MaxFood.",
+     "text": "How much food it has left. It can be assigned: the number is rounded and brought between 0 and MaxFood.",
      "use": "local character = game.Character\nprint(character.Food)"
     },
     {
@@ -12113,7 +12113,7 @@
      "id": "WaxPlayerCharacter.Water",
      "name": "Water",
      "type": "integer?",
-     "text": "How much water it has left. The host can assign it: the number is rounded and brought between 0 and MaxWater.",
+     "text": "How much water it has left. It can be assigned: the number is rounded and brought between 0 and MaxWater.",
      "use": "local character = game.Character\nprint(character.Water)"
     },
     {
@@ -12127,7 +12127,7 @@
      "id": "WaxPlayerCharacter.Oxygen",
      "name": "Oxygen",
      "type": "integer?",
-     "text": "How much oxygen it has left. The host can assign it: the number is rounded and brought between 0 and MaxOxygen.",
+     "text": "How much oxygen it has left. It can be assigned: the number is rounded and brought between 0 and MaxOxygen.",
      "use": "local character = game.Character\nprint(character.Oxygen)"
     },
     {
@@ -12561,7 +12561,7 @@
        "text": "The number the game gave it, which GetModifiers lists as Id. nil when the game did not put it on."
       }
      ],
-     "text": "Puts a modifier on the character, for the host only: in someone else's game it raises an error that says so. The modifier is named by its row of D_ModifierStates, such as \"Health_Regen\", in any letter case, and a name the game does not have raises an error that suggests the nearest ones. How long it stays has to be given: the game's table keeps no time of its own for a modifier. It is on at once, and GetModifiers and HasModifier say so in the same frame. It has been tried on a player's character. The game's table marks some modifiers as not for creatures.",
+     "text": "Puts a modifier on the character. The modifier is named by its row of D_ModifierStates, such as \"Health_Regen\", in any letter case, and a name the game does not have raises an error that suggests the nearest ones. How long it stays has to be given: the game's table keeps no time of its own for a modifier. It is on at once, and GetModifiers and HasModifier say so in the same frame. It has been tried on a player's character. The game's table marks some modifiers as not for creatures.",
      "ref": "/docs/reference/stats#stats-addmodifier",
      "use": "local character = game.Character\nlocal id = character:AddModifier(name, seconds)"
     },
@@ -12582,7 +12582,7 @@
        "text": "How many were taken off. 0 when none of that name was on."
       }
      ],
-     "text": "Takes modifiers off the character at once, for the host only. With a name, every modifier of that row. With a record that GetModifiers gave, the one with that Id.",
+     "text": "Takes modifiers off the character at once. With a name, every modifier of that row. With a record that GetModifiers gave, the one with that Id.",
      "ref": "/docs/reference/stats#stats-removemodifier",
      "use": "local character = game.Character\nlocal count = character:RemoveModifier(modifier)"
     }
@@ -12594,7 +12594,7 @@
    "title": "game.Time",
    "kind": "namespace",
    "group": "session",
-   "text": "The time of day in the prospect, game.Time. Each field asks the game when it is read. Every field is nil while you are not in a prospect. No field can be assigned: the host moves the clock with Set.",
+   "text": "The time of day in the prospect, game.Time. Each field asks the game when it is read. Every field is nil while you are not in a prospect. No field can be assigned: Set moves the clock.",
    "ref": "/docs/reference/session#game-time",
    "guide": {
     "href": "/docs/time-and-weather",
@@ -12679,7 +12679,7 @@
        "text": "True when the clock says that time afterwards."
       }
      ],
-     "text": "Moves the game's clock forward to a time later today, for the host only: in someone else's game it raises an error that says so. The game's clock only goes forward within a day. It would count an earlier time as the next day, and Wax does not do that yet, so an earlier time raises an error that says what the clock shows. The minute the clock is already in changes nothing.",
+     "text": "Moves the game's clock forward to a time later today. The game's clock only goes forward within a day. It would count an earlier time as the next day, and Wax does not do that yet, so an earlier time raises an error that says what the clock shows. The minute the clock is already in changes nothing.",
      "ref": "/docs/reference/session#game-time-set",
      "use": "local time = game.Time\nlocal set = time:Set(hour, minute)"
     }
@@ -13352,7 +13352,7 @@
        "text": "Why not all of them, in plain words, when fewer went in: \"there was no room for 3 of the 10\"."
       }
      ],
-     "text": "Puts items into the inventory, for the host only: in someone else's game it raises an error that says so. They go onto the stacks of that item first, then into empty slots that the game says take that kind of item, a full stack to a slot. What does not fit is not given, and nothing is dropped on the ground. A tool comes as the game makes a new one, with its full durability. Count, Has and List follow in the same frame, the weight a moment later. It has been tried on a player's backpack.",
+     "text": "Puts items into the inventory. They go onto the stacks of that item first, then into empty slots that the game says take that kind of item, a full stack to a slot. What does not fit is not given, and nothing is dropped on the ground. A tool comes as the game makes a new one, with its full durability. Count, Has and List follow in the same frame, the weight a moment later. It has been tried on a player's backpack.",
      "ref": "/docs/reference/items#inventory-give",
      "use": "local backpack = game.Me.Backpack\nlocal given, why = backpack:Give(item, count)"
     },
@@ -13384,7 +13384,7 @@
        "text": "Says how many there were, when there were fewer than asked for."
       }
      ],
-     "text": "Takes items out of the inventory, for the host only. They are gone, not dropped, and the last stack of the item goes first. It has been tried on a player's backpack and hotbar.",
+     "text": "Takes items out of the inventory. They are gone, not dropped, and the last stack of the item goes first. It has been tried on a player's backpack and hotbar.",
      "ref": "/docs/reference/items#inventory-take",
      "use": "local backpack = game.Me.Backpack\nlocal taken, why = backpack:Take(item, count)"
     },
@@ -13411,7 +13411,7 @@
        "text": "Why not what was asked, in plain words: \"slot 31 holds something, so 31 slots stay\"."
       }
      ],
-     "text": "Gives the inventory this many slots, for the host only. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.",
+     "text": "Gives the inventory this many slots. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.",
      "ref": "/docs/reference/items#inventory-resize",
      "use": "local backpack = game.Me.Backpack\nlocal size, why = backpack:Resize(slots)"
     }
@@ -13574,7 +13574,7 @@
        "text": "Why not all of them, when fewer went in."
       }
      ],
-     "text": "Gives the character items into its backpack, for the host only, as the backpack's own Give does. What does not fit in the backpack is not given: nothing goes to the hotbar and nothing is dropped.",
+     "text": "Gives the character items into its backpack, as the backpack's own Give does. What does not fit in the backpack is not given: nothing goes to the hotbar and nothing is dropped.",
      "ref": "/docs/reference/items#playeritems-give",
      "use": "local me = game.Me\nlocal given, why = me:Give(item, count)"
     },
@@ -13606,7 +13606,7 @@
        "text": "Says how many there were, when there were fewer than asked for."
       }
      ],
-     "text": "Takes items away from the character, for the host only: out of its backpack first, then out of its hotbar. What it wears and what its other inventories hold is left alone. Take from one of those with the inventory's own Take.",
+     "text": "Takes items away from the character: out of its backpack first, then out of its hotbar. What it wears and what its other inventories hold is left alone. Take from one of those with the inventory's own Take.",
      "ref": "/docs/reference/items#playeritems-take",
      "use": "local me = game.Me\nlocal taken, why = me:Take(item, count)"
     }
@@ -13618,7 +13618,7 @@
    "title": "WaxCreatureMembers",
    "kind": "object",
    "group": "creature",
-   "text": "What Wax adds to a creature: every Instance whose class is IcarusNPCCharacter or IcarusPawn, or is built on one of them. Each field asks the game when it is read. A field is nil when the creature has no such value. Epic, Behaviour, Action, Target, Stance and IsFrozen are read from an IcarusNPCCharacter only. On the few creatures that are an IcarusPawn they are nil. The host can assign Behaviour and call SetLevel, Freeze, Unfreeze, Attack and Remove. They act on the machine that runs them, so in someone else's game each of them raises an error that says only the host can. game.IsHost says which you are. In this version of Wax they are for wild animals that are an IcarusNPCCharacter. On a tamed animal and on an IcarusPawn each raises an error that says so, because the game's calls were only made on wild ones. No other field can be assigned. A creature that is an IcarusNPCCharacter is a character as well, so it also has what every character has: Health, Level, Alive, Heal, Kill, Teleport, Damaged, Died and the rest.",
+   "text": "What Wax adds to a creature: every Instance whose class is IcarusNPCCharacter or IcarusPawn, or is built on one of them. Each field asks the game when it is read. A field is nil when the creature has no such value. Epic, Behaviour, Action, Target, Stance and IsFrozen are read from an IcarusNPCCharacter only. On the few creatures that are an IcarusPawn they are nil. Behaviour can be assigned, and SetLevel, Freeze, Unfreeze, Attack and Remove called. They are the game's own calls. In this version of Wax they are for wild animals that are an IcarusNPCCharacter. On a tamed animal and on an IcarusPawn each raises an error that says so, because the game's calls were only made on wild ones. No other field can be assigned. A creature that is an IcarusNPCCharacter is a character as well, so it also has what every character has: Health, Level, Alive, Heal, Kill, Teleport, Damaged, Died and the rest.",
    "ref": "/docs/reference/creature#waxcreaturemembers",
    "guide": {
     "href": "/docs/creatures",
@@ -13658,7 +13658,7 @@
      "id": "WaxCreatureMembers.Behaviour",
      "name": "Behaviour",
      "type": "string?",
-     "text": "The team the game has it on now, which decides whom it treats as an enemy: \"Friendly\" for the team FriendlyAll, \"Tame\" for Player (the players' own team), \"HostileToPlayers\" for EnemyPlayerOnly, \"HostileToAll\" for EnemyAll. On any other team it is \"Default\" while that is the team its variant starts on, and else the team's own name, a row of D_AIRelationships such as \"DefaultLargeCarnivore\". nil when the game names no team. The host can assign it: one of the five words, where \"Default\" puts it back on the team its variant starts on, or a team's own name. A name that is neither raises an error that suggests the nearest. The game goes by the new team from the next time the animal notices somebody, not at once: a wolf that had a player in view attacked two seconds after \"HostileToPlayers\", a wolf that was walking away did nothing in five, and an animal that is attacking goes on attacking after \"Friendly\".",
+     "text": "The team the game has it on now, which decides whom it treats as an enemy: \"Friendly\" for the team FriendlyAll, \"Tame\" for Player (the players' own team), \"HostileToPlayers\" for EnemyPlayerOnly, \"HostileToAll\" for EnemyAll. On any other team it is \"Default\" while that is the team its variant starts on, and else the team's own name, a row of D_AIRelationships such as \"DefaultLargeCarnivore\". nil when the game names no team. It can be assigned: one of the five words, where \"Default\" puts it back on the team its variant starts on, or a team's own name. A name that is neither raises an error that suggests the nearest. The game goes by the new team from the next time the animal notices somebody, not at once: a wolf that had a player in view attacked two seconds after \"HostileToPlayers\", a wolf that was walking away did nothing in five, and an animal that is attacking goes on attacking after \"Friendly\".",
      "use": "local creature = game.Creatures:GetNearest()\nprint(creature.Behaviour)"
     },
     {
@@ -13771,7 +13771,7 @@
        "text": "The reason, when it did not start."
       }
      ],
-     "text": "Makes a mount attack, for the host only, as the game does when its rider attacks: it plays the mount's own attack, takes the stamina that costs, and hits what stands in front of it at the strike. The game keeps this for mounts with the talent for it. Strike asks for no talent.",
+     "text": "Makes a mount attack, as the game does when its rider attacks: it plays the mount's own attack, takes the stamina that costs, and hits what stands in front of it at the strike. The game keeps this for mounts with the talent for it. Strike asks for no talent.",
      "ref": "/docs/reference/creature#creature-strike",
      "use": "local creature = game.Creatures:GetNearest()\nlocal started, why = creature:Strike()"
     },
@@ -13793,7 +13793,7 @@
        "text": "True when the level changed. False when the creature had that level already."
       }
      ],
-     "text": "Sets the creature's level through the game, for the host only. Its experience, the most health it can have and its level stats follow in the same call, and its health is full afterwards. So set the level first and Health after it.",
+     "text": "Sets the creature's level through the game. Its experience, the most health it can have and its level stats follow in the same call, and its health is full afterwards. So set the level first and Health after it.",
      "ref": "/docs/reference/creature#creature-setlevel",
      "use": "local creature = game.Creatures:GetNearest()\nlocal changed = creature:SetLevel(level)"
     },
@@ -13808,7 +13808,7 @@
        "text": "True when it moved freely and is frozen now. False when it was frozen already."
       }
      ],
-     "text": "Holds the creature where it stands, for the host only. It stops in the same frame and decides nothing until Unfreeze.",
+     "text": "Holds the creature where it stands. It stops in the same frame and decides nothing until Unfreeze.",
      "ref": "/docs/reference/creature#creature-freeze",
      "use": "local creature = game.Creatures:GetNearest()\nlocal frozen = creature:Freeze()"
     },
@@ -13823,7 +13823,7 @@
        "text": "True when it was frozen and is free now. False when it was not frozen."
       }
      ],
-     "text": "Lets a frozen creature go again, for the host only. A deer walked on within half a second.",
+     "text": "Lets a frozen creature go again. A deer walked on within half a second.",
      "ref": "/docs/reference/creature#creature-unfreeze",
      "use": "local creature = game.Creatures:GetNearest()\nlocal freed = creature:Unfreeze()"
     },
@@ -13845,7 +13845,7 @@
        "text": "True when its aggression is raised afterwards."
       }
      ],
-     "text": "Makes the creature angry at a player's character, for the host only: the game raises its aggression to the most and tells it where the target is. A wolf had the character as its Target within a second or two and ran at it. It is for the animals the game gives aggression, the hunters. For one that has none, such as a deer or a rabbit, it raises an error that says so, and so it does for a target that is not a player's character. Nothing in Wax calls an attack off again. Remove takes the animal away.",
+     "text": "Makes the creature angry at a player's character: the game raises its aggression to the most and tells it where the target is. A wolf had the character as its Target within a second or two and ran at it. It is for the animals the game gives aggression, the hunters. For one that has none, such as a deer or a rabbit, it raises an error that says so, and so it does for a target that is not a player's character. Nothing in Wax calls an attack off again. Remove takes the animal away.",
      "ref": "/docs/reference/creature#creature-attack",
      "use": "local creature = game.Creatures:GetNearest()\nlocal angry = creature:Attack(target)"
     },
@@ -13860,7 +13860,7 @@
        "text": "Always true."
       }
      ],
-     "text": "Takes the creature out of the world, for the host only, alive or dead, with nothing left behind. The game does it a moment later, not in the same frame: IsValid() says when it is gone. The game replaces a dead creature by a corpse a few seconds after its death, one to three seconds when it was timed. The corpse is no creature: it is not in game.Creatures, and Remove raises an error on the creature it was, which is gone by then. A dead creature that was removed before that left no corpse.",
+     "text": "Takes the creature out of the world, alive or dead, with nothing left behind. The game does it a moment later, not in the same frame: IsValid() says when it is gone. The game replaces a dead creature by a corpse a few seconds after its death, one to three seconds when it was timed. The corpse is no creature: it is not in game.Creatures, and Remove raises an error on the creature it was, which is gone by then. A dead creature that was removed before that left no corpse.",
      "ref": "/docs/reference/creature#creature-remove",
      "use": "local creature = game.Creatures:GetNearest()\nlocal asked = creature:Remove()"
     }
@@ -14871,7 +14871,7 @@
      "overloads": [
       "dataTable:Set(row: string, fields: table<string, any>)"
      ],
-     "text": "Gives one field of a row a new value in the game. It is written before Set returns, so whatever the game reads from the row next is the new value. In a game someone else hosts, this changes the tables on this PC only: the host works from its own tables and decides what really happens. The player is told so once for each mod, in each game they join. `game.IsHost` says which it is. `field` is a whole field of the row, such as \"Inputs\", not a path into one. The value is whole: a struct with each of its fields, a list with each of its entries, as Change hands it to its function. Row gives the same, except that it leaves an enum inside a struct out until that enum's own path is named (`Row(name, { \"SessionRequirement.DataTableName\" })`). Set needs it and raises \"SessionRequirement lacks DataTableName\" without it. Two things may be left out of a struct: a typed row handle's DataTableName, which is filled in from the kind of handle, and text and references to assets, which stay as they are. A typed row handle only takes its own table: an ItemsStaticRowHandle names a row of ItemsStatic and nothing else, apart from the table and row the field holds already. A table name is taken with or without \"D_\", in any letter case, and written as the game lists it. An enum takes its number. Once Wax has read a value of that field in this session (for a list: from a row where the list has an entry), the number has to be one the enum has or the one the field holds, and the enum's name as the game spells it is taken too. Until then a name raises an error that asks for the number. Everything is checked before anything is written: the row, the field, the kind of every value, and that a row handle or a row enum names a row its table has (a row the field already names may stay, as some of the game's own rows name rows that are not there). What is wrong raises an error that names the place, such as \"Inputs[2] lacks Count\". After the write the field is read again. If the game did not take the value, the old one is put back and an error says what differed. The change belongs to the mod that makes it and is put back when the mod unloads. A mod that makes the same change again in the frame it reloads, or within 2 seconds of it, writes nothing. A change it no longer makes is put back when those 2 seconds are over. After a reload the row may still hold the mod's own earlier value, so a new value worked out from what the row holds belongs in Change. When two mods set one field, the mod that loads later is used, and Conflicts lists the field. With a table of fields in place of the field name, every value is checked before any is written. Two keys that mean the same field, such as Count and count, are an error. This version does not change text, references to assets, maps, sets, doubles or references to live objects. A list whose entries only the game can make (they hold one of those, a row enum or a multi row handle) keeps its length: its entries can be changed where they are, not added or removed. A kind of change that this version has switched off raises an error that says so. That can be a list that would get longer or shorter while it has more than 4 entries, while it is inside another value, or while its entries are strings or can hold strings or lists of their own. It can also be a row handle pointed at another table than the one it names now.",
+     "text": "Gives one field of a row a new value in the game. It is written before Set returns, so whatever the game reads from the row next is the new value. `field` is a whole field of the row, such as \"Inputs\", not a path into one. The value is whole: a struct with each of its fields, a list with each of its entries, as Change hands it to its function. Row gives the same, except that it leaves an enum inside a struct out until that enum's own path is named (`Row(name, { \"SessionRequirement.DataTableName\" })`). Set needs it and raises \"SessionRequirement lacks DataTableName\" without it. Two things may be left out of a struct: a typed row handle's DataTableName, which is filled in from the kind of handle, and text and references to assets, which stay as they are. A typed row handle only takes its own table: an ItemsStaticRowHandle names a row of ItemsStatic and nothing else, apart from the table and row the field holds already. A table name is taken with or without \"D_\", in any letter case, and written as the game lists it. An enum takes its number. Once Wax has read a value of that field in this session (for a list: from a row where the list has an entry), the number has to be one the enum has or the one the field holds, and the enum's name as the game spells it is taken too. Until then a name raises an error that asks for the number. Everything is checked before anything is written: the row, the field, the kind of every value, and that a row handle or a row enum names a row its table has (a row the field already names may stay, as some of the game's own rows name rows that are not there). What is wrong raises an error that names the place, such as \"Inputs[2] lacks Count\". After the write the field is read again. If the game did not take the value, the old one is put back and an error says what differed. The change belongs to the mod that makes it and is put back when the mod unloads. A mod that makes the same change again in the frame it reloads, or within 2 seconds of it, writes nothing. A change it no longer makes is put back when those 2 seconds are over. After a reload the row may still hold the mod's own earlier value, so a new value worked out from what the row holds belongs in Change. When two mods set one field, the mod that loads later is used, and Conflicts lists the field. With a table of fields in place of the field name, every value is checked before any is written. Two keys that mean the same field, such as Count and count, are an error. This version does not change text, references to assets, maps, sets, doubles or references to live objects. A list whose entries only the game can make (they hold one of those, a row enum or a multi row handle) keeps its length: its entries can be changed where they are, not added or removed. A kind of change that this version has switched off raises an error that says so. That can be a list that would get longer or shorter while it has more than 4 entries, while it is inside another value, or while its entries are strings or can hold strings or lists of their own. It can also be a row handle pointed at another table than the one it names now.",
      "ref": "/docs/reference/data#datatable-set",
      "use": "local dataTable = game.Data:Table(name)\ndataTable:Set(row, field, value)"
     },
@@ -14923,7 +14923,7 @@
        "name": "name"
       }
      ],
-     "text": "Adds a row: a copy of the row `options.like` names, as that row is now, with `values` written over it as Set would. Returns the row's name. The name is letters, digits and underscores and begins with the mod's id and an underscore, such as \"MyMod_Quick_Axe\". A character of the id that is none of those counts as an underscore. The game's own index of the table is renewed, so the game knows the row at once. The row belongs to the mod that added it, and Add again for the same row uses the row that is there. When the mod unloads, what it wrote into the row is put back and the row stays in the table, because a row is not taken out while the game runs. A recipe is switched off then: bForceDisableRecipe is set and it is on no bench, which takes it off the game's lists. The game still makes it when something asks for it by name. A row of another table is left as it is. A row that could not be switched off like that in this version is refused as the row to start from, with an error that says why. A row of the game is never replaced or removed. In a game someone else hosts, Add raises an error, because the host's game would not have the row. While adding rows is switched off in a version of Wax, Add raises an error that says so.",
+     "text": "Adds a row: a copy of the row `options.like` names, as that row is now, with `values` written over it as Set would. Returns the row's name. The name is letters, digits and underscores and begins with the mod's id and an underscore, such as \"MyMod_Quick_Axe\". A character of the id that is none of those counts as an underscore. The game's own index of the table is renewed, so the game knows the row at once. The row belongs to the mod that added it, and Add again for the same row uses the row that is there. When the mod unloads, what it wrote into the row is put back and the row stays in the table, because a row is not taken out while the game runs. A recipe is switched off then: bForceDisableRecipe is set and it is on no bench, which takes it off the game's lists. The game still makes it when something asks for it by name. A row of another table is left as it is. A row that could not be switched off like that in this version is refused as the row to start from, with an error that says why. A row of the game is never replaced or removed. While adding rows is switched off in a version of Wax, Add raises an error that says so.",
      "ref": "/docs/reference/data#datatable-add",
      "use": "local dataTable = game.Data:Table(name)\nlocal result = dataTable:Add(name, values, options)"
     },
@@ -15346,7 +15346,7 @@
    "title": "WaxRecipe",
    "kind": "object",
    "group": "recipes",
-   "text": "One crafting recipe: a row of D_ProcessorRecipes. `game.Recipes:Get(\"Stone_Axe\")` gives one. Reading a field reads the game's table, so it is always what the table holds now. The lists it gives are yours to change: that changes nothing in the game. One exception keeps a mod steady while it is being reloaded: what the mod itself wrote before the reload is left out, so `if recipe.Work > 2000 then recipe:SetWork(2000) end` does the same thing each time. Every function that changes the recipe returns the recipe, so changes can follow one another: `game.Recipes:Get(\"Stone_Axe\"):SetInputs({ Stone = 1 }):SetSeconds(1)`. A change is written before the function returns. It belongs to the mod that makes it and is put back when the mod unloads, as every change of game.Data is. What two mods do to one recipe is worked out in the order the mods load. SetInput, RemoveInput, the Scale functions, AddBench, RemoveBench and the output functions build on what an earlier mod did. SetInputs, SetBenches, MoveTo, SetWork, SetSeconds, SetRequirement, Hide and Show replace it, and `game.Data:Conflicts()` lists a field where that hides another mod's different value. What a change does to something that is being made or waiting in a queue, as it was seen on the host: a new time counts from the next moment, so what is half done by the old time may be nearly done, or done, by the new one. What is taken and what comes out is read from the recipe when the making ends, as the recipe is then. Nothing is taken before that. As soon as the player cannot pay what the recipe takes, the making is dropped without a message, and nothing is lost. So change recipes when the mod loads if a player should never see one change while it is being made. In a game someone else hosts, a change is made on this PC only. The host works from its own tables and decides what is taken, what is made and how long it takes. Names of items, benches, recipes and nodes are matched without regard to letter case. A name the game does not have raises an error that suggests the nearest ones. This version of Wax cannot make every list of a recipe longer or shorter. The outputs keep their number: each can become another item and another count. The resources keep their number too. The items, the tags and the benches of a recipe can be added to and taken from while the list has 4 entries or fewer, before and after. A change that is refused raises an error that says so, and changes nothing.",
+   "text": "One crafting recipe: a row of D_ProcessorRecipes. `game.Recipes:Get(\"Stone_Axe\")` gives one. Reading a field reads the game's table, so it is always what the table holds now. The lists it gives are yours to change: that changes nothing in the game. One exception keeps a mod steady while it is being reloaded: what the mod itself wrote before the reload is left out, so `if recipe.Work > 2000 then recipe:SetWork(2000) end` does the same thing each time. Every function that changes the recipe returns the recipe, so changes can follow one another: `game.Recipes:Get(\"Stone_Axe\"):SetInputs({ Stone = 1 }):SetSeconds(1)`. A change is written before the function returns. It belongs to the mod that makes it and is put back when the mod unloads, as every change of game.Data is. What two mods do to one recipe is worked out in the order the mods load. SetInput, RemoveInput, the Scale functions, AddBench, RemoveBench and the output functions build on what an earlier mod did. SetInputs, SetBenches, MoveTo, SetWork, SetSeconds, SetRequirement, Hide and Show replace it, and `game.Data:Conflicts()` lists a field where that hides another mod's different value. What a change does to something that is being made or waiting in a queue, as it was seen on the host: a new time counts from the next moment, so what is half done by the old time may be nearly done, or done, by the new one. What is taken and what comes out is read from the recipe when the making ends, as the recipe is then. Nothing is taken before that. As soon as the player cannot pay what the recipe takes, the making is dropped without a message, and nothing is lost. So change recipes when the mod loads if a player should never see one change while it is being made. Names of items, benches, recipes and nodes are matched without regard to letter case. A name the game does not have raises an error that suggests the nearest ones. This version of Wax cannot make every list of a recipe longer or shorter. The outputs keep their number: each can become another item and another count. The resources keep their number too. The items, the tags and the benches of a recipe can be added to and taken from while the list has 4 entries or fewer, before and after. A change that is refused raises an error that says so, and changes nothing.",
    "ref": "/docs/reference/recipes#waxrecipe",
    "guide": {
     "href": "/docs/recipes",
@@ -15840,7 +15840,7 @@
      "id": "WaxRecipeList.[integer]",
      "name": "[integer]",
      "type": "WaxRecipe",
-     "text": "One crafting recipe: a row of D_ProcessorRecipes. `game.Recipes:Get(\"Stone_Axe\")` gives one. Reading a field reads the game's table, so it is always what the table holds now. The lists it gives are yours to change: that changes nothing in the game. One exception keeps a mod steady while it is being reloaded: what the mod itself wrote before the reload is left out, so `if recipe.Work > 2000 then recipe:SetWork(2000) end` does the same thing each time. Every function that changes the recipe returns the recipe, so changes can follow one another: `game.Recipes:Get(\"Stone_Axe\"):SetInputs({ Stone = 1 }):SetSeconds(1)`. A change is written before the function returns. It belongs to the mod that makes it and is put back when the mod unloads, as every change of game.Data is. What two mods do to one recipe is worked out in the order the mods load. SetInput, RemoveInput, the Scale functions, AddBench, RemoveBench and the output functions build on what an earlier mod did. SetInputs, SetBenches, MoveTo, SetWork, SetSeconds, SetRequirement, Hide and Show replace it, and `game.Data:Conflicts()` lists a field where that hides another mod's different value. What a change does to something that is being made or waiting in a queue, as it was seen on the host: a new time counts from the next moment, so what is half done by the old time may be nearly done, or done, by the new one. What is taken and what comes out is read from the recipe when the making ends, as the recipe is then. Nothing is taken before that. As soon as the player cannot pay what the recipe takes, the making is dropped without a message, and nothing is lost. So change recipes when the mod loads if a player should never see one change while it is being made. In a game someone else hosts, a change is made on this PC only. The host works from its own tables and decides what is taken, what is made and how long it takes. Names of items, benches, recipes and nodes are matched without regard to letter case. A name the game does not have raises an error that suggests the nearest ones. This version of Wax cannot make every list of a recipe longer or shorter. The outputs keep their number: each can become another item and another count. The resources keep their number too. The items, the tags and the benches of a recipe can be added to and taken from while the list has 4 entries or fewer, before and after. A change that is refused raises an error that says so, and changes nothing."
+     "text": "One crafting recipe: a row of D_ProcessorRecipes. `game.Recipes:Get(\"Stone_Axe\")` gives one. Reading a field reads the game's table, so it is always what the table holds now. The lists it gives are yours to change: that changes nothing in the game. One exception keeps a mod steady while it is being reloaded: what the mod itself wrote before the reload is left out, so `if recipe.Work > 2000 then recipe:SetWork(2000) end` does the same thing each time. Every function that changes the recipe returns the recipe, so changes can follow one another: `game.Recipes:Get(\"Stone_Axe\"):SetInputs({ Stone = 1 }):SetSeconds(1)`. A change is written before the function returns. It belongs to the mod that makes it and is put back when the mod unloads, as every change of game.Data is. What two mods do to one recipe is worked out in the order the mods load. SetInput, RemoveInput, the Scale functions, AddBench, RemoveBench and the output functions build on what an earlier mod did. SetInputs, SetBenches, MoveTo, SetWork, SetSeconds, SetRequirement, Hide and Show replace it, and `game.Data:Conflicts()` lists a field where that hides another mod's different value. What a change does to something that is being made or waiting in a queue, as it was seen on the host: a new time counts from the next moment, so what is half done by the old time may be nearly done, or done, by the new one. What is taken and what comes out is read from the recipe when the making ends, as the recipe is then. Nothing is taken before that. As soon as the player cannot pay what the recipe takes, the making is dropped without a message, and nothing is lost. So change recipes when the mod loads if a player should never see one change while it is being made. Names of items, benches, recipes and nodes are matched without regard to letter case. A name the game does not have raises an error that suggests the nearest ones. This version of Wax cannot make every list of a recipe longer or shorter. The outputs keep their number: each can become another item and another count. The resources keep their number too. The items, the tags and the benches of a recipe can be added to and taken from while the list has 4 entries or fewer, before and after. A change that is refused raises an error that says so, and changes nothing."
     }
    ],
    "funcs": [
@@ -17377,7 +17377,7 @@
    "title": "game.Workshop",
    "kind": "namespace",
    "group": "workshop",
-   "text": "The store on the station, which the game calls the Workshop: its categories, its nodes and their prices, and where the player stands with them. The categories, nodes and prices are read from the game's tables and can be asked anywhere. What the player has researched and holds can be asked while IsReady is true. Nothing here buys, researches or replicates anything. Node, Category and Reset change the store for the mod that calls them: prices, places, what a node needs, line styles and levels. Every change is a change of the game's tables made through game.Data. It is checked first, belongs to the mod, and is put back when the mod unloads. After a change Wax asks the game's store to refresh, and asks each changed node on the store's screen to read its row and its store item again. In the game that was seen to bring a node's place and price up to date while the store was not showing. With the store open it has not been looked at yet. In a game someone else hosts a change is made in the tables on this PC only, as game.Data tells the player. The store is paid from each player's own account, so other players are expected to keep their own store. That has not been tried with two PCs. What cannot be undone is what a player did while a change stood: what they researched is saved in their account under the node's row name, whatever it cost then, and Wax pays nothing back and takes nothing away when a price or a requirement changes or goes back. Row names are matched without regard to letter case. What is returned is a new table each time, yours to change.",
+   "text": "The store on the station, which the game calls the Workshop: its categories, its nodes and their prices, and where the player stands with them. The categories, nodes and prices are read from the game's tables and can be asked anywhere. What the player has researched and holds can be asked while IsReady is true. Nothing here buys, researches or replicates anything. Node, Category and Reset change the store for the mod that calls them: prices, places, what a node needs, line styles and levels. Every change is a change of the game's tables made through game.Data. It is checked first, belongs to the mod, and is put back when the mod unloads. After a change Wax asks the game's store to refresh, and asks each changed node on the store's screen to read its row and its store item again. In the game that was seen to bring a node's place and price up to date while the store was not showing. With the store open it has not been looked at yet. The store is paid from each player's own account. What cannot be undone is what a player did while a change stood: what they researched is saved in their account under the node's row name, whatever it cost then, and Wax pays nothing back and takes nothing away when a price or a requirement changes or goes back. Row names are matched without regard to letter case. What is returned is a new table each time, yours to change.",
    "ref": "/docs/reference/workshop#game-workshop",
    "guide": {
     "href": "/docs/store",
@@ -18747,7 +18747,7 @@
        "type": "WaxThing"
       }
      ],
-     "text": "Puts one in the world and gives the thing. `position` is { X = 0, Y = 0, Z = 0 } or { 0, 0, 0 }, also what a call such as K2_GetActorLocation gives. `rotation` is a turn in degrees, { Pitch = 0, Yaw = 90, Roll = 0 } or { 0, 90, 0 }, with what is left out being 0. `data` is a table of your own that the thing keeps as its Data. Only the host of a session can spawn: on a client it raises an error that says so, as it does while there is no world. A mistake while the thing is put together raises an error and leaves nothing standing. Whether the other players of a session see a thing has not been tried. The game's own part of making a thing with two mesh parts took about half a millisecond.",
+     "text": "Puts one in the world and gives the thing. `position` is { X = 0, Y = 0, Z = 0 } or { 0, 0, 0 }, also what a call such as K2_GetActorLocation gives. `rotation` is a turn in degrees, { Pitch = 0, Yaw = 90, Roll = 0 } or { 0, 90, 0 }, with what is left out being 0. `data` is a table of your own that the thing keeps as its Data. While there is no world it raises an error that says so. A mistake while the thing is put together raises an error and leaves nothing standing. Whether the other players of a session see a thing has not been tried. The game's own part of making a thing with two mesh parts took about half a millisecond.",
      "ref": "/docs/reference/blueprints#blueprint-spawn",
      "use": "local blueprint = game.Blueprints:Define(name, options)\nlocal thing = blueprint:Spawn(position, rotation, data)"
     },

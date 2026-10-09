@@ -200,7 +200,7 @@ inventory:Refresh()
 
 ### `inventory:Give(item, count?)` [#inventory-give]
 
-Puts items into the inventory, for the host only: in someone else's game it raises an error that says so. They go onto the stacks of that item first, then into empty slots that the game says take that kind of item, a full stack to a slot. What does not fit is not given, and nothing is dropped on the ground. A tool comes as the game makes a new one, with its full durability. Count, Has and List follow in the same frame, the weight a moment later. It has been tried on a player's backpack.
+Puts items into the inventory. They go onto the stacks of that item first, then into empty slots that the game says take that kind of item, a full stack to a slot. What does not fit is not given, and nothing is dropped on the ground. A tool comes as the game makes a new one, with its full durability. Count, Has and List follow in the same frame, the weight a moment later. It has been tried on a player's backpack.
 
 ```lua
 inventory:Give(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer, string?
@@ -220,7 +220,7 @@ inventory:Give(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer
 
 ### `inventory:Take(item, count?)` [#inventory-take]
 
-Takes items out of the inventory, for the host only. They are gone, not dropped, and the last stack of the item goes first. It has been tried on a player's backpack and hotbar.
+Takes items out of the inventory. They are gone, not dropped, and the last stack of the item goes first. It has been tried on a player's backpack and hotbar.
 
 ```lua
 inventory:Take(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer, string?
@@ -240,7 +240,7 @@ inventory:Take(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer
 
 ### `inventory:Resize(slots)` [#inventory-resize]
 
-Gives the inventory this many slots, for the host only. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.
+Gives the inventory this many slots. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.
 
 ```lua
 inventory:Resize(slots: integer): integer, string?
@@ -323,7 +323,7 @@ playerItems:List(): WaxItemStack[]
 
 ### `playerItems:Give(item, count?)` [#playeritems-give]
 
-Gives the character items into its backpack, for the host only, as the backpack's own Give does. What does not fit in the backpack is not given: nothing goes to the hotbar and nothing is dropped.
+Gives the character items into its backpack, as the backpack's own Give does. What does not fit in the backpack is not given: nothing goes to the hotbar and nothing is dropped.
 
 ```lua
 playerItems:Give(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer, string?
@@ -343,7 +343,7 @@ playerItems:Give(item: string|WaxItemStack|WaxItemFacts, count?: integer): integ
 
 ### `playerItems:Take(item, count?)` [#playeritems-take]
 
-Takes items away from the character, for the host only: out of its backpack first, then out of its hotbar. What it wears and what its other inventories hold is left alone. Take from one of those with the inventory's own Take.
+Takes items away from the character: out of its backpack first, then out of its hotbar. What it wears and what its other inventories hold is left alone. Take from one of those with the inventory's own Take.
 
 ```lua
 playerItems:Take(item: string|WaxItemStack|WaxItemFacts, count?: integer): integer, string?

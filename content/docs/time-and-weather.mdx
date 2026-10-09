@@ -48,7 +48,7 @@ end)
 
 ### Set the time
 
-The host can move the clock forward to a time later the same day.
+The clock can be moved forward to a time later the same day.
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Clock", width = 260, height = 130 })
@@ -64,8 +64,6 @@ end)
 - `game.Time:Set(hour, minute)` gives back `true` when the clock says that time afterwards.
 - The game's clock only goes forward within a day. An earlier time raises an error that says what the clock
   shows. Going on to the next day is not in this version.
-- In a game someone else hosts it raises an error that says only the host can. See
-  [Multiplayer](/docs/multiplayer#host-and-guest).
 
 ## The weather
 

@@ -1,6 +1,6 @@
 ---
 title: Stats and modifiers
-description: Read any stat the game keeps for a character, see the effects that are on it, and put one on as the host.
+description: Read any stat the game keeps for a character, see the effects that are on it, and put one on.
 icon: Activity
 ---
 
@@ -94,9 +94,6 @@ end)
 ```
 
 ## Put one on or take it off
-
-Only the host can do this. In a game someone else hosts, both functions raise an error that says so. See
-[Multiplayer](/docs/multiplayer#host-and-guest).
 
 ```lua title="init.lua"
 local window = ui.Window({ title = "Regen", width = 280, height = 160 })

@@ -155,9 +155,6 @@ A change that is refused raises an error that says so, and changes nothing.
   without a message and nothing is lost. So change recipes when your mod loads.
 - Unloading your mod puts every recipe back, also under something that is being made. When that was
   tried, the making was dropped, and nothing was taken or made.
-- In a game someone else hosts, a change is made on your PC only. The host works from its own tables and
-  decides what is taken, what is made and how long it takes. See
-  [Multiplayer](/docs/multiplayer#host-and-guest).
 - When two mods change one recipe, `SetInput`, `RemoveInput`, the `Scale` functions, `AddBench`,
   `RemoveBench` and the output functions build on what the earlier mod did. `SetInputs`, `SetBenches`, `MoveTo`, `SetWork`, `SetSeconds`,
   `SetRequirement`, `Hide` and `Show` replace it. `game.Data:Conflicts()` lists where that hides another mod's

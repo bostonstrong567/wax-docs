@@ -200,7 +200,6 @@ tools:Add(mod.id .. "_Axe", { Felling_Damage = 100 }, { like = "Stone_Axe" })
 
 - The name begins with your mod's id and an underscore, so two mods never add the same row.
 - It is there at once. When your mod unloads the row stays in the table, and a recipe row is switched off.
-- Only the host can add rows.
 - A whole item is a row in several tables that point at each other: `ItemsStatic`, `Itemable`, `ItemTemplate`,
   and the ones for what it does, such as `ToolDamage` and `Durable`. A recipe that makes it is a row of
   `ProcessorRecipes` whose output names your `ItemTemplate` row.
@@ -218,12 +217,6 @@ tools:Add(mod.id .. "_Axe", { Felling_Damage = 100 }, { like = "Stone_Axe" })
 - A table's meta table can be read, not changed.
 
 A change that is refused raises an error that says so, and changes nothing.
-
-### In a game someone else hosts
-
-A change is made in the tables on your PC only. The host works from its own tables and decides what really
-happens. Wax tells the player so once for each mod, in each game they join. `game.IsHost` says which you
-are. See [Multiplayer](/docs/multiplayer#host-and-guest). This has not been tried with two PCs yet.
 
 ### What the game makes of a change
 

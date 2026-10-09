@@ -207,9 +207,6 @@ end)
 
 <NextVersion />
 
-Only the host can do what this section and the next describe. In a game someone else hosts, each of these
-raises an error that says so. See [Multiplayer](/docs/multiplayer#host-and-guest).
-
 ```lua title="init.lua"
 local window = ui.Window({ title = "Spawner", width = 280, height = 170 })
 
@@ -287,7 +284,7 @@ end)
 | `creature:Attack(target)` | Makes a hunter angry at a player's character. `target` is that character or `game.Me`. |
 | `creature:Remove()` | Takes it out of the world, alive or dead, with nothing left behind. |
 | `creature.Behaviour = "Friendly"` | Puts it on another team: `"Default"`, `"Friendly"`, `"Tame"`, `"HostileToPlayers"`, `"HostileToAll"`, or a team's own name. |
-| `creature:Heal()`, `creature:Kill()`, `creature:Teleport(place)`, `creature.Health = 50` | What the host can do to [any character](/docs/character#what-the-host-can-change). |
+| `creature:Heal()`, `creature:Kill()`, `creature:Teleport(place)`, `creature.Health = 50` | What can be done to [any character](/docs/character#what-you-can-change). |
 
 Things to know:
 

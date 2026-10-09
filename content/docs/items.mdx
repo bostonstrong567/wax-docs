@@ -1,6 +1,6 @@
 ---
 title: Items and inventories
-description: Look up what an item is, count what a character carries, and give or take items as the host.
+description: Look up what an item is, count what a character carries, and give or take items.
 icon: Backpack
 ---
 
@@ -155,9 +155,6 @@ Wax keeps a copy of an inventory you ask about, so asking often costs little.
 
 ## Give and take
 
-Only the host can do this. In a game someone else hosts, both raise an error that says so. See
-[Multiplayer](/docs/multiplayer#host-and-guest).
-
 ```lua title="init.lua"
 local window = ui.Window({ title = "Supplies", width = 280, height = 160 })
 
@@ -192,7 +189,7 @@ end)
 
 <Since version="0.3.1" />
 
-`inventory:Resize(slots)` gives an inventory that many slots. Only the host can do this.
+`inventory:Resize(slots)` gives an inventory that many slots.
 
 ```lua title="init.lua"
 local pack = game.Me and game.Me.Backpack

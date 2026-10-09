@@ -10,7 +10,7 @@ The [Explorer](/explorer) searches everything on this page, and the classes of t
 
 ## `game.Time` [#game-time]
 
-The time of day in the prospect, game.Time. Each field asks the game when it is read. Every field is nil while you are not in a prospect. No field can be assigned: the host moves the clock with Set.
+The time of day in the prospect, game.Time. Each field asks the game when it is read. Every field is nil while you are not in a prospect. No field can be assigned: Set moves the clock.
 
 Type name: `WaxTime`.
 
@@ -31,7 +31,7 @@ Type name: `WaxTime`.
 
 ### `game.Time:Set(hour, minute?)` [#game-time-set]
 
-Moves the game's clock forward to a time later today, for the host only: in someone else's game it raises an error that says so. The game's clock only goes forward within a day. It would count an earlier time as the next day, and Wax does not do that yet, so an earlier time raises an error that says what the clock shows. The minute the clock is already in changes nothing.
+Moves the game's clock forward to a time later today. The game's clock only goes forward within a day. It would count an earlier time as the next day, and Wax does not do that yet, so an earlier time raises an error that says what the clock shows. The minute the clock is already in changes nothing.
 
 ```lua
 game.Time:Set(hour: integer, minute?: integer): boolean
