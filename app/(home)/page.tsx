@@ -139,7 +139,7 @@ export default function HomePage() {
       <figure className="-mt-4 flex flex-col gap-3">
         <img
           src={`${basePath}/img/showcase.webp`}
-          alt="The Wax panel in the game. One window shows the explorer with the player picked and a list of its properties, one lists the mods, and one shows what Wax costs each frame."
+          alt="The Wax panel in the game, as three windows. In front, the Mods page with one mod open on its keys. Behind it, the Explorer with the game's objects, and the Browse page with the mods of the catalogue."
           width={1840}
           height={976}
           className="h-auto w-full rounded-xl border"
