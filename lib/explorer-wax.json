@@ -252,6 +252,7 @@
     "WaxNotification",
     "WaxTag",
     "WaxHotkey",
+    "WaxBind",
     "WaxModel",
     "WaxUnknownOption",
     "WaxOptions",
@@ -267,9 +268,11 @@
     "WaxFitOptions",
     "WaxNotifyOptions",
     "WaxKeyOwner",
+    "WaxKeyBind",
     "WaxTextOptions",
     "WaxTagOptions",
     "WaxHotkeyOptions",
+    "WaxBindOptions",
     "WaxModelFur",
     "WaxModelPart",
     "WaxModelLook",
@@ -460,6 +463,9 @@
   "ui.Keys.Get": "ui.Keys.Get",
   "ui.Keys.Set": "ui.Keys.Set",
   "ui.Keys.Owners": "ui.Keys.Owners",
+  "ui.Keys.Binds": "ui.Keys.Binds",
+  "ui.Keys.SetBind": "ui.Keys.SetBind",
+  "ui.Keys.Clashes": "ui.Keys.Clashes",
   "ui.Open": "ui.Open",
   "ui.Close": "ui.Close",
   "ui.Toggle": "ui.Toggle",
@@ -483,6 +489,7 @@
   "ui.Notify": "ui.Notify",
   "ui.Windows": "ui.Windows",
   "ui.Hotkey": "ui.Hotkey",
+  "ui.Bind": "ui.Bind",
   "ui.IsKeyDown": "ui.IsKeyDown",
   "ui.MinScale": "ui.MinScale",
   "ui.SetScale": "ui.SetScale",
@@ -501,6 +508,9 @@
   "Tag:Remove": "WaxTag.Remove",
   "Hotkey.Disconnect": "WaxHotkey.Disconnect",
   "Hotkey:SetKey": "WaxHotkey.SetKey",
+  "Bind:Get": "WaxBind.Get",
+  "Bind:Set": "WaxBind.Set",
+  "Bind:Disconnect": "WaxBind.Disconnect",
   "Model:Show": "WaxModel.Show",
   "Model:Clear": "WaxModel.Clear",
   "Model:GetView": "WaxModel.GetView",
@@ -2909,6 +2919,14 @@
      "receives": "owner: string, key: string?",
      "text": "Fires with the owner and its new key when a key is changed.",
      "use": "ui.Keys.Changed:Connect(function(owner, key)\n    print(owner, key)\nend)"
+    },
+    {
+     "id": "ui.Keys.BindChanged",
+     "name": "BindChanged",
+     "type": "WaxSignal<fun(owner: string, name: string, key: string?)>",
+     "receives": "owner: string, name: string, key: string?",
+     "text": "Fires when a named key of a mod is given another key.",
+     "use": "ui.Keys.BindChanged:Connect(function(owner, name, key)\n    print(owner, name, key)\nend)"
     }
    ],
    "funcs": [
@@ -2958,7 +2976,7 @@
        "name": "taken_by"
       }
      ],
-     "text": "Gives an owner another key, or none with nil. A key that another owner has, or that another mod uses as a hotkey, is refused: the key stays what it was, a notification says who has it, and you get false and that name.",
+     "text": "Gives an owner another key, or none with nil. A key that another owner has, or that another mod uses as a hotkey, is given all the same: a notification says who else has it, the Mods page shows the clash, and the second value is that name.",
      "ref": "/docs/reference/ui#ui-keys-set",
      "use": "local changed, taken_by = ui.Keys.Set(owner, key)"
     },
@@ -2974,6 +2992,134 @@
      "text": "Every owner that has a window, Wax first.",
      "ref": "/docs/reference/ui#ui-keys-owners",
      "use": "local keyOwners = ui.Keys.Owners()"
+    },
+    {
+     "id": "ui.Keys.Binds",
+     "name": "Binds",
+     "call": "ui.Keys.Binds",
+     "params": [
+      {
+       "name": "owner",
+       "type": "string",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxKeyBind[]"
+      }
+     ],
+     "text": "The named keys mods made with ui.Bind. With a mod's id, only that mod's, and for a mod that is not running the keys its mod.lua names.",
+     "ref": "/docs/reference/ui#ui-keys-binds",
+     "use": "local keyBinds = ui.Keys.Binds(owner)"
+    },
+    {
+     "id": "ui.Keys.SetBind",
+     "name": "SetBind",
+     "call": "ui.Keys.SetBind",
+     "params": [
+      {
+       "name": "owner",
+       "type": "string",
+       "text": "A mod's id."
+      },
+      {
+       "name": "name",
+       "type": "string",
+       "text": "The name the mod gave the key."
+      },
+      {
+       "name": "key",
+       "type": "string?",
+       "text": "An engine key name such as \"F10\" or \"Ctrl+K\"."
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "changed"
+      }
+     ],
+     "text": "Gives a named key of a mod another key, or none with nil, and remembers it for that player. A key somebody else uses is taken all the same: a notification says who else has it, and ui.Keys.Clashes lists it.",
+     "ref": "/docs/reference/ui#ui-keys-setbind",
+     "use": "local changed = ui.Keys.SetBind(owner, name, key)"
+    },
+    {
+     "id": "ui.Keys.Clashes",
+     "name": "Clashes",
+     "call": "ui.Keys.Clashes",
+     "params": [
+      {
+       "name": "owner",
+       "type": "string",
+       "optional": true,
+       "text": "\"Wax\" or a mod's id."
+      }
+     ],
+     "returns": [
+      {
+       "type": "string[]"
+      }
+     ],
+     "text": "The keys that more than one owner acts on, one line of text for each: the Wax panel's key, the key of each mod's windows, every named key and every plain hotkey of a mod. With an owner, only the clashes that owner is part of, said from its side. An empty list when nothing clashes.",
+     "ref": "/docs/reference/ui#ui-keys-clashes",
+     "use": "local list = ui.Keys.Clashes(owner)"
+    }
+   ]
+  },
+  {
+   "id": "WaxKeyBind",
+   "name": "WaxKeyBind",
+   "title": "WaxKeyBind",
+   "kind": "data",
+   "group": "ui",
+   "text": "One named key of a mod, as ui.Keys.Binds lists it.",
+   "ref": "/docs/reference/ui#waxkeybind",
+   "makers": [
+    "ui.Keys.Binds"
+   ],
+   "props": [
+    {
+     "id": "WaxKeyBind.Id",
+     "name": "Id",
+     "type": "string",
+     "text": "The mod's id.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Id)"
+    },
+    {
+     "id": "WaxKeyBind.Name",
+     "name": "Name",
+     "type": "string",
+     "text": "The name the mod gave the key.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Name)"
+    },
+    {
+     "id": "WaxKeyBind.Label",
+     "name": "Label",
+     "type": "string",
+     "text": "What the mod's card calls it.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Label)"
+    },
+    {
+     "id": "WaxKeyBind.Key",
+     "name": "Key",
+     "type": "string?",
+     "text": "The key it has now. nil when the player left it without one.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Key)"
+    },
+    {
+     "id": "WaxKeyBind.Default",
+     "name": "Default",
+     "type": "string?",
+     "text": "The key the mod asked for.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Default)"
+    },
+    {
+     "id": "WaxKeyBind.Declared",
+     "name": "Declared",
+     "type": "boolean?",
+     "text": "true when the mod is not running and the key is known from its mod.lua.",
+     "use": "local keyBinds = ui.Keys.Binds(owner)\nprint(keyBinds[1].Declared)"
     }
    ]
   },
@@ -3248,7 +3394,7 @@
        "name": "taken_by"
       }
      ],
-     "text": "Sets the key that shows and hides Wax's own panel, by the engine's key name (\"F8\"). nil leaves the panel without a key. A key that somebody has is refused, as with ui.Keys.Set. Every mod has a key of its own: see ui.Keys.",
+     "text": "Sets the key that shows and hides Wax's own panel, by the engine's key name (\"F8\"). nil leaves the panel without a key. A key that somebody has is given all the same, with a notice, as with ui.Keys.Set. Every mod has a key of its own: see ui.Keys.",
      "ref": "/docs/reference/ui#ui-settogglekey",
      "use": "local changed, taken_by = ui.SetToggleKey(key)"
     },
@@ -3529,6 +3675,40 @@
       "title": "Hotkeys"
      },
      "use": "local hotkey = ui.Hotkey(key, function() end, options)"
+    },
+    {
+     "id": "ui.Bind",
+     "name": "Bind",
+     "call": "ui.Bind",
+     "params": [
+      {
+       "name": "name",
+       "type": "string",
+       "text": "A name for the key that stays the same between versions, such as \"Open\". One mod cannot have two of one name."
+      },
+      {
+       "name": "key",
+       "type": "string?",
+       "text": "The key it starts with, such as \"F10\" or \"Ctrl+K\". nil takes the key mod.lua names for it in `keys`, or none until the player gives one."
+      },
+      {
+       "name": "callback",
+       "type": "fun()"
+      },
+      {
+       "name": "options",
+       "type": "WaxBindOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxBind"
+      }
+     ],
+     "text": "A hotkey with a name. It runs callback when its key is pressed, like ui.Hotkey, and it is listed on your mod's card of the Mods page, where the player can give it another key. The player's choice is remembered and used the next time, so `key` is only where it starts. When two mods act on one key both still run, and the Mods page says which keys clash. Use it for every key a player might want to change.",
+     "ref": "/docs/reference/ui#ui-bind",
+     "use": "local bind = ui.Bind(name, key, function() end, options)"
     },
     {
      "id": "ui.IsKeyDown",
@@ -4017,6 +4197,110 @@
      "text": "Changes the key it reacts to.",
      "ref": "/docs/reference/ui#hotkey-setkey",
      "use": "local hotkey = ui.Hotkey(key, function() end, options)\nhotkey:SetKey(key)"
+    }
+   ]
+  },
+  {
+   "id": "WaxBind",
+   "name": "WaxBind",
+   "title": "WaxBind",
+   "kind": "object",
+   "group": "ui",
+   "text": "A named key of your mod, as ui.Bind returns it.",
+   "ref": "/docs/reference/ui#waxbind",
+   "makers": [
+    "ui.Bind"
+   ],
+   "use": "local bind = ui.Bind(name, key, function() end, options)",
+   "signals": [
+    {
+     "id": "WaxBind.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun(key: string?)>",
+     "receives": "key: string?",
+     "text": "Fires with the new key when the player, or your mod, changes it.",
+     "use": "local bind = ui.Bind(name, key, function() end, options)\nbind.Changed:Connect(function(key)\n    print(key)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxBind.Get",
+     "name": "Get",
+     "call": "bind:Get",
+     "returns": [
+      {
+       "type": "string?"
+      }
+     ],
+     "text": "The key it has now. nil when the player left it without one.",
+     "ref": "/docs/reference/ui#bind-get",
+     "use": "local bind = ui.Bind(name, key, function() end, options)\nlocal result = bind:Get()"
+    },
+    {
+     "id": "WaxBind.Set",
+     "name": "Set",
+     "call": "bind:Set",
+     "params": [
+      {
+       "name": "key",
+       "type": "string?"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "changed"
+      }
+     ],
+     "text": "Gives it another key, or none with nil, as the player does on the mod's card.",
+     "ref": "/docs/reference/ui#bind-set",
+     "use": "local bind = ui.Bind(name, key, function() end, options)\nlocal changed = bind:Set(key)"
+    },
+    {
+     "id": "WaxBind.Disconnect",
+     "name": "Disconnect",
+     "call": "bind:Disconnect",
+     "text": "Takes the key away from your mod. It also goes when the mod unloads.",
+     "ref": "/docs/reference/ui#bind-disconnect",
+     "use": "local bind = ui.Bind(name, key, function() end, options)\nbind:Disconnect()"
+    }
+   ]
+  },
+  {
+   "id": "WaxBindOptions",
+   "name": "WaxBindOptions",
+   "title": "WaxBindOptions",
+   "kind": "data",
+   "group": "ui",
+   "text": "The options of ui.Bind.",
+   "ref": "/docs/reference/ui#waxbindoptions",
+   "users": [
+    "ui.Bind"
+   ],
+   "props": [
+    {
+     "id": "WaxBindOptions.label",
+     "name": "label",
+     "type": "string",
+     "optional": true,
+     "text": "What the mod's card calls the key. The name when omitted.",
+     "use": "local bind = ui.Bind(name, key, function() end, { label = \"text\" })"
+    },
+    {
+     "id": "WaxBindOptions.in_menu",
+     "name": "in_menu",
+     "type": "boolean",
+     "optional": true,
+     "text": "true lets it run while the menu is open as well.",
+     "use": "local bind = ui.Bind(name, key, function() end, { in_menu = true })"
+    },
+    {
+     "id": "WaxBindOptions.typing",
+     "name": "typing",
+     "type": "boolean",
+     "optional": true,
+     "text": "true lets it run while a text box has the keyboard.",
+     "use": "local bind = ui.Bind(name, key, function() end, { typing = true })"
     }
    ]
   },

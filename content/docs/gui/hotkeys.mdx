@@ -99,26 +99,38 @@ and gives you its name.
 
 ## Let the player choose the key
 
-This takes three parts: a hotkey, a `Keybind` control to change it, and `storage` to remember the choice.
+<Since version="0.3.11" />
+
+Give the key a name with `ui.Bind`. It works like `ui.Hotkey`, and Wax does the rest:
 
 ```lua title="init.lua"
-local settings = storage.Load("keys", { ping = "F6" })
-
-local hotkey = ui.Hotkey(settings.ping, function()
+local ping = ui.Bind("Ping", "F6", function()
     ui.Notify("Ping!", { kind = "good" })
-end)
+end, { label = "Send a ping" })
 
-local window = ui.Window({ title = "Hotkeys", width = 300, height = 140 })
-
-window:Keybind("Ping", settings.ping, function(key)
-    hotkey:SetKey(key)
-    settings.ping = key
-    storage.Save("keys", settings)
-end)
+print("Ping is on", ping:Get() or "no key")
 ```
 
-Open the menu, click the button beside **Ping** and press a new key. Close the menu and try it. The choice is
-still there the next time you play.
+- The key is listed on your mod's card of the **Mods** page, under the label you gave. The player clicks it and
+  presses a new key, or clears it.
+- The player's choice is remembered and used the next time. `"F6"` is only where it starts.
+- When another mod, or the Wax panel, acts on the same key, both still run. The card says which key clashes and
+  with whom, and so does a line at the top of the Mods page, so the player can change one of them.
+- `in_menu = true` in the options lets it run while the menu is open as well.
+
+| Function | What it does |
+| --- | --- |
+| `ui.Bind(name, key, callback, options)` | A named key. `name` stays the same between versions of your mod. |
+| `bind:Get()` | The key it has now, or `nil` when the player left it without one. |
+| `bind:Set(key)` | Gives it another key, as the player does on the card. |
+| `bind.Changed` | A signal that fires with the new key. |
+| `ui.Keys.Binds(owner)` | The named keys of one mod, or of every mod. |
+| `ui.Keys.Clashes(owner)` | The keys more than one owner acts on, as lines of text. |
+
+Name the key in `mod.lua` as well (`keys = { "F6: Ping" }`), and it is on the card while your mod is still switched
+off. [Mods](/docs/mods#keys) has that.
+
+Use `ui.Bind` for every key a player might want to change, and `ui.Hotkey` for the ones that are fixed.
 
 ## Stop a hotkey
 

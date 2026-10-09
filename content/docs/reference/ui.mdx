@@ -169,7 +169,7 @@ ui.IsPreview(): boolean
 
 ### `ui.SetToggleKey(key)` [#ui-settogglekey]
 
-Sets the key that shows and hides Wax's own panel, by the engine's key name ("F8"). nil leaves the panel without a key. A key that somebody has is refused, as with [`ui.Keys.Set`](/docs/reference/ui#ui-keys-set). Every mod has a key of its own: see ui.Keys.
+Sets the key that shows and hides Wax's own panel, by the engine's key name ("F8"). nil leaves the panel without a key. A key that somebody has is given all the same, with a notice, as with [`ui.Keys.Set`](/docs/reference/ui#ui-keys-set). Every mod has a key of its own: see ui.Keys.
 
 ```lua
 ui.SetToggleKey(key: string?): boolean, string?
@@ -383,6 +383,25 @@ ui.Hotkey(key: string, callback: fun(), options?: WaxHotkeyOptions): WaxHotkey
 **Returns** [`WaxHotkey`](/docs/reference/ui#waxhotkey)
 
 <InExplorer id="ui.Hotkey" />
+
+### `ui.Bind(name, key, callback, options?)` [#ui-bind]
+
+A hotkey with a name. It runs callback when its key is pressed, like [`ui.Hotkey`](/docs/reference/ui#ui-hotkey), and it is listed on your mod's card of the Mods page, where the player can give it another key. The player's choice is remembered and used the next time, so `key` is only where it starts. When two mods act on one key both still run, and the Mods page says which keys clash. Use it for every key a player might want to change.
+
+```lua
+ui.Bind(name: string, key: string?, callback: fun(), options?: WaxBindOptions): WaxBind
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | A name for the key that stays the same between versions, such as "Open". One mod cannot have two of one name. |
+| `key` | `string?` | The key it starts with, such as "F10" or "Ctrl+K". nil takes the key mod.lua names for it in `keys`, or none until the player gives one. |
+| `callback` | `fun()` |  |
+| `options` (optional) | [`WaxBindOptions`](/docs/reference/ui#waxbindoptions) |  |
+
+**Returns** [`WaxBind`](/docs/reference/ui#waxbind)
+
+<InExplorer id="ui.Bind" />
 
 ### `ui.IsKeyDown(key)` [#ui-iskeydown]
 
@@ -784,6 +803,7 @@ Type name: `WaxKeys`.
 | Signal | Handler receives | Description |
 | --- | --- | --- |
 | `Changed` | `owner`: `string`, `key`: `string?` | Fires with the owner and its new key when a key is changed. |
+| `BindChanged` | `owner`: `string`, `name`: `string`, `key`: `string?` | Fires when a named key of a mod is given another key. |
 
 ### `ui.Keys.Get(owner?)` [#ui-keys-get]
 
@@ -803,7 +823,7 @@ ui.Keys.Get(owner?: string): string?
 
 ### `ui.Keys.Set(owner, key)` [#ui-keys-set]
 
-Gives an owner another key, or none with nil. A key that another owner has, or that another mod uses as a hotkey, is refused: the key stays what it was, a notification says who has it, and you get false and that name.
+Gives an owner another key, or none with nil. A key that another owner has, or that another mod uses as a hotkey, is given all the same: a notification says who else has it, the Mods page shows the clash, and the second value is that name.
 
 ```lua
 ui.Keys.Set(owner: string, key: string?): boolean, string?
@@ -832,6 +852,56 @@ ui.Keys.Owners(): WaxKeyOwner[]
 **Returns** [`WaxKeyOwner[]`](/docs/reference/ui#waxkeyowner)
 
 <InExplorer id="ui.Keys.Owners" />
+
+### `ui.Keys.Binds(owner?)` [#ui-keys-binds]
+
+The named keys mods made with [`ui.Bind`](/docs/reference/ui#ui-bind). With a mod's id, only that mod's, and for a mod that is not running the keys its mod.lua names.
+
+```lua
+ui.Keys.Binds(owner?: string): WaxKeyBind[]
+```
+
+| Parameter | Type |
+| --- | --- |
+| `owner` (optional) | `string` |
+
+**Returns** [`WaxKeyBind[]`](/docs/reference/ui#waxkeybind)
+
+<InExplorer id="ui.Keys.Binds" />
+
+### `ui.Keys.SetBind(owner, name, key)` [#ui-keys-setbind]
+
+Gives a named key of a mod another key, or none with nil, and remembers it for that player. A key somebody else uses is taken all the same: a notification says who else has it, and [`ui.Keys.Clashes`](/docs/reference/ui#ui-keys-clashes) lists it.
+
+```lua
+ui.Keys.SetBind(owner: string, name: string, key: string?): boolean
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `owner` | `string` | A mod's id. |
+| `name` | `string` | The name the mod gave the key. |
+| `key` | `string?` | An engine key name such as "F10" or "Ctrl+K". |
+
+**Returns** `boolean` (`changed`)
+
+<InExplorer id="ui.Keys.SetBind" />
+
+### `ui.Keys.Clashes(owner?)` [#ui-keys-clashes]
+
+The keys that more than one owner acts on, one line of text for each: the Wax panel's key, the key of each mod's windows, every named key and every plain hotkey of a mod. With an owner, only the clashes that owner is part of, said from its side. An empty list when nothing clashes.
+
+```lua
+ui.Keys.Clashes(owner?: string): string[]
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `owner` (optional) | `string` | "Wax" or a mod's id. |
+
+**Returns** `string[]`
+
+<InExplorer id="ui.Keys.Clashes" />
 
 ## WaxPage [#waxpage]
 
@@ -1510,6 +1580,58 @@ hotkey:SetKey(key: string)
 
 <InExplorer id="WaxHotkey.SetKey" />
 
+## WaxBind [#waxbind]
+
+A named key of your mod, as [`ui.Bind`](/docs/reference/ui#ui-bind) returns it.
+
+You get one from [`ui.Bind`](/docs/reference/ui#ui-bind). Below, `bind` stands for one of these.
+
+<InExplorer id="WaxBind" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Changed` | `key`: `string?` | Fires with the new key when the player, or your mod, changes it. |
+
+### `bind:Get()` [#bind-get]
+
+The key it has now. nil when the player left it without one.
+
+```lua
+bind:Get(): string?
+```
+
+**Returns** `string?`
+
+<InExplorer id="WaxBind.Get" />
+
+### `bind:Set(key)` [#bind-set]
+
+Gives it another key, or none with nil, as the player does on the mod's card.
+
+```lua
+bind:Set(key: string?): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `key` | `string?` |
+
+**Returns** `boolean` (`changed`)
+
+<InExplorer id="WaxBind.Set" />
+
+### `bind:Disconnect()` [#bind-disconnect]
+
+Takes the key away from your mod. It also goes when the mod unloads.
+
+```lua
+bind:Disconnect()
+```
+
+**Returns** nothing.
+
+<InExplorer id="WaxBind.Disconnect" />
+
 ## WaxModel [#waxmodel]
 
 A creature or any other skeletal mesh of the game, drawn in 3D. It turns slowly by itself until the player touches it. The model follows the mouse when dragged: to the right its near side goes right, and down it is seen more from above. The wheel moves the camera nearer and further while the mouse is over the view, and the page does not scroll then. Two presses in a row put the view back. Nothing is drawn while the view is not on screen.
@@ -1909,6 +2031,23 @@ Returned by [`ui.Keys.Owners`](/docs/reference/ui#ui-keys-owners).
 | `key` | `string?` | Its key, or nil when it has none. |
 | `open` | `boolean` | True while its windows are up. |
 
+## WaxKeyBind [#waxkeybind]
+
+One named key of a mod, as [`ui.Keys.Binds`](/docs/reference/ui#ui-keys-binds) lists it.
+
+Returned by [`ui.Keys.Binds`](/docs/reference/ui#ui-keys-binds).
+
+<InExplorer id="WaxKeyBind" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Id` | `string` | The mod's id. |
+| `Name` | `string` | The name the mod gave the key. |
+| `Label` | `string` | What the mod's card calls it. |
+| `Key` | `string?` | The key it has now. nil when the player left it without one. |
+| `Default` | `string?` | The key the mod asked for. |
+| `Declared` | `boolean?` | true when the mod is not running and the key is known from its mod.lua. |
+
 ## WaxTextOptions [#waxtextoptions]
 
 Used by [`ui.TextWidth`](/docs/reference/ui#ui-textwidth), [`ui.Shorten`](/docs/reference/ui#ui-shorten).
@@ -1946,6 +2085,20 @@ Used by [`ui.Hotkey`](/docs/reference/ui#ui-hotkey).
 | `in_menu` | `boolean` | Also reacts while the menu is open (off by default, so that typing in a box does not trigger it). |
 | `typing` | `boolean` | Also reacts while a text box has the keyboard (for a key meant for the box, such as Tab). |
 | `hover` | `boolean` | Makes it a key for the slot under the mouse: it only reacts while a slot is under it. |
+
+## WaxBindOptions [#waxbindoptions]
+
+The options of [`ui.Bind`](/docs/reference/ui#ui-bind).
+
+Used by [`ui.Bind`](/docs/reference/ui#ui-bind).
+
+<InExplorer id="WaxBindOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `label` | `string` | What the mod's card calls the key. The name when omitted. |
+| `in_menu` | `boolean` | true lets it run while the menu is open as well. |
+| `typing` | `boolean` | true lets it run while a text box has the keyboard. |
 
 ## WaxModelFur [#waxmodelfur]
 

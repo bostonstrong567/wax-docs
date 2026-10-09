@@ -45,8 +45,35 @@ return {
 | `version` | The version shown on the Mods page. | `"0.0.0"` |
 | `main` | The file Wax runs first. | `"init.lua"` |
 | `dependencies` | Ids of mods that must load before this one. | None. |
+| `key` | The key that shows and hides the mod's windows, such as `"F6"`. | A free key Wax picks. |
+| `keys` | The mod's other keys, one line each: `"F10: Show or hide the pins"`. | None. |
 
 `mod.lua` may only hold plain values like the ones above. It cannot call functions.
+
+### Keys
+
+<Since version="0.3.11" />
+
+A mod that makes a window names the key that shows it, and a mod that makes a panel or has other keys names those:
+
+```lua title="mod.lua"
+return {
+    id = "MapMarkers",
+    name = "Map Markers",
+    version = "1.2.0",
+    key = "F6",                                  -- shows and hides the mod's windows
+    keys = { "F10: Show or hide the pins" },       -- one line for each key made with ui.Bind: the key, a colon, its name
+}
+```
+
+- Wax reads these before the mod runs, so the keys are on the mod's card of the **Mods** page while the mod is
+  still switched off, and a clash with another mod's key is said before the player switches it on.
+- `key` is what `ui.Window` uses when you give it no `key` of its own.
+- A name in `keys` is the name you give [`ui.Bind`](/docs/gui/hotkeys#let-the-player-choose-the-key):
+  `ui.Bind("Show or hide the pins", nil, fn)` takes the key from `mod.lua`.
+- The player can change every one of them on the card. Their choice is kept.
+
+A mod you [publish](/docs/publish-a-mod) must name a key when it has a window or a panel.
 
 ## What every mod can use
 

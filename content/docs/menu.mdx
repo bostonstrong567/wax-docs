@@ -32,7 +32,12 @@ A mod's key is on its card of the **Mods** page of the Wax panel, as **Open key*
 - A mod can ask for a key. For a mod that asks for none, Wax picks the first of F6, F9, F10, F11, F5, F4, F3
   and F2 that nobody uses, and a notification tells you once which it is.
 - To change it, click the key on the card and press the new one. It can be held with Ctrl, Shift or Alt.
-- A key that somebody else already has is refused. A notification says who has it.
+- A key that somebody else already has is yours all the same. A notification says who else has it, and the
+  card shows the clash until one of the two is changed.
+- A mod can have more keys, each with a name ([`ui.Bind`](/docs/gui/hotkeys#let-the-player-choose-the-key)). They
+  are on the same card and are changed the same way.
+- When two mods act on one key, or a mod uses the key of the Wax panel, the card says so and a line at the top of
+  the Mods page lists every clash. Change one of the keys and the line goes away.
 
 [The Wax panel](/docs/debug-panel#a-key-for-each-mod) has more on this.
 
@@ -128,7 +133,7 @@ end)
 | Function | What it does |
 | --- | --- |
 | `ui.Keys.Get(owner)` | The key of an owner. Leave `owner` out for your own mod. |
-| `ui.Keys.Set(owner, key)` | Gives an owner another key, or none with `nil`. A key somebody has is refused: you get `false` and the name of who has it, and a notification says so. |
+| `ui.Keys.Set(owner, key)` | Gives an owner another key, or none with `nil`. A key somebody has is given all the same: the second value is the name of who else has it, and a notification says so. |
 | `ui.Keys.Owners()` | Everybody who has a window, Wax first. Each entry has `id`, `name`, `key` and `open`. |
 | `ui.Keys.Changed` | A signal that fires with the owner and the new key. |
 | `ui.GetToggleKey()`, `ui.SetToggleKey(key)` | The key of the Wax panel. The same as `ui.Keys.Get("Wax")` and `ui.Keys.Set("Wax", key)`. |

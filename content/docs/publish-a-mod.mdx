@@ -108,8 +108,36 @@ return {
 | `homepage` | No | A web address with more about the mod. The mod's page links to it. |
 | `dependencies` | No | Ids of other mods that must load before this one. The mod's page tells players to install them too. |
 | `wax` | No | The lowest Wax version the mod needs. The mod's page shows it as "Needs Wax 0.2.0". |
+| `key` | When the mod has a window | The key that shows and hides the mod's windows, such as `"F6"`. |
+| `keys` | When the mod has a panel or other keys | The mod's other keys, one line each: `"F10: Show or hide the pins"`. |
 
 `mod.lua` may only hold plain values like the ones above. It cannot call functions.
+
+### A key for a mod with an interface
+
+A mod whose code calls `ui.Window` or `ui.Panel` must name a default key in `mod.lua`: `key`, or at least one
+line in `keys`. A mod with an interface and no key is refused, and the check says which file makes the window.
+The reason is the player: the key is on the mod's card before they switch the mod on, they can change it there,
+and Wax tells them when it is the same key as another mod's.
+
+A mod that makes a window names the key that shows it, and a mod that makes a panel or has other keys names those:
+
+```lua title="mod.lua"
+return {
+    id = "MapMarkers",
+    name = "Map Markers",
+    version = "1.2.0",
+    key = "F6",                                  -- shows and hides the mod's windows
+    keys = { "F10: Show or hide the pins" },       -- one line for each key made with ui.Bind: the key, a colon, its name
+}
+```
+
+- Wax reads these before the mod runs, so the keys are on the mod's card of the **Mods** page while the mod is
+  still switched off, and a clash with another mod's key is said before the player switches it on.
+- `key` is what `ui.Window` uses when you give it no `key` of its own.
+- A name in `keys` is the name you give [`ui.Bind`](/docs/gui/hotkeys#let-the-player-choose-the-key):
+  `ui.Bind("Show or hide the pins", nil, fn)` takes the key from `mod.lua`.
+- The player can change every one of them on the card. Their choice is kept.
 
 ### The id
 
@@ -262,6 +290,7 @@ This is what is checked:
 | --- | --- |
 | The layout | `mod.lua` and `init.lua` at the top of the repository. |
 | `mod.lua` | Every field, by the rules in the table above. |
+| A key | A mod that calls `ui.Window` or `ui.Panel` names a key in `mod.lua`. |
 | The files | The file types, the sizes and the number of files. The pictures, by the rules above. |
 | The Lua code | Every `.lua` file must compile. A file that does not is reported with its name and the line. |
 | Calls that are refused | See below. |
@@ -347,6 +376,7 @@ the checks counts too. After that it asks you to wait.
 - `mod.lua` has every needed field, and `version` is one you have not published before.
 - The id is the one you want to keep.
 - The description says what the mod does and how to open it.
+- A mod with a window or a panel has `key` or `keys` in `mod.lua`.
 - The pictures are in `pictures`, in the right order, and within the limits.
 - The repository is public and holds nothing you do not want to share.
 - The commit has the tag `v` and the version, and the tag is pushed.
