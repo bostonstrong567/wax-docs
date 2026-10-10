@@ -100,6 +100,31 @@ const places: Card[] = [
   },
 ];
 
+type Slide = { file: string; alt: string };
+
+const tour: Slide[] = [
+  {
+    file: 'mods.webp',
+    alt: 'The Mods page of the Wax panel. A mod is open on its card: its status, a switch, and a row for each of its keys. Beside it: Every mod, every key, one page.',
+  },
+  {
+    file: 'browse.webp',
+    alt: 'The Browse page of the Wax panel, listing the mods of the catalogue with their pictures and votes. Beside it: Add mods without leaving the game.',
+  },
+  {
+    file: 'explorer.webp',
+    alt: 'The Explorer page of the Wax panel, with the objects of the game as a tree. Beside it: See what the game is made of.',
+  },
+  {
+    file: 'performance.webp',
+    alt: 'The Performance page of the Wax panel, with the frame rate and what Wax costs each frame. Beside it: A third of a millisecond.',
+  },
+  {
+    file: 'icons.webp',
+    alt: 'The Icons page of the Wax panel, a grid of icons. Beside it: 1,573 icons, by name.',
+  },
+];
+
 export default function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-14 md:py-20">
@@ -145,9 +170,29 @@ export default function HomePage() {
           className="h-auto w-full rounded-xl border"
         />
         <figcaption className="text-sm text-fd-muted-foreground">
-          The panel that comes with Wax, open in the game: the explorer, your mods and the frame cost.
+          The panel that comes with Wax, open in the game: your mods, the explorer and the mod catalogue.
         </figcaption>
       </figure>
+
+      <section className="-mt-6 flex flex-col gap-4">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="text-xl font-semibold tracking-tight">A look around</h2>
+          <p className="text-sm text-fd-muted-foreground">Scroll sideways for more</p>
+        </div>
+        <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3">
+          {tour.map((slide) => (
+            <img
+              key={slide.file}
+              src={`${basePath}/img/tour/${slide.file}`}
+              alt={slide.alt}
+              width={1600}
+              height={900}
+              loading="lazy"
+              className="h-auto w-[88%] shrink-0 snap-center rounded-xl border md:w-[82%]"
+            />
+          ))}
+        </div>
+      </section>
 
       <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
