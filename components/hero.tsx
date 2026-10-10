@@ -90,7 +90,7 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
           alt={alt}
           width={1840}
           height={976}
-          className="wax-hero-main absolute inset-0 size-full object-contain"
+          className="absolute inset-0 size-full object-contain"
         />
       </div>
       {slides.map((slide, index) => (

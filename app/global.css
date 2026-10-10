@@ -75,26 +75,12 @@ html > body[data-scroll-locked] {
   will-change: transform;
 }
 
-.wax-hero-main {
-  animation: wax-rise 4.5s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
 @keyframes wax-bob {
   from {
     transform: translate3d(calc(var(--side, 0px) * -1), calc(var(--far, 30px) * -1), 0) rotate(calc(var(--tilt, 0deg) - 3deg));
   }
   to {
     transform: translate3d(var(--side, 0px), var(--far, 30px), 0) rotate(calc(var(--tilt, 0deg) + 3deg));
-  }
-}
-
-@keyframes wax-rise {
-  from {
-    transform: translate3d(0, -7px, 0);
-  }
-  to {
-    transform: translate3d(0, 8px, 0);
   }
 }
 
