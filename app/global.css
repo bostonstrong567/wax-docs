@@ -68,33 +68,33 @@ html > body[data-scroll-locked] {
 }
 
 .wax-ghost {
-  opacity: 0.27;
-  filter: blur(1.5px);
+  opacity: 0.5;
+  filter: blur(0.6px);
   transform: rotate(var(--tilt, 0deg));
-  animation: wax-bob 12s ease-in-out infinite alternate;
+  animation: wax-bob 6s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 .wax-hero-main {
-  animation: wax-rise 9s ease-in-out infinite alternate;
+  animation: wax-rise 4.5s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 @keyframes wax-bob {
   from {
-    transform: translate3d(0, -14px, 0) rotate(var(--tilt, 0deg));
+    transform: translate3d(calc(var(--side, 0px) * -1), calc(var(--far, 30px) * -1), 0) rotate(calc(var(--tilt, 0deg) - 3deg));
   }
   to {
-    transform: translate3d(0, 16px, 0) rotate(calc(var(--tilt, 0deg) + 2deg));
+    transform: translate3d(var(--side, 0px), var(--far, 30px), 0) rotate(calc(var(--tilt, 0deg) + 3deg));
   }
 }
 
 @keyframes wax-rise {
   from {
-    transform: translate3d(0, -3px, 0);
+    transform: translate3d(0, -7px, 0);
   }
   to {
-    transform: translate3d(0, 4px, 0);
+    transform: translate3d(0, 8px, 0);
   }
 }
 

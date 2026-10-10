@@ -10,11 +10,12 @@ type Ghost = { file: string; className: string; style: React.CSSProperties };
 
 // Faint windows that drift slowly behind the first picture. Each has its own place, tilt, pace and start.
 const ghosts: Ghost[] = [
-  { file: 'ghost-performance.webp', className: 'left-[-5%] top-[5%] w-[25%]', style: { ['--tilt' as string]: '-9deg', animationDuration: '11s' } },
-  { file: 'ghost-icons.webp', className: 'right-[-5%] top-[3%] w-[24%]', style: { ['--tilt' as string]: '8deg', animationDuration: '13s', animationDelay: '-4s' } },
-  { file: 'ghost-browse.webp', className: 'left-[2%] bottom-[-11%] w-[21%]', style: { ['--tilt' as string]: '6deg', animationDuration: '14s', animationDelay: '-7s' } },
-  { file: 'ghost-performance.webp', className: 'right-[1%] bottom-[-12%] w-[22%]', style: { ['--tilt' as string]: '-7deg', animationDuration: '12s', animationDelay: '-2s' } },
-  { file: 'ghost-icons.webp', className: 'left-[38%] top-[-15%] w-[19%]', style: { ['--tilt' as string]: '3deg', animationDuration: '16s', animationDelay: '-9s' } },
+  { file: 'ghost-performance.webp', className: 'left-[-3%] top-[3%] w-[24%]', style: { ['--tilt' as string]: '-10deg', ['--far' as string]: '30px', ['--side' as string]: '14px', animationDuration: '5.5s' } },
+  { file: 'ghost-icons.webp', className: 'right-[-3%] top-[1%] w-[23%]', style: { ['--tilt' as string]: '9deg', ['--far' as string]: '36px', ['--side' as string]: '-12px', animationDuration: '6.5s', animationDelay: '-2s' } },
+  { file: 'ghost-browse.webp', className: 'left-[1%] bottom-[-6%] w-[21%]', style: { ['--tilt' as string]: '7deg', ['--far' as string]: '34px', ['--side' as string]: '-16px', animationDuration: '7s', animationDelay: '-4s' } },
+  { file: 'ghost-performance.webp', className: 'right-[0%] bottom-[-7%] w-[22%]', style: { ['--tilt' as string]: '-8deg', ['--far' as string]: '28px', ['--side' as string]: '16px', animationDuration: '6s', animationDelay: '-1s' } },
+  { file: 'ghost-icons.webp', className: 'left-[39%] top-[-13%] w-[20%]', style: { ['--tilt' as string]: '4deg', ['--far' as string]: '24px', ['--side' as string]: '20px', animationDuration: '8s', animationDelay: '-5s' } },
+  { file: 'ghost-browse.webp', className: 'left-[40%] bottom-[-16%] w-[19%]', style: { ['--tilt' as string]: '-5deg', ['--far' as string]: '26px', ['--side' as string]: '-18px', animationDuration: '7.5s', animationDelay: '-3s' } },
 ];
 
 const EVERY = 6500; // milliseconds a picture stays before the next comes by itself
