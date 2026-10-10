@@ -11,12 +11,12 @@ download.
 
 ## Download
 
-Download `Wax-0.3.11.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
+Download `Wax-0.3.12.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
 The number in the file name is the version. Extract the whole zip before you run anything in it.
 
 The same page has the VS Code extension as a `.vsix` file. The [editor page](/docs/editor) says what it is for.
 
-It also has `Wax-0.3.11.manifest` and `Wax-0.3.11.manifest.sig`. They are the signed list of the release's
+It also has `Wax-0.3.12.manifest` and `Wax-0.3.12.manifest.sig`. They are the signed list of the release's
 files. You don't need them to install. [Check a download by hand](/docs/security#check-a-download-by-hand)
 says how to use them.
 
@@ -91,15 +91,17 @@ Wax is tested on the UE4SS build in the zip, so the installer puts that build in
 one, it first copies the old files to a folder inside `Win64`. The folder's name is `ue4ss-backup-` followed
 by the date and time. Your other UE4SS mods in `ue4ss\Mods` are left alone.
 
-UE4SS comes with three small mods that open the game's developer console and its cheat commands:
-`CheatManagerEnablerMod`, `ConsoleCommandsMod` and `ConsoleEnablerMod`. Wax does not need them, so they are
-switched off in the download. Wax 0.2.0 and older left them on.
+UE4SS comes with a few small mods of its own. Three of them open the game's developer console and its cheat
+commands (`CheatManagerEnablerMod`, `ConsoleCommandsMod`, `ConsoleEnablerMod`), and the others load blueprint
+mods, add keys for UE4SS's own tools, or are examples. Wax needs none of them, so none of them is in the
+download: the only thing in `ue4ss\Mods` is Wax.
 
-- If you install over one of those versions and never changed `ue4ss\Mods\mods.txt`, the installer switches
-  the three off and says so.
-- If you changed that file, the installer keeps it and tells you which of the three are on in it.
+- Earlier versions of Wax installed them. If you install over one of those and never changed
+  `ue4ss\Mods\mods.txt`, the installer removes them and says so.
+- If you changed that file, the installer keeps it and the mods, and tells you which of the three above are
+  switched on in it.
 
-To switch one on, open `mods.txt` in Notepad and change the `0` after its name to `1`.
+If you want one of them, get it from UE4SS's own release and list it in `mods.txt` as that release does.
 
 ## Check that it works
 
@@ -130,11 +132,11 @@ The bottom of the panel says how many mods loaded, and whether there were errors
 
 <Shot
   src="panel-mods.png"
-  alt="The Mods page of the Wax panel. Under a search box are a Look for updates switch, a Check now button and two cards. The card of Entity ESP 1.0.0 is open: Status loaded, Load time 4.2 ms, an Enabled switch and an Auto Update switch that are on, Open key F6, a Reload button and a bin. The card of Recipe Browser 0.9.2 is closed. Each card has six dots at its left. The line along the bottom reads 2 of 2 mods loaded, no errors."
+  alt="The Mods page of the Wax panel. Under a search box are a Look for updates switch, a Check now button and two cards. The card of Entity ESP 1.0.0 is open: Status loaded, Load time 4.2 ms, an Enabled switch and an Auto Update switch that are on, Show / hide F6, a Reload button and a bin. The card of Recipe Browser 0.9.2 is closed. Each card has six dots at its left. The line along the bottom reads 2 of 2 mods loaded, no errors."
   caption="Here with two mods. A new install lists none. The picture shows Prospector's Codex under its earlier name, Recipe Browser."
 />
 
-<NextVersion>The picture shows the panel of the next version. In Wax 0.2.1 a card has up and down arrows in place of the six dots, and no **Open key** or **Auto Update** switch of its own.</NextVersion>
+<NextVersion>The picture shows the panel of the next version. In Wax 0.2.1 a card has up and down arrows in place of the six dots, and no **Show / hide** or **Auto Update** switch of its own.</NextVersion>
 
 ## Where Wax is
 
@@ -196,8 +198,8 @@ the **Add to game** button the way you set it.
 Download the newest zip and copy the contents of `game` into `Win64` again. Say yes when Windows asks to
 replace files.
 
-Your own mods and your settings are not in the zip, so they stay. The UE4SS settings files `UE4SS-settings.ini`,
-`mods.txt` and `mods.json` are replaced by the copies from the zip.
+Your own mods and your settings are not in the zip, so they stay. The UE4SS settings files `UE4SS-settings.ini`
+and `mods.txt` are replaced by the copies from the zip.
 
 ### Updates in the game
 

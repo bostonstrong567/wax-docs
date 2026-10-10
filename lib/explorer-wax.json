@@ -2998,7 +2998,6 @@
       }
      ],
      "text": "The key a mod's mod.lua names for its windows (`key = \"F6\"`), as the player has it now. nil when mod.lua names none. It is known while the mod is not running.",
-     "next": true,
      "ref": "/docs/reference/ui#ui-keys-named",
      "use": "local result = ui.Keys.Named(owner)"
     },
