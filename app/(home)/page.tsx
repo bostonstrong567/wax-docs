@@ -164,7 +164,7 @@ export default function HomePage() {
 
       <figure className="-mt-4 flex flex-col gap-3">
         <img
-          src={`${basePath}/img/showcase.webp`}
+          src={`${basePath}/img/hero-mods.webp`}
           alt="The Wax panel in the game, on its Mods page. One mod is open on its card: its status, a switch to turn it on or off, and a row for each of its keys."
           width={1840}
           height={976}
