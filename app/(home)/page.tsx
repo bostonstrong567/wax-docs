@@ -142,12 +142,6 @@ export default function HomePage() {
           >
             Your first mod
           </Link>
-          <Link
-            href="https://www.nexusmods.com/icarus/mods/354"
-            className="rounded-lg border bg-fd-card px-4 py-2 text-sm font-medium transition-colors hover:bg-fd-accent"
-          >
-            Nexus Mods
-          </Link>
         </div>
       </section>
 

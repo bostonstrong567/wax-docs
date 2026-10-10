@@ -13,7 +13,6 @@ export function baseOptions(): BaseLayoutProps {
       { text: 'Explorer', url: '/explorer' },
       { text: 'Mods', url: '/mods' },
       { text: 'Icons', url: '/icons' },
-      { text: 'Nexus', url: 'https://www.nexusmods.com/icarus/mods/354', external: true },
     ],
   };
 }
