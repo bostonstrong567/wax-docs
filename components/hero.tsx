@@ -54,7 +54,7 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
       : `pointer-events-none opacity-0 scale-[0.985] ${from > 0 === index > at || (at === 0 && index === count - 1 && from < 0) ? 'translate-x-[3%]' : '-translate-x-[3%]'}`;
 
   const arrow =
-    'absolute top-1/2 z-20 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white/90 opacity-0 shadow-lg backdrop-blur-md transition duration-300 hover:scale-110 hover:bg-black/55 focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-80';
+    'absolute top-1/2 z-20 flex size-10 cursor-pointer -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white/90 opacity-0 shadow-lg backdrop-blur-md transition duration-300 hover:scale-110 hover:bg-black/55 focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-80';
 
   return (
     <div
@@ -113,7 +113,7 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
       </button>
 
       <div className="absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-black/45 to-transparent" aria-hidden />
-      <div className="absolute inset-x-0 bottom-4 z-20 flex items-center justify-center gap-2">
+      <div className="absolute inset-x-0 bottom-2 z-20 flex items-center justify-center gap-0.5">
         {Array.from({ length: count }, (_, index) => (
           <button
             key={index}
@@ -121,15 +121,19 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
             aria-label={`Picture ${index + 1} of ${count}`}
             aria-current={index === at}
             onClick={() => go(index)}
-            className={`relative h-2 overflow-hidden rounded-full transition-all duration-500 ${index === at ? 'w-8 bg-white/30' : 'w-2 bg-white/35 hover:bg-white/70'}`}
+            className="group/dot cursor-pointer px-1 py-2"
           >
-            {index === at ? (
-              <span
-                key={`${at}-${held}`}
-                className="wax-dot-fill absolute inset-y-0 left-0 rounded-full bg-fd-primary"
-                style={{ animationDuration: `${EVERY}ms`, animationPlayState: held ? 'paused' : 'running', width: held ? '100%' : undefined }}
-              />
-            ) : null}
+            <span
+              className={`relative block h-2 overflow-hidden rounded-full transition-all duration-500 ${index === at ? 'w-8 bg-white/30' : 'w-2 bg-white/35 group-hover/dot:scale-125 group-hover/dot:bg-white/80'}`}
+            >
+              {index === at ? (
+                <span
+                  key={`${at}-${held}`}
+                  className="wax-dot-fill absolute inset-y-0 left-0 rounded-full bg-fd-primary"
+                  style={{ animationDuration: `${EVERY}ms`, animationPlayState: held ? 'paused' : 'running', width: held ? '100%' : undefined }}
+                />
+              ) : null}
+            </span>
           </button>
         ))}
       </div>
