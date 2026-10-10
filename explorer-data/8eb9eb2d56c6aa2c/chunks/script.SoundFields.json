@@ -1,0 +1,3 @@
+{"chunk":"script.SoundFields","types":[
+{"name":"AmbisonicsEncodingSettings","kind":"class","from":"/Script/SoundFields.AmbisonicsEncodingSettings","parent":"SoundfieldEncodingSettingsBase","origin":"native","props":[["AmbisonicsOrder","integer","print(obj.AmbisonicsOrder)"]],"funcs":[]}
+]}

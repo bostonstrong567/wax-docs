@@ -1,0 +1,3 @@
+{"chunk":"script.TcpMessaging","types":[
+{"name":"TcpMessagingSettings","kind":"class","from":"/Script/TcpMessaging.TcpMessagingSettings","parent":"Object","origin":"native","props":[["ConnectToEndpoints","string[]","print(obj.ConnectToEndpoints)"],["ConnectionRetryDelay","integer","print(obj.ConnectionRetryDelay)"],["EnableTransport","boolean","print(obj.EnableTransport)"],["ListenEndpoint","string","print(obj.ListenEndpoint)"],["bStopServiceWhenAppDeactivates","boolean","print(obj.bStopServiceWhenAppDeactivates)"]],"funcs":[]}
+]}

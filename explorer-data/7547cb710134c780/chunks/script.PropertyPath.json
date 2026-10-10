@@ -1,0 +1,4 @@
+{"chunk":"script.PropertyPath","types":[
+{"name":"CachedPropertyPath","kind":"struct","from":"/Script/PropertyPath.CachedPropertyPath","props":[["CachedFunction","Function","print(value.CachedFunction)"],["Segments","PropertyPathSegment[]","print(value.Segments)"]]},
+{"name":"PropertyPathSegment","kind":"struct","from":"/Script/PropertyPath.PropertyPathSegment","props":[["ArrayIndex","integer","print(value.ArrayIndex)"],["Name","string","print(value.Name)"],["Struct","Struct","print(value.Struct)"]]}
+]}

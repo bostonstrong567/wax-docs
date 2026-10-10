@@ -1,0 +1,9 @@
+{"chunk":"script.EngineMessages","types":[
+{"name":"EngineServiceAuthDeny","kind":"struct","from":"/Script/EngineMessages.EngineServiceAuthDeny","props":[["UserName","string","print(value.UserName)"],["UserToDeny","string","print(value.UserToDeny)"]]},
+{"name":"EngineServiceAuthGrant","kind":"struct","from":"/Script/EngineMessages.EngineServiceAuthGrant","props":[["UserName","string","print(value.UserName)"],["UserToGrant","string","print(value.UserToGrant)"]]},
+{"name":"EngineServiceExecuteCommand","kind":"struct","from":"/Script/EngineMessages.EngineServiceExecuteCommand","props":[["Command","string","print(value.Command)"],["UserName","string","print(value.UserName)"]]},
+{"name":"EngineServiceNotification","kind":"struct","from":"/Script/EngineMessages.EngineServiceNotification","props":[["Text","string","print(value.Text)"],["TimeSeconds","number","print(value.TimeSeconds)"]]},
+{"name":"EngineServicePing","kind":"struct","from":"/Script/EngineMessages.EngineServicePing","props":[]},
+{"name":"EngineServicePong","kind":"struct","from":"/Script/EngineMessages.EngineServicePong","props":[["CurrentLevel","string","print(value.CurrentLevel)"],["EngineVersion","integer","print(value.EngineVersion)"],["HasBegunPlay","boolean","print(value.HasBegunPlay)"],["InstanceId","Guid","print(value.InstanceId)"],["InstanceType","string","print(value.InstanceType)"],["SessionId","Guid","print(value.SessionId)"],["WorldTimeSeconds","number","print(value.WorldTimeSeconds)"]]},
+{"name":"EngineServiceTerminate","kind":"struct","from":"/Script/EngineMessages.EngineServiceTerminate","props":[["UserName","string","print(value.UserName)"]]}
+]}

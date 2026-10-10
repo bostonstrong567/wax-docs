@@ -1,0 +1,4 @@
+{"chunk":"content.Game.UI.Components.BlueprintUnlocks","types":[
+{"name":"EBlueprintTiers","kind":"enum","from":"/Game/UI/Components/BlueprintUnlocks/EBlueprintTiers.EBlueprintTiers","values":[["NewEnumerator0",0],["NewEnumerator1",1],["NewEnumerator2",2],["NewEnumerator3",3],["EBlueprintTiers_MAX",4]]},
+{"name":"ELevelUnlockState","kind":"enum","from":"/Game/UI/Components/BlueprintUnlocks/ELevelUnlockState.ELevelUnlockState","values":[["NewEnumerator0",0],["NewEnumerator1",1],["NewEnumerator2",2],["ELevelUnlockState_MAX",3]]}
+]}

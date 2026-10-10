@@ -1,0 +1,4 @@
+{"chunk":"script.NetCore","types":[
+{"name":"NetAnalyticsAggregatorConfig","kind":"class","from":"/Script/NetCore.NetAnalyticsAggregatorConfig","parent":"Object","origin":"native","props":[["NetAnalyticsData","NetAnalyticsDataConfig[]","print(obj.NetAnalyticsData)"]],"funcs":[]},
+{"name":"NetAnalyticsDataConfig","kind":"struct","from":"/Script/NetCore.NetAnalyticsDataConfig","props":[["DataName","string","print(value.DataName)"],["bEnabled","boolean","print(value.bEnabled)"]]}
+]}

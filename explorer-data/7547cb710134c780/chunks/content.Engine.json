@@ -1,0 +1,5 @@
+{"chunk":"content.Engine","types":[
+{"name":"ActorMacros_C","kind":"class","from":"/Engine/EditorBlueprintResources/ActorMacros.ActorMacros_C","parent":"Actor","origin":"blueprint","props":[],"funcs":[]},
+{"name":"DmgTypeBP_Environmental_C","kind":"class","from":"/Engine/EngineDamageTypes/DmgTypeBP_Environmental.DmgTypeBP_Environmental_C","parent":"DamageType","origin":"blueprint","props":[],"funcs":[]},
+{"name":"StandardMacros_C","kind":"class","from":"/Engine/EditorBlueprintResources/StandardMacros.StandardMacros_C","parent":"Object","origin":"blueprint","props":[],"funcs":[]}
+]}

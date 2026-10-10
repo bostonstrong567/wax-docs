@@ -1,0 +1,3 @@
+{"chunk":"script.FacialAnimation","types":[
+{"name":"AudioCurveSourceComponent","kind":"class","from":"/Script/FacialAnimation.AudioCurveSourceComponent","parent":"AudioComponent","origin":"native","props":[["CurveSourceBindingName","string","print(obj.CurveSourceBindingName)"],["CurveSyncOffset","number","print(obj.CurveSyncOffset)"]],"funcs":[]}
+]}

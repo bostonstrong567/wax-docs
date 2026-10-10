@@ -1,0 +1,5 @@
+{"chunk":"script.MediaUtils","types":[
+{"name":"EMediaPlayerOptionBooleanOverride","kind":"enum","from":"/Script/MediaUtils.EMediaPlayerOptionBooleanOverride","values":[["UseMediaPlayerSetting",0],["Enabled",1],["Disabled",2]]},
+{"name":"MediaPlayerOptions","kind":"struct","from":"/Script/MediaUtils.MediaPlayerOptions","props":[["Loop","EMediaPlayerOptionBooleanOverride","print(value.Loop)"],["PlayOnOpen","EMediaPlayerOptionBooleanOverride","print(value.PlayOnOpen)"],["SeekTime","Timespan","print(value.SeekTime)"],["Tracks","MediaPlayerTrackOptions","print(value.Tracks)"]]},
+{"name":"MediaPlayerTrackOptions","kind":"struct","from":"/Script/MediaUtils.MediaPlayerTrackOptions","props":[["Audio","integer","print(value.Audio)"],["Caption","integer","print(value.Caption)"],["Metadata","integer","print(value.Metadata)"],["Script","integer","print(value.Script)"],["Subtitle","integer","print(value.Subtitle)"],["Text","integer","print(value.Text)"],["Video","integer","print(value.Video)"]]}
+]}
