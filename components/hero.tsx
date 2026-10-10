@@ -8,20 +8,21 @@ export type HeroSlide = { file: string; alt: string };
 
 type Ghost = { file: string; className: string; style: React.CSSProperties };
 
-// Faint windows that drift slowly behind the first picture. Each has its own place, tilt, pace and start.
+// Faint windows behind the first picture. A short drift, each on its own pace. The sharp windows stay still.
 const ghosts: Ghost[] = [
-  { file: 'ghost-performance.webp', className: 'left-[-3%] top-[3%] w-[24%]', style: { ['--tilt' as string]: '-10deg', ['--far' as string]: '30px', ['--side' as string]: '14px', animationDuration: '5.5s' } },
-  { file: 'ghost-icons.webp', className: 'right-[-3%] top-[1%] w-[23%]', style: { ['--tilt' as string]: '9deg', ['--far' as string]: '36px', ['--side' as string]: '-12px', animationDuration: '6.5s', animationDelay: '-2s' } },
-  { file: 'ghost-browse.webp', className: 'left-[1%] bottom-[-6%] w-[21%]', style: { ['--tilt' as string]: '7deg', ['--far' as string]: '34px', ['--side' as string]: '-16px', animationDuration: '7s', animationDelay: '-4s' } },
-  { file: 'ghost-performance.webp', className: 'right-[0%] bottom-[-7%] w-[22%]', style: { ['--tilt' as string]: '-8deg', ['--far' as string]: '28px', ['--side' as string]: '16px', animationDuration: '6s', animationDelay: '-1s' } },
-  { file: 'ghost-icons.webp', className: 'left-[39%] top-[-13%] w-[20%]', style: { ['--tilt' as string]: '4deg', ['--far' as string]: '24px', ['--side' as string]: '20px', animationDuration: '8s', animationDelay: '-5s' } },
-  { file: 'ghost-browse.webp', className: 'left-[40%] bottom-[-16%] w-[19%]', style: { ['--tilt' as string]: '-5deg', ['--far' as string]: '26px', ['--side' as string]: '-18px', animationDuration: '7.5s', animationDelay: '-3s' } },
+  { file: 'ghost-performance.webp', className: 'left-[-3%] top-[3%] w-[24%]', style: { ['--tilt' as string]: '-10deg', ['--far' as string]: '12px', ['--side' as string]: '8px', animationDuration: '22s' } },
+  { file: 'ghost-icons.webp', className: 'right-[-3%] top-[1%] w-[23%]', style: { ['--tilt' as string]: '9deg', ['--far' as string]: '14px', ['--side' as string]: '-7px', animationDuration: '26s', animationDelay: '-6s' } },
+  { file: 'ghost-browse.webp', className: 'left-[1%] bottom-[-6%] w-[21%]', style: { ['--tilt' as string]: '7deg', ['--far' as string]: '11px', ['--side' as string]: '-9px', animationDuration: '24s', animationDelay: '-11s' } },
+  { file: 'ghost-performance.webp', className: 'right-[0%] bottom-[-7%] w-[22%]', style: { ['--tilt' as string]: '-8deg', ['--far' as string]: '13px', ['--side' as string]: '8px', animationDuration: '28s', animationDelay: '-3s' } },
+  { file: 'ghost-icons.webp', className: 'left-[39%] top-[-13%] w-[20%]', style: { ['--tilt' as string]: '4deg', ['--far' as string]: '10px', ['--side' as string]: '9px', animationDuration: '30s', animationDelay: '-14s' } },
+  { file: 'ghost-browse.webp', className: 'left-[40%] bottom-[-16%] w-[19%]', style: { ['--tilt' as string]: '-5deg', ['--far' as string]: '12px', ['--side' as string]: '-8px', animationDuration: '25s', animationDelay: '-8s' } },
 ];
 
 const EVERY = 6500; // milliseconds a picture stays before the next comes by itself
 
-// The pictures at the top of the home page, one at a time. The first is three windows of the Wax panel with faint
-// ones drifting behind. Arrows show under the mouse, dots at the bottom pick a picture, and it moves on by itself.
+// The pictures at the top of the home page, one at a time. The first is three still windows of the Wax panel,
+// with faint ones drifting behind and a slow light crossing the glass. Arrows show under the mouse, dots at the
+// bottom pick a picture, and it moves on by itself.
 export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
   const count = slides.length + 1;
   const [at, setAt] = useState(0);
@@ -76,6 +77,8 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
         if (Math.abs(moved) > 40) go(at + (moved < 0 ? 1 : -1), moved < 0 ? 1 : -1);
       }}
     >
+      <div className="wax-glow wax-glow-gold" aria-hidden />
+      <div className="wax-glow wax-glow-teal" aria-hidden />
       <div className={`absolute inset-0 transition duration-700 ease-out ${place(0)}`} aria-hidden={at !== 0}>
         {ghosts.map((ghost, index) => (
           <div
@@ -105,6 +108,8 @@ export function Hero({ alt, slides }: { alt: string; slides: HeroSlide[] }) {
           />
         </div>
       ))}
+
+      <div className="wax-sheen" aria-hidden />
 
       <button type="button" aria-label="The picture before" onClick={() => go(at - 1, -1)} className={`${arrow} left-2`}>
         <ChevronLeft className="size-5" />

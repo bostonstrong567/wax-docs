@@ -58,7 +58,7 @@ html > body[data-scroll-locked] {
   overflow-wrap: anywhere;
 }
 
-/* The picture at the top of the home page: a dark ground with two glows, faint windows drifting behind three sharp ones. */
+/* The picture at the top of the home page. The sharp windows stay still. Light and the faint windows behind them move. */
 .wax-hero {
   background:
     radial-gradient(60% 80% at 14% 8%, rgba(22, 66, 74, 0.55), transparent 70%),
@@ -67,20 +67,95 @@ html > body[data-scroll-locked] {
     #090b0f;
 }
 
+.wax-glow {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: wax-drift 28s ease-in-out infinite alternate;
+}
+
+.wax-glow-gold {
+  left: -8%;
+  top: -24%;
+  background: radial-gradient(circle, rgba(245, 176, 66, 0.2), transparent 68%);
+}
+
+.wax-glow-teal {
+  right: -12%;
+  bottom: -30%;
+  background: radial-gradient(circle, rgba(36, 128, 148, 0.28), transparent 68%);
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+
+/* One band of gold light. Transform and opacity only, so the pictures underneath are not redrawn. */
+.wax-sheen {
+  position: absolute;
+  z-index: 15;
+  top: -35%;
+  bottom: -35%;
+  left: 0;
+  width: 26%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 220, 160, 0.05) 44%,
+    rgba(255, 214, 140, 0.18) 50%,
+    rgba(255, 220, 160, 0.05) 56%,
+    transparent 70%
+  );
+  animation: wax-sheen 11s ease-in-out infinite;
+}
+
 .wax-ghost {
-  opacity: 0.5;
-  filter: blur(0.6px);
+  opacity: 0.42;
   transform: rotate(var(--tilt, 0deg));
-  animation: wax-bob 6s ease-in-out infinite alternate;
-  will-change: transform;
+  animation: wax-bob 24s ease-in-out infinite alternate;
+}
+
+@keyframes wax-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(7%, 9%, 0) scale(1.06);
+  }
+}
+
+@keyframes wax-sheen {
+  0%,
+  46% {
+    transform: translate3d(-140%, 0, 0);
+    opacity: 0;
+  }
+  58% {
+    opacity: 1;
+  }
+  82%,
+  100% {
+    transform: translate3d(420%, 0, 0);
+    opacity: 0;
+  }
 }
 
 @keyframes wax-bob {
   from {
-    transform: translate3d(calc(var(--side, 0px) * -1), calc(var(--far, 30px) * -1), 0) rotate(calc(var(--tilt, 0deg) - 3deg));
+    transform: translate3d(calc(var(--side, 0px) * -1), calc(var(--far, 12px) * -1), 0) rotate(calc(var(--tilt, 0deg) - 1.5deg));
   }
   to {
-    transform: translate3d(var(--side, 0px), var(--far, 30px), 0) rotate(calc(var(--tilt, 0deg) + 3deg));
+    transform: translate3d(var(--side, 0px), var(--far, 12px), 0) rotate(calc(var(--tilt, 0deg) + 1.5deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wax-glow,
+  .wax-sheen,
+  .wax-ghost {
+    animation: none;
   }
 }
 
