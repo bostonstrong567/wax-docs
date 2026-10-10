@@ -57,3 +57,50 @@ html > body[data-scroll-locked] {
 .prose :is(h1, h2, h3, h4) {
   overflow-wrap: anywhere;
 }
+
+/* The picture at the top of the home page: a dark ground with two glows, faint windows drifting behind three sharp ones. */
+.wax-hero {
+  background:
+    radial-gradient(60% 80% at 14% 8%, rgba(22, 66, 74, 0.55), transparent 70%),
+    radial-gradient(60% 90% at 88% 96%, rgba(24, 40, 82, 0.6), transparent 70%),
+    radial-gradient(34% 44% at 50% 50%, rgba(40, 90, 170, 0.22), transparent 75%),
+    #090b0f;
+}
+
+.wax-ghost {
+  opacity: 0.27;
+  filter: blur(1.5px);
+  transform: rotate(var(--tilt, 0deg));
+  animation: wax-bob 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.wax-hero-main {
+  animation: wax-rise 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes wax-bob {
+  from {
+    transform: translate3d(0, -14px, 0) rotate(var(--tilt, 0deg));
+  }
+  to {
+    transform: translate3d(0, 16px, 0) rotate(calc(var(--tilt, 0deg) + 2deg));
+  }
+}
+
+@keyframes wax-rise {
+  from {
+    transform: translate3d(0, -3px, 0);
+  }
+  to {
+    transform: translate3d(0, 4px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wax-ghost,
+  .wax-hero-main {
+    animation: none;
+  }
+}

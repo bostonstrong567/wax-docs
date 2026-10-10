@@ -3,7 +3,7 @@ import { Activity, Boxes, Keyboard, LayoutPanelLeft, Package, RefreshCw, Search,
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Shot } from '@/components/shot';
-import { Tour } from '@/components/tour';
+import { Hero } from '@/components/hero';
 import icons from '@/lib/icon-names.json';
 import { basePath } from '@/lib/shared';
 
@@ -101,31 +101,6 @@ const places: Card[] = [
   },
 ];
 
-type Slide = { file: string; alt: string };
-
-const tour: Slide[] = [
-  {
-    file: 'mods.webp',
-    alt: 'The Mods page of the Wax panel. A mod is open on its card: its status, a switch, and a row for each of its keys. Beside it: Every mod, every key, one page.',
-  },
-  {
-    file: 'browse.webp',
-    alt: 'The Browse page of the Wax panel, listing the mods of the catalogue with their pictures and votes. Beside it: Add mods without leaving the game.',
-  },
-  {
-    file: 'explorer.webp',
-    alt: 'The Explorer page of the Wax panel, with the objects of the game as a tree. Beside it: See what the game is made of.',
-  },
-  {
-    file: 'performance.webp',
-    alt: 'The Performance page of the Wax panel, with the frame rate and what Wax costs each frame. Beside it: A third of a millisecond.',
-  },
-  {
-    file: 'icons.webp',
-    alt: 'The Icons page of the Wax panel, a grid of icons. Beside it: 1,573 icons, by name.',
-  },
-];
-
 export default function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-14 md:py-20">
@@ -163,22 +138,11 @@ export default function HomePage() {
       </section>
 
       <figure className="-mt-4 flex flex-col gap-3">
-        <img
-          src={`${basePath}/img/hero-mods.webp`}
-          alt="The Wax panel in the game, on its Mods page. One mod is open on its card: its status, a switch to turn it on or off, and a row for each of its keys."
-          width={1840}
-          height={976}
-          className="h-auto w-full rounded-xl border"
-        />
+        <Hero alt="The Wax panel in the game, as three windows. In front, the Mods page with one mod open on its keys. Behind it, tilted, the Explorer with the game's objects and the Browse page with the mods of the catalogue." />
         <figcaption className="text-sm text-fd-muted-foreground">
-          The panel that comes with Wax, open in the game: every mod, and every key it uses, on one page.
+          The panel that comes with Wax, open in the game: your mods, the explorer and the mod catalogue.
         </figcaption>
       </figure>
-
-      <section className="-mt-6 flex flex-col gap-4">
-        <h2 className="text-xl font-semibold tracking-tight">A look around</h2>
-        <Tour slides={tour.map((slide) => ({ src: `${basePath}/img/tour/${slide.file}`, alt: slide.alt }))} />
-      </section>
 
       <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
         <div className="min-w-0">
