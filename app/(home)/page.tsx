@@ -101,6 +101,14 @@ const places: Card[] = [
   },
 ];
 
+const slides = [
+  { file: 'slide-mods.webp', alt: 'The Mods page of the Wax panel. A mod is open on its card: its status, a switch, and a row for each of its keys. Beside it: Every mod, every key, one page.' },
+  { file: 'slide-browse.webp', alt: 'The Browse page of the Wax panel, listing the mods of the catalogue with their pictures and votes. Beside it: Add mods without leaving the game.' },
+  { file: 'slide-explorer.webp', alt: 'The Explorer page of the Wax panel, with the objects of the game as a tree. Beside it: See what the game is made of.' },
+  { file: 'slide-performance.webp', alt: 'The Performance page of the Wax panel, with the frame rate and what Wax costs each frame. Beside it: A third of a millisecond.' },
+  { file: 'slide-icons.webp', alt: 'The Icons page of the Wax panel, a grid of icons. Beside it: 1,573 icons, by name.' },
+];
+
 export default function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-14 md:py-20">
@@ -138,9 +146,9 @@ export default function HomePage() {
       </section>
 
       <figure className="-mt-4 flex flex-col gap-3">
-        <Hero alt="The Wax panel in the game, as three windows. In front, the Mods page with one mod open on its keys. Behind it, tilted, the Explorer with the game's objects and the Browse page with the mods of the catalogue." />
+        <Hero slides={slides} alt="The Wax panel in the game, as three windows. In front, the Mods page with one mod open on its keys. Behind it, tilted, the Explorer with the game's objects and the Browse page with the mods of the catalogue." />
         <figcaption className="text-sm text-fd-muted-foreground">
-          The panel that comes with Wax, open in the game: your mods, the explorer and the mod catalogue.
+          The panel that comes with Wax, open in the game. Use the arrows or the dots for a closer look at each page.
         </figcaption>
       </figure>
 

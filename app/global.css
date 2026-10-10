@@ -98,9 +98,16 @@ html > body[data-scroll-locked] {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wax-ghost,
-  .wax-hero-main {
-    animation: none;
+.wax-dot-fill {
+  width: 0;
+  animation: wax-fill 6500ms linear forwards;
+}
+
+@keyframes wax-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
   }
 }
