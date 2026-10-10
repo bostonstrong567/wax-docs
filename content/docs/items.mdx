@@ -1,6 +1,6 @@
 ---
 title: Items and inventories
-description: Look up what an item is, count what a character carries, and give or take items.
+description: Look up what an item is, count what a character carries, give or take items, and put a stack in hand.
 icon: Backpack
 ---
 
@@ -133,8 +133,8 @@ end
 | `inventory:Where(item)` | The stacks of one item. |
 | `inventory:Refresh()` | Reads every slot again now. |
 
-A stack is a plain table: `Item`, `Count`, `Slot`, `Durability`, and `Properties` with every number the game
-keeps for it. Changing the table changes nothing in the game.
+A stack is a table of plain fields: `Item`, `Count`, `Slot`, `Durability`, and `Properties` with every number
+the game keeps for it. Changing those fields changes nothing in the game.
 
 Other things that hold items have inventories of the game's class `Inventory` too, and the same functions
 work on them. Reading them was tried on a drop ship and a gravestone. Giving, taking and the signals were not
@@ -152,6 +152,94 @@ Wax keeps a copy of an inventory you ask about, so asking often costs little.
   has to be exact at once, not every frame.
 
 `Count` looks at the inventory's own slots. It does not look inside a bag that lies in a slot.
+
+## Hotbar slots, the dropship and the hand
+
+<Since version="0.3.13" />
+
+`character.Inventory` is the backpack. It is the same value as `character.Backpack`, on a player's character
+and on `game.Me`. The character in the station has no backpack, so `Inventory` is nil there too. On a
+creature, `Inventory` stays the inventory the game keeps on it.
+
+### Slots by number
+
+`inventory[n]` is `inventory:Slot(n)`, and `#inventory` is how many slots it has. This works on the hotbar,
+the backpack, the dropship and any other inventory.
+
+```lua title="init.lua"
+local hotbar = game.Me.Hotbar
+if hotbar then
+    for slot = 1, #hotbar do
+        local stack = hotbar[slot]
+        if stack and stack.Item == "Stone_Pickaxe" then
+            print("A pickaxe is in slot", slot)
+        end
+    end
+end
+```
+
+An empty slot is nil. `ipairs` stops at the first empty slot, so count from 1 to `#hotbar` when you want
+every slot.
+
+### The dropship
+
+`character.ShipInventory` is the cargo of the dropship assigned to that character. The game calls that hold
+`DropShip_Equipment`. A new ship has 15 slots there.
+
+```lua title="init.lua"
+local ship = game.Me.ShipInventory
+if ship then
+    print(ship:Count("Wood"), "wood in the dropship")
+end
+```
+
+It is nil on the station, and nil while this character has no dropship. Another player's ship stays theirs.
+The small hold the game calls `Dropship_RemoveOnly` is a different inventory.
+
+`Count`, `Has` and `List` on the character count the six inventories it carries. Ask the ship with its own
+`Count`, `Has` and `List`.
+
+Wax looks up the ship at most once a second, and again after a map change. Giving, taking and the item
+signals on that hold have not been tried. Reading it has.
+
+### The hand
+
+```lua title="init.lua"
+local stack = game.Me.Hotbar and game.Me.Hotbar[1]
+if stack then
+    stack:Equip()
+end
+
+game.Me.Equipped:Connect(function(held, previous)
+    print("In hand:", held and held.Item or "empty", "was", previous)
+end)
+
+game.Me.Activated:Connect(function(held, use)
+    print(held.Item, use)
+end)
+```
+
+`stack:Equip()` tells the game to focus that slot. The game's own location for the slot is `Slot - 1`.
+Pressing a hotbar key changes the slot in hand the same way, and `game.Me.Equipped` follows either one on
+its next look.
+
+`game.Me.Equipped` fires when the hotbar slot in hand, or the item in it, is not what it was. Wax looks four
+times a second, and only while a handler is connected. Your function gets the stack in hand now, or nil when
+that slot is empty, and the name of the item that was in hand. What was already in hand when you connect is
+where the signal starts. A change of durability alone does not fire it. Bare hands are the item
+`Player_Fist`.
+
+`stack:Activate()` puts the stack in the hand and fires `game.Me.Activated` in that call, with the stack
+and nil.
+
+`stack:Activate("Consume")` also runs that use. A use is a row of `D_Uses`, such as `"Consume"` or
+`"Place"`. A name the game does not have raises an error that says so.
+
+A tool's swing is the game's fire button. `Activate()` puts the tool in the hand and fires `Activated`.
+The swing stays with that button.
+
+Call them with a colon: `stack:Equip()` and `stack:Activate()`. The stack has to be one that `Slot`,
+`List`, `Where` or `HeldItem` gave.
 
 ## Give and take
 

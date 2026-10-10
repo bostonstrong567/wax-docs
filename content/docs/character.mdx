@@ -95,6 +95,8 @@ end)
 | `ModifierAdded`, `ModifierRemoved` | An effect came onto the character or left it. | The [modifier](/docs/stats#modifiers). |
 | `Damaged`, `Died` | The character was hit, or is dead. | See [Events of the game](/docs/events). |
 | `ItemAdded`, `ItemRemoved`, `ItemChanged` | What the character carries changed. | See [Events of the game](/docs/events). |
+| `Equipped` | The hotbar slot in hand, or the item in it, changed. | The stack in hand, and the name of the item that was there. See [Items and inventories](/docs/items#the-hand). |
+| `Activated` | `stack:Activate` ran. | The stack, and the use name. See [Items and inventories](/docs/items#the-hand). |
 | `Respawned` | The character is alive after it was dead. | The character. |
 | `Spawned`, `Despawned` | A character appeared where there was none, or the one that was there is gone. | The character, for `Spawned`. |
 

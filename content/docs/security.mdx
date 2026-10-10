@@ -20,17 +20,16 @@ Wax 0.2.1 and newer.
 ## What Wax puts on your PC
 
 Almost everything is inside the game folder, `...\steamapps\common\Icarus\Icarus\Binaries\Win64\`. Two
-things are not: a registry key that is only made when you say yes, and a small log file of the
-**Add to game** button.
+things are not: a registry key for the **Add to game** button, and a small log file of that button.
 
 | Where | What it is | How to remove it |
 | --- | --- | --- |
 | `dwmapi.dll` and the `ue4ss` folder | UE4SS, the script loader Wax runs on, as its own project released it, without the mods it brings (its console and cheat mods among them). The game loads `dwmapi.dll` from its own folder when it starts, and that file starts UE4SS. | `Uninstall Wax.cmd` asks whether to remove it. By hand: delete both. |
-| `ue4ss\Mods\Wax` | Wax: Lua files in `Scripts`, pictures in `assets`, tables in `data`, two helper files in `bin`, and `Wax-Import.ps1`, which handles the **Add to game** button. | `Uninstall Wax.cmd`. By hand: delete the folder. |
+| `ue4ss\Mods\Wax` | Wax: Lua files in `Scripts`, pictures in `assets`, tables in `data`, two helper files in `bin`, and, from the full zip or from Wax Setup, `Wax-Import.ps1`, which handles the **Add to game** button. The manual zip has no script. | `Uninstall Wax.cmd`, or `Wax Setup.exe` when it removes Wax. By hand: delete the folder. |
 | `ue4ss\Mods\Wax\mods` | Your mods. None comes with Wax. | `Uninstall Wax.cmd` asks first. By hand: delete a mod's folder. |
 | `ue4ss\Mods\Wax\saved` | The settings of Wax and of your mods. | The same question as for `mods`. |
 | `ue4ss\Mods\Wax\run` | Working files: the log of this session and of the one before, downloads while they are checked, and your answer about the **Add to game** button. | Goes with the `Wax` folder. |
-| The registry key `HKEY_CURRENT_USER\Software\Classes\wax` | Tells Windows that links starting with `wax://` go to Wax. Made only when you say yes at install. | `Uninstall Wax.cmd` removes it. By hand: the line below. |
+| The registry key `HKEY_CURRENT_USER\Software\Classes\wax` | Tells Windows that links starting with `wax://` go to Wax. `Install Wax.cmd` makes it when you say yes. `Wax Setup.exe` makes it unless you pass `--no-links`. | `Uninstall Wax.cmd` removes it, and so does `Wax Setup.exe` when it removes Wax. By hand: the line below. |
 | `%LOCALAPPDATA%\Wax\import.log` | What the **Add to game** button did: one line with the time, the mod and the outcome for each `wax://` link that was opened. It stays on your PC, and it starts again when it passes 256 KB. | Delete the `Wax` folder in `%LOCALAPPDATA%`. |
 
 The two helper files are small programs written in C, and their source is in the repository:
@@ -53,8 +52,10 @@ What Wax does not do:
 
 ### The registry key
 
-The key holds one command: Windows PowerShell, in a window you can see, runs `Wax-Import.ps1` from Wax's
-folder with the link. `Install Wax.cmd` asks before it makes the key, and Enter alone means no.
+The key holds one command. `Install Wax.cmd` asks before it makes the key, and Enter alone means no. That
+command is Windows PowerShell, in a window you can see, running `Wax-Import.ps1` from Wax's folder with the
+link. `Wax Setup.exe` makes the key on its own. Its command is that program, with `--link` and the link. To
+leave the key as it is, run `Wax Setup.exe --install --no-links`.
 
 To look at it, open a Command Prompt and type:
 
@@ -328,7 +329,9 @@ the file. Start the game again after either.
   technique of its own.
 - **The three `.cmd` files set PowerShell's script rule aside** for the one run they start
   (`-ExecutionPolicy Bypass`). Without it Windows refuses a script that came out of a downloaded zip. It
-  changes no setting on your PC.
+  changes no setting on your PC. Those files are only in `Wax-<version>.zip`.
+  `Wax-<version>-manual.zip` has no script. `Wax Setup.exe` copies the files itself and does not start
+  PowerShell. Windows has not signed that program, so it may warn you when you run it.
 - **The site's address is a free dynamic-DNS name.** `wax-icarus.duckdns.org` belongs to the DuckDNS
   service, not to Wax. Whoever controls that service, or the owner's account there, could point the name at
   another server. That is why nothing relies on the address for what gets installed: a mod or an update

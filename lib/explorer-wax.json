@@ -56,10 +56,10 @@
    "text": "game.Items, inventories and what a character carries.",
    "types": [
     "game.Items",
+    "WaxItemStack",
     "WaxInventory",
     "WaxPlayerItems",
-    "WaxItemFacts",
-    "WaxItemStack"
+    "WaxItemFacts"
    ],
    "members": []
   },
@@ -711,6 +711,8 @@
   "Stats:AddModifier": "WaxCharacterStats.AddModifier",
   "Stats:RemoveModifier": "WaxCharacterStats.RemoveModifier",
   "game.Time:Set": "game.Time.Set",
+  "Stack:Equip": "WaxItemStack.Equip",
+  "Stack:Activate": "WaxItemStack.Activate",
   "game.Items:Get": "game.Items.Get",
   "game.Items:Has": "game.Items.Has",
   "game.Items:GetNames": "game.Items.GetNames",
@@ -12513,7 +12515,7 @@
    "title": "game.Me",
    "kind": "namespace",
    "group": "character",
-   "text": "The local player's character, whichever one that is. game.Me is not an Instance: it finds the character each time it is used, so it goes on working after a respawn and on another map. It has every field and function of the character, and Character, Exists and the signals listed here. While there is no character, as at the title screen, Exists is false, a field reads nil, and calling a function or assigning a field raises an error that says so. A signal is fed by looking at the character a few times a second, and only while a handler is connected to it. What changes and changes back between two looks is not seen. A signal that hands over a value and the one before does not fire while there is no character, and for it another character whose value is not the last one seen counts as a change. Damaged and the three item signals are not fed by looking: the game tells Wax itself, through a hook on the game's own function that is made when the first handler connects. A handler never runs inside the game's call: what was heard is told from the frame loop, in the same frame or the next. All of it was seen on the host of a session. As a guest in someone else's game it has not been tried.",
+   "text": "The local player's character, whichever one that is. game.Me is not an Instance: it finds the character each time it is used, so it goes on working after a respawn and on another map. It has every field and function of the character, and Character, Exists and the signals listed here. While there is no character, as at the title screen, Exists is false, a field reads nil, and calling a function or assigning a field raises an error that says so. A signal is fed by looking at the character a few times a second, and only while a handler is connected to it. What changes and changes back between two looks is not seen. A signal that hands over a value and the one before does not fire while there is no character, and for it another character whose value is not the last one seen counts as a change. Damaged and the three item signals are not fed by looking: the game tells Wax itself, through a hook on the game's own function that is made when the first handler connects. A handler never runs inside the game's call: what was heard is told from the frame loop, in the same frame or the next. All of it was seen on the host of a session. As a guest in someone else's game it has not been tried. Equipped is looked at four times a second. Activated fires inside stack:Activate, in that call.",
    "parents": [
     "BP_IcarusPlayerCharacterSurvival_C",
     "WaxPlayerCharacter"
@@ -12643,6 +12645,22 @@
      "receives": "stack: WaxItemStack?, previous: WaxItemStack?",
      "text": "Fires for every slot of what your character carries that holds something else than a frame before: what it holds now, nil for nothing, and what it held, each with its Inventory. A tool that wore and a stack that moved are changes too. A spoil timer that only counts down is not.",
      "use": "game.Me.ItemChanged:Connect(function(stack, previous)\n    print(stack, previous)\nend)"
+    },
+    {
+     "id": "game.Me.Equipped",
+     "name": "Equipped",
+     "type": "WaxSignal<fun(stack: WaxItemStack?, previous: string?)>",
+     "receives": "stack: WaxItemStack?, previous: string?",
+     "text": "Fires when the hotbar slot in hand, or the item in it, is not what it was at the last look. Looked at four times a second. Your function gets the stack in hand now, or nil when that slot is empty, and the name of the item that was in hand. Bare hands are the item Player_Fist. What was already in hand when you connect is where it starts. A change of durability alone does not fire it.",
+     "use": "game.Me.Equipped:Connect(function(stack, previous)\n    print(stack, previous)\nend)"
+    },
+    {
+     "id": "game.Me.Activated",
+     "name": "Activated",
+     "type": "WaxSignal<fun(stack: WaxItemStack, use: string?)>",
+     "receives": "stack: WaxItemStack, use: string?",
+     "text": "Fires inside stack:Activate, with the stack and the use name. The use name is nil when Activate was called with no name.",
+     "use": "game.Me.Activated:Connect(function(stack, use)\n    print(stack, use)\nend)"
     },
     {
      "id": "game.Me.BiomeChanged",
@@ -13283,9 +13301,9 @@
    "id": "WaxItemStack",
    "name": "WaxItemStack",
    "title": "WaxItemStack",
-   "kind": "data",
+   "kind": "object",
    "group": "items",
-   "text": "One stack in a slot of an inventory, as plain values. The table is yours: changing it changes nothing in the game.",
+   "text": "One stack in a slot of an inventory. Its fields are plain values, and changing them changes nothing in the game. Equip and Activate are functions: they tell the game to put this stack in a character's hand.",
    "ref": "/docs/reference/items#waxitemstack",
    "guide": {
     "href": "/docs/items",
@@ -13297,60 +13315,75 @@
     "WaxInventory.Where",
     "WaxPlayerItems.List"
    ],
-   "users": [
-    "game.Items.Get",
-    "WaxInventory.Count",
-    "WaxInventory.Has",
-    "WaxInventory.Where",
-    "WaxInventory.Give",
-    "WaxInventory.Take",
-    "WaxPlayerItems.Count",
-    "WaxPlayerItems.Has",
-    "WaxPlayerItems.Give",
-    "WaxPlayerItems.Take"
-   ],
+   "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)",
    "props": [
     {
      "id": "WaxItemStack.Item",
      "name": "Item",
      "type": "string",
      "text": "The item's name as the game spells it. The game's own files do not always use the same letter case, so compare two names without it, or ask Count, Has or Where.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Item)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Item)"
     },
     {
      "id": "WaxItemStack.Count",
      "name": "Count",
      "type": "integer",
      "text": "How many are in the stack. 1 for an item the game keeps no stack number for.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Count)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Count)"
     },
     {
      "id": "WaxItemStack.Slot",
      "name": "Slot",
      "type": "integer",
      "text": "The slot it is in, counted from 1. The game's own functions count from 0: their Location is Slot - 1.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Slot)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Slot)"
     },
     {
      "id": "WaxItemStack.Durability",
      "name": "Durability",
      "type": "integer?",
      "text": "How much durability it has left. nil for an item the game keeps none for.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Durability)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Durability)"
     },
     {
      "id": "WaxItemStack.Properties",
      "name": "Properties",
      "type": "table<string|integer, integer>?",
      "text": "Every number the game keeps for this stack, under the game's own name for it (EDynamicItemProperties): ItemableStack, Durability, GunCurrentMagSize, CurrentAmmoType, MillijoulesRemaining, TransmutableUnits, Fillable_StoredUnits, Fillable_Type, Decayable_CurrentSpoilTime and the others. One this version of Wax has no name for is under its number. nil when the game keeps none.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Properties)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Properties)"
     },
     {
      "id": "WaxItemStack.Inventory",
      "name": "Inventory",
      "type": "string?",
      "text": "Which inventory of the character it is in: \"Backpack\", \"Hotbar\", \"Equipment\", \"Suit\", \"Upgrades\" or \"Vision\". Only what a character's List and HeldItem give has it.",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()\nprint(itemStacks[1].Inventory)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nprint(stack.Inventory)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxItemStack.Equip",
+     "name": "Equip",
+     "call": "stack:Equip",
+     "text": "Puts this stack into the character's hand. The game focuses this slot of its inventory. The location the game uses is Slot - 1. game.Me.Equipped follows on its next look. A hotbar key does the same kind of change, and Equipped follows that too. The stack has to be one that Slot, List, Where or HeldItem gave.",
+     "ref": "/docs/reference/items#stack-equip",
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nstack:Equip()"
+    },
+    {
+     "id": "WaxItemStack.Activate",
+     "name": "Activate",
+     "call": "stack:Activate",
+     "params": [
+      {
+       "name": "use",
+       "type": "string",
+       "optional": true,
+       "text": "The name of a row of D_Uses. Leave it out to put the stack in the hand."
+      }
+     ],
+     "text": "Puts this stack into the character's hand, then fires game.Me.Activated with the stack and `use`. With a use name, the game also runs that row of D_Uses. \"Consume\" and \"Place\" are two such names. A name the game does not have raises an error. With no name, the stack is in the hand and Activated fires with nil. A tool's swing is the game's fire button.",
+     "ref": "/docs/reference/items#stack-activate",
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)\nstack:Activate(use)"
     }
    ]
   },
@@ -13480,7 +13513,7 @@
      "id": "WaxInventory.Size",
      "name": "Size",
      "type": "integer?",
-     "text": "How many slots it has.",
+     "text": "How many slots it has. #inventory is this number.",
      "use": "local backpack = game.Me.Backpack\nprint(backpack.Size)"
     },
     {
@@ -13536,7 +13569,7 @@
      ],
      "text": "Every stack in the inventory, in the order of its slots.",
      "ref": "/docs/reference/items#inventory-list",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:List()"
+     "use": "local backpack = game.Me.Backpack\nlocal stacks = backpack:List()"
     },
     {
      "id": "WaxInventory.Slot",
@@ -13553,9 +13586,9 @@
        "type": "WaxItemStack?"
       }
      ],
-     "text": "What one slot holds, or nil when it is empty. Slots are counted from 1 to Size, and another number raises an error.",
+     "text": "What one slot holds, or nil when it is empty. Slots are counted from 1 to Size, and another number raises an error. inventory[n] is this. An empty slot is nil, so a loop from 1 to #inventory reaches every slot.",
      "ref": "/docs/reference/items#inventory-slot",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStack = backpack:Slot(slot)"
+     "use": "local backpack = game.Me.Backpack\nlocal stack = backpack:Slot(slot)"
     },
     {
      "id": "WaxInventory.Count",
@@ -13618,7 +13651,7 @@
      ],
      "text": "The stacks of an item in the inventory, in the order of their slots. An empty list when it holds none.",
      "ref": "/docs/reference/items#inventory-where",
-     "use": "local backpack = game.Me.Backpack\nlocal itemStacks = backpack:Where(item)"
+     "use": "local backpack = game.Me.Backpack\nlocal stacks = backpack:Where(item)"
     },
     {
      "id": "WaxInventory.Refresh",
@@ -13744,11 +13777,25 @@
      "use": "local me = game.Me\nprint(me.Backpack)"
     },
     {
+     "id": "WaxPlayerItems.Inventory",
+     "name": "Inventory",
+     "type": "Inventory|WaxInventory?",
+     "text": "The character's backpack, the same value as Backpack. On a creature, Inventory stays the inventory the game keeps on it.",
+     "use": "local me = game.Me\nprint(me.Inventory)"
+    },
+    {
      "id": "WaxPlayerItems.Hotbar",
      "name": "Hotbar",
      "type": "Inventory|WaxInventory?",
-     "text": "The character's hotbar: its QuickbarInventory.",
+     "text": "The character's hotbar: its QuickbarInventory. hotbar[n] is hotbar:Slot(n), and #hotbar is how many slots it has. An empty slot is nil, so count from 1 to #hotbar to see every slot.",
      "use": "local me = game.Me\nprint(me.Hotbar)"
+    },
+    {
+     "id": "WaxPlayerItems.ShipInventory",
+     "name": "ShipInventory",
+     "type": "Inventory|WaxInventory?",
+     "text": "The cargo of the dropship assigned to this character, the hold the game calls DropShip_Equipment. nil while this character has no assigned dropship, as on the station. Count, Has and List on the character count the six inventories it carries; ask the ship with its own. Wax looks the ship up at most once a second. The hold the game calls Dropship_RemoveOnly is a different inventory.",
+     "use": "local me = game.Me\nprint(me.ShipInventory)"
     },
     {
      "id": "WaxPlayerItems.Equipment",
@@ -13849,7 +13896,7 @@
      ],
      "text": "Every stack the character carries: the backpack's first, then the hotbar's, what it wears, and the other three, each in the order of its slots. Each record says in `Inventory` which one it is in.",
      "ref": "/docs/reference/items#playeritems-list",
-     "use": "local me = game.Me\nlocal itemStacks = me:List()"
+     "use": "local me = game.Me\nlocal stacks = me:List()"
     },
     {
      "id": "WaxPlayerItems.Give",

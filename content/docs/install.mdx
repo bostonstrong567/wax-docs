@@ -11,8 +11,14 @@ download.
 
 ## Download
 
-Download the zip from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest).
+The [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest) has three zips.
 Extract the whole zip before you run anything in it.
+
+| Zip | What it is |
+| --- | --- |
+| `Wax-<version>.zip` | The full download. It has the installer. This is the file the updater checks. |
+| `Wax-<version>-manual.zip` | The same game files, with no installer. Copy the `game` folder by hand. This is the file on Nexus Mods. |
+| `Wax-Setup-<version>.zip` | `Wax Setup.exe`. It finds the game and copies the files. It does not run a script. |
 
 The same page has the VS Code extension as a `.vsix` file. The [editor page](/docs/editor) says what it is for.
 
@@ -20,7 +26,7 @@ It also has a `.manifest` file and a `.manifest.sig` file, with the same version
 They are the signed list of the release's files. You don't need them to install.
 [Check a download by hand](/docs/security#check-a-download-by-hand) says how to use them.
 
-| In the zip | What it is |
+| In the full zip | What it is |
 | --- | --- |
 | `Install Wax.cmd` | Copies Wax into your game. |
 | `Update Wax.cmd` | Looks for a newer Wax and installs it. |
@@ -42,7 +48,7 @@ Inside `game`:
 
 ## Install
 
-Close ICARUS first. Then install in one of two ways.
+Close ICARUS first. Then install in one of three ways.
 
 ### Install with the installer
 
@@ -70,7 +76,20 @@ administrators can change it, and other accounts can only read it.
 Run the installer from the Windows account you play on. Under another account Wax could not save its
 settings.
 
+### Install with Wax Setup
+
+`Wax-Setup-<version>.zip` holds one program, `Wax Setup.exe`. Close ICARUS, extract the zip, and run that
+program. It finds the game through Steam and copies the files. It does not run a script, and it does not
+change who can change Wax's folder.
+
+It also sets up the **Add to game** button. That is one entry in your own part of the registry, the same
+kind the installer asks about. To leave that entry as it is, run `Wax Setup.exe --install --no-links`.
+
+Windows may ask you to confirm first, because the program is not signed by Windows.
+
 ### Install by hand
+
+Use this for `Wax-<version>-manual.zip`, and for the `game` folder inside the full zip.
 
 Copy everything inside the `game` folder into this folder of the game:
 
@@ -193,10 +212,15 @@ You can also download the newest zip and run its `Install Wax.cmd`. Installing o
 Both ways keep your mods (`Wax\mods`), your settings (`Wax\saved`) and your UE4SS settings. They also leave
 the **Add to game** button the way you set it.
 
+### Update with Wax Setup
+
+Run `Wax Setup.exe` again. It puts the copy it carries over the one in the game, and keeps your mods and
+your settings.
+
 ### Update by hand
 
-Download the newest zip and copy the contents of `game` into `Win64` again. Say yes when Windows asks to
-replace files.
+Download the newest `Wax-<version>.zip` or `Wax-<version>-manual.zip` and copy the contents of `game` into
+`Win64` again. Say yes when Windows asks to replace files.
 
 Your own mods and your settings are not in the zip, so they stay. The UE4SS settings files `UE4SS-settings.ini`
 and `mods.txt` are replaced by the copies from the zip.
@@ -222,6 +246,12 @@ Double-click `Uninstall Wax.cmd`. It removes Wax and the registry entry of the *
 asks before it removes your mods and settings, and before it removes UE4SS. Press **Enter** at a question to
 keep them.
 
+### Remove with Wax Setup
+
+Run `Wax Setup.exe` and choose remove, or run `Wax Setup.exe --uninstall`. It removes Wax and the registry
+entry of the **Add to game** button. Your mods and UE4SS stay unless you also pass `--remove-mine` or
+`--remove-ue4ss`.
+
 ### Remove by hand
 
 Delete this folder:
@@ -234,7 +264,7 @@ Your mods and settings are in it. Copy `mods` and `saved` somewhere else first i
 
 To remove UE4SS too, delete `dwmapi.dll` and the `ue4ss` folder from `Win64`.
 
-If you said yes to the **Add to game** button, remove its registry entry as well. Open a Command Prompt and
+If the **Add to game** button was set up, remove its registry entry as well. Open a Command Prompt and
 type:
 
 ```text

@@ -1,6 +1,6 @@
 ---
 title: Events of the game
-description: Hear when a character is hit or dies, and when items come into an inventory or leave it.
+description: Hear when a character is hit or dies, when items come into an inventory or leave it, and when the item in hand changes.
 icon: Zap
 ---
 
@@ -92,6 +92,27 @@ end)
   without it, or ask `Count` or `Has`.
 
 A stack is the same table that [inventories](/docs/items#one-inventory) give.
+
+## The hand
+
+<Since version="0.3.13" />
+
+`game.Me.Equipped` fires when the hotbar slot in hand, or the item in it, is not what it was. Wax looks
+four times a second, and only while a handler is connected. Your function gets the stack in hand now, or
+nil when that slot is empty, and the name of the item that was in hand. What was already in hand when you
+connect is where the signal starts. Bare hands are the item `Player_Fist`.
+
+`game.Me.Activated` fires inside `stack:Activate`, with the stack and the use name. With no use name, that
+second value is nil.
+
+```lua title="init.lua"
+game.Me.Equipped:Connect(function(stack, previous)
+    print("In hand:", stack and stack.Item or "empty", "was", previous)
+end)
+```
+
+How to put a stack in the hand, and what `Activate("Consume")` runs, is on
+[Items and inventories](/docs/items#the-hand).
 
 ## When your function runs
 
