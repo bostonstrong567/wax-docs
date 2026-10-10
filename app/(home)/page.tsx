@@ -3,6 +3,7 @@ import { Activity, Boxes, Keyboard, LayoutPanelLeft, Package, RefreshCw, Search,
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Shot } from '@/components/shot';
+import { Tour } from '@/components/tour';
 import icons from '@/lib/icon-names.json';
 import { basePath } from '@/lib/shared';
 
@@ -164,34 +165,19 @@ export default function HomePage() {
       <figure className="-mt-4 flex flex-col gap-3">
         <img
           src={`${basePath}/img/showcase.webp`}
-          alt="The Wax panel in the game, as three windows. In front, the Mods page with one mod open on its keys. Behind it, the Explorer with the game's objects, and the Browse page with the mods of the catalogue."
+          alt="The Wax panel in the game, on its Mods page. One mod is open on its card: its status, a switch to turn it on or off, and a row for each of its keys."
           width={1840}
           height={976}
           className="h-auto w-full rounded-xl border"
         />
         <figcaption className="text-sm text-fd-muted-foreground">
-          The panel that comes with Wax, open in the game: your mods, the explorer and the mod catalogue.
+          The panel that comes with Wax, open in the game: every mod, and every key it uses, on one page.
         </figcaption>
       </figure>
 
       <section className="-mt-6 flex flex-col gap-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-xl font-semibold tracking-tight">A look around</h2>
-          <p className="text-sm text-fd-muted-foreground">Scroll sideways for more</p>
-        </div>
-        <div className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3">
-          {tour.map((slide) => (
-            <img
-              key={slide.file}
-              src={`${basePath}/img/tour/${slide.file}`}
-              alt={slide.alt}
-              width={1600}
-              height={900}
-              loading="lazy"
-              className="h-auto w-[88%] shrink-0 snap-center rounded-xl border md:w-[82%]"
-            />
-          ))}
-        </div>
+        <h2 className="text-xl font-semibold tracking-tight">A look around</h2>
+        <Tour slides={tour.map((slide) => ({ src: `${basePath}/img/tour/${slide.file}`, alt: slide.alt }))} />
       </section>
 
       <section className="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
