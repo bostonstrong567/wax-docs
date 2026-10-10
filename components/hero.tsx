@@ -16,13 +16,11 @@ export function Hero({ alt }: { alt: string }) {
   return (
     <div className="wax-hero relative aspect-[1840/976] w-full overflow-hidden rounded-xl border">
       {ghosts.map((ghost, index) => (
-        <img
+        <div
           key={index}
-          src={`${basePath}/img/hero/${ghost.file}`}
-          alt=""
           aria-hidden
-          className={`wax-ghost pointer-events-none absolute select-none ${ghost.className}`}
-          style={ghost.style}
+          className={`wax-ghost pointer-events-none absolute aspect-[1140/988] bg-contain bg-no-repeat ${ghost.className}`}
+          style={{ ...ghost.style, backgroundImage: `url(${basePath}/img/hero/${ghost.file})` }}
         />
       ))}
       <img
