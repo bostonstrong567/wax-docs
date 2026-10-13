@@ -206,6 +206,24 @@ tools:Add(mod.id .. "_Axe", { Felling_Damage = 100 }, { like = "Stone_Axe" })
 - This was tried once: six rows for a new tool, which was then given, held and used. It has not been tried
   across a save and a restart. An item of a row that is gone, because the mod is off, has not been looked at.
 
+### Change every row
+
+<Since version="0.3.14" />
+
+`table:SetAll(field, value, options)` sets one field of every row, spread over frames so the game keeps
+running. `value` is the new value, or a function of what the game itself has for the row:
+
+```lua title="init.lua"
+local items = game.Data:Table("Itemable")
+local job = items:SetAll("MaxStack", function(was) return was * 2 end, {
+    where = function(name, row) return row.MaxStack > 1 end,
+})
+job.Done:Connect(function() print(job.Changed .. " stacks doubled") end)
+```
+
+The function always gets the game's own value, never what a mod set before, so running it again with another
+factor is right. [Mods that change numbers](/docs/number-mods) builds a whole mod on it, with a settings window.
+
 ### What cannot be changed in this version
 
 - Text, references to assets, maps and a few rarer kinds of field. `Set` raises an error that says which.

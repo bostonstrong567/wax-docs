@@ -97,6 +97,31 @@ Click a few times, then save `init.lua` again. The mod reloads and the count is 
 - Change what is inside the table. Don't replace the table.
 - Each mod has its own keys.
 
+## A settings window in one call
+
+<Since version="0.3.14" />
+
+When your settings are what a window shows, `ui.Settings` does both at once: a window with a control for each
+field, values that are saved under your mod's name and come back the next time, presets, a Defaults button,
+and a signal for when a value moves.
+
+```lua title="init.lua"
+local settings = ui.Settings({
+    title = "Saved settings",
+    fields = {
+        { "enabled", "Enabled", toggle = true, default = true },
+        { "volume", "Volume", slider = { min = 0, max = 100, step = 1 }, default = 65 },
+    },
+})
+
+settings.Changed:Connect(function(key, value)
+    print(key .. " is now " .. tostring(value))
+end)
+```
+
+`settings.values.volume` is the number whenever you need it. [Mods that change numbers](/docs/number-mods)
+shows every kind of field and the presets.
+
 ## What Wax remembers by itself
 
 You don't have to save these. Wax does it:

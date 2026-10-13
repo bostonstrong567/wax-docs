@@ -1,0 +1,115 @@
+---
+title: Mods that change numbers
+description: "Stack sizes, craft times, XP, prices: a settings window and one call that writes every row."
+icon: SlidersHorizontal
+---
+
+<Since version="0.3.14" />
+
+Most of the mods players ask for change numbers in the game's tables: how much fits in a stack, how long a
+craft takes, how much a mission pays. Such a mod is three parts in Wax: a settings window the player can change,
+the table rows the settings apply to, and a line that applies them again when a setting moves. Here is a whole
+one.
+
+```lua title="init.lua"
+local settings = ui.Settings({
+    title = "Bigger Stacks",
+    icon = "layers",
+    presets = {
+        { "Balanced", { multiplier = 2, weight = 1 } },
+        { "Lots", { multiplier = 10, weight = 0.5 } },
+    },
+    fields = {
+        { "multiplier", "Stack multiplier", slider = { min = 1, max = 50, step = 1, format = "%dx" }, default = 2 },
+        { "weight", "Weight", slider = { min = 0.1, max = 1, step = 0.1 }, default = 1,
+          help = "1 leaves weight as the game has it." },
+    },
+})
+
+local items = game.Data:Table("Itemable")
+
+local function apply()
+    local v = settings.values
+    items:SetAll("MaxStack", function(was)
+        return math.floor(was * v.multiplier)
+    end, { where = function(name, row) return row.MaxStack > 1 end })
+    items:SetAll("Weight", function(was) return math.floor(was * v.weight) end)
+end
+
+apply()
+local due = false
+settings.Changed:Connect(function()
+    if due then return end
+    due = true
+    task.defer(function()
+        due = false
+        apply()
+    end)
+end)
+```
+
+## The settings window
+
+`ui.Settings` builds a window with a control for each field, keeps the values on disk under your mod's name,
+and gives them back the next time the game starts. Each field is `{ key, caption, kind, default }`:
+
+| Kind | Control | The value |
+| --- | --- | --- |
+| `slider = { min, max, step, format }` | A slider with a read-out | A number. Reported when the mouse lets go. |
+| `toggle = true` | A switch | `true` or `false` |
+| `choices = { "Slow", "Normal", "Fast" }` | A dropdown | One of the choices |
+| `text = { hint = "..." }` | A text box | A string |
+
+A table with only `heading = "Ammo"` draws a heading between fields. `help` under a field adds a dim line of
+explanation; use it where a number is not obvious.
+
+`presets` are named sets of values. The window gets a Preset dropdown at the top that reads "Custom" while
+the values match none of them. A Defaults button puts every default back.
+
+- `settings.values` holds the values by key. Read them whenever you need them.
+- `settings.Changed` fires with the key and the new value whenever one moves: the player, a preset, `Set` or
+  `Reset`. Handlers run as tasks, so they may pause.
+- `settings:Set(key, value)`, `settings:Get(key)`, `settings:UsePreset(name)`, `settings:Reset()` do from code
+  what the player does with the mouse.
+- `settings.window` is the window; `settings.section` the card the controls sit in, for controls of your own.
+
+## Writing every row
+
+`table:SetAll(field, value, options)` sets one field of every row and spreads the work over frames, so the
+game keeps running while 2,679 items are written. It returns a job at once; `job.Done` fires when the last row
+is through.
+
+`value` is the new value for every row, or a function of three things: `was`, the value the game itself has
+for that row (never what a mod set before, so running it again with a new factor is right), the row's name, and
+the row with the field and the `fields` named in the options. Return `nil` to leave a row alone.
+
+| Option | What it does |
+| --- | --- |
+| `where = function(name, row)` | Only rows it answers true for are changed. |
+| `fields = { "Tags", "Weight" }` | Other fields read into the row that `where` and the function see. |
+| `rows = { "Item_Wood", "Item_Stone" }` | Only these rows. |
+| `budget = 0.002` | Seconds of one frame the job may use before it pauses. 0.001 when omitted. |
+
+Each row is set as `table:Set` sets it, so every change belongs to your mod and is put back when the mod
+unloads or is switched off. Writing the value a row already has costs nothing.
+
+## Applying a change again
+
+A `Set` by the same mod replaces its earlier `Set`, so `apply()` can run as often as the settings move.
+The `due` flag in the example runs it once per frame however many fields a preset changed at once.
+
+When a setting can go back to vanilla, write nothing for that part, or put the rows back first:
+`table:Reset()` with no arguments puts back everything your mod changed in that table, and `apply()` then
+sets what is on.
+
+## What to watch
+
+- A field keeps its kind. An integer field such as a stack size gets `math.floor(...)`; a float a number; a
+  struct or a list is given whole.
+- The game reads its tables at different moments. A stack size counts for the next stack the game makes; a
+  craft time for the next craft; some things the game worked out earlier and keeps. [Changing a table](/docs/tables#changing-a-table)
+  says what is known.
+- Look at a row before you write it: `python scripts\exmod.py row D_Itemable Item_Wood` prints it as the game
+  has it, with every field.
+
+Every function is listed in the [Game tables reference](/docs/reference/data) and the [Interface reference](/docs/reference/ui).

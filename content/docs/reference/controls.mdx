@@ -8,6 +8,8 @@ icon: SlidersHorizontal
 
 The [Explorer](/explorer) searches everything on this page, and the classes of the game too.
 
+<NextLegend />
+
 ## WaxContainer [#waxcontainer]
 
 Something controls can be added to: a window, a page, a section, a row or an overlay.
@@ -774,7 +776,7 @@ toggle:Set(on: boolean, instant?: boolean)
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `on` | `boolean` |  |
-| `instant` (optional) | `boolean` | True skips the sliding animation, for a switch that is being reused for another row. |
+| `instant` (optional) <NextMark /> | `boolean` | True skips the sliding animation, for a switch that is being reused for another row. |
 
 **Returns** nothing.
 
@@ -783,6 +785,48 @@ toggle:Set(on: boolean, instant?: boolean)
 ### `toggle:SetCaption(text)` [#toggle-setcaption]
 
 Changes the text beside the switch.
+
+```lua
+toggle:SetCaption(text: string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `string` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxToggle.SetCaption" />
+
+### `toggle:Get()` [#toggle-get-2]
+
+Whether the switch is on.
+
+```lua
+toggle:Get(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxToggle.Get" />
+
+### `toggle:Set(on)` [#toggle-set-2]
+
+Flips the switch from code. Changed does not fire.
+
+```lua
+toggle:Set(on: boolean)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `on` | `boolean` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxToggle.Set" />
+
+### `toggle:SetCaption(text)` [#toggle-setcaption-2]
 
 ```lua
 toggle:SetCaption(text: string)
@@ -918,6 +962,34 @@ slider:Set(value: number)
 
 <InExplorer id="WaxSlider.Set" />
 
+### `slider:Get()` [#slider-get-2]
+
+The value shown.
+
+```lua
+slider:Get(): number
+```
+
+**Returns** `number`
+
+<InExplorer id="WaxSlider.Get" />
+
+### `slider:Set(value)` [#slider-set-2]
+
+Moves the slider from code, snapped to its step and kept inside its range. Changed does not fire.
+
+```lua
+slider:Set(value: number)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `value` | `number` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxSlider.Set" />
+
 ## WaxInput [#waxinput]
 
 A box the user types text into, with or without a caption.
@@ -1016,6 +1088,34 @@ input:SetHint(hint: string)
 
 <InExplorer id="WaxInput.SetHint" />
 
+### `input:Get()` [#input-get-2]
+
+The text in the box.
+
+```lua
+input:Get(): string
+```
+
+**Returns** `string`
+
+<InExplorer id="WaxInput.Get" />
+
+### `input:Set(text)` [#input-set-2]
+
+Puts text in the box from code. Changed does not fire.
+
+```lua
+input:Set(text: string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `string` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxInput.Set" />
+
 ## WaxDropdown [#waxdropdown]
 
 A dropdown opens in place under its header. The chosen row is highlighted, and only one list is open at a time. The header is always one line: a choice too long for it ends in "..." there and is whole in the list.
@@ -1043,6 +1143,34 @@ dropdown:Get(): any
 ### `dropdown:Set(choice)` [#dropdown-set]
 
 Selects a choice without firing Changed.
+
+```lua
+dropdown:Set(choice: any)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `choice` | `any` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxDropdown.Set" />
+
+### `dropdown:Get()` [#dropdown-get-2]
+
+The chosen entry.
+
+```lua
+dropdown:Get(): any
+```
+
+**Returns** `any`
+
+<InExplorer id="WaxDropdown.Get" />
+
+### `dropdown:Set(choice)` [#dropdown-set-2]
+
+Chooses an entry from code. Changed does not fire.
 
 ```lua
 dropdown:Set(choice: any)
@@ -1227,6 +1355,34 @@ keybind:Get(): string?
 ### `keybind:Set(key)` [#keybind-set]
 
 Sets the key without firing Changed.
+
+```lua
+keybind:Set(key: string?)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `key` | `string?` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxKeybind.Set" />
+
+### `keybind:Get()` [#keybind-get-2]
+
+The key shown, or nil for none.
+
+```lua
+keybind:Get(): string?
+```
+
+**Returns** `string?`
+
+<InExplorer id="WaxKeybind.Get" />
+
+### `keybind:Set(key)` [#keybind-set-2]
+
+Shows another key from code. Changed does not fire.
 
 ```lua
 keybind:Set(key: string?)

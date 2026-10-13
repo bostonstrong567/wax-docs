@@ -110,6 +110,7 @@
    "types": [
     "game.Data",
     "WaxDataTable",
+    "WaxBulkJob",
     "WaxDataCurveKey",
     "WaxDataCurve",
     "WaxRowHandle",
@@ -118,6 +119,7 @@
     "WaxDataAddOptions",
     "WaxDataChange",
     "WaxDataConflict",
+    "WaxBulkOptions",
     "WaxDataRow"
    ],
    "members": []
@@ -253,6 +255,7 @@
     "WaxTag",
     "WaxHotkey",
     "WaxBind",
+    "WaxSettings",
     "WaxModel",
     "WaxUnknownOption",
     "WaxOptions",
@@ -273,6 +276,8 @@
     "WaxTagOptions",
     "WaxHotkeyOptions",
     "WaxBindOptions",
+    "WaxSettingsField",
+    "WaxSettingsSpec",
     "WaxModelFur",
     "WaxModelPart",
     "WaxModelLook",
@@ -503,6 +508,7 @@
   "ui.Color": "ui.Color",
   "ui.Theme": "ui.Theme",
   "ui.AddSettings": "ui.AddSettings",
+  "ui.Settings": "ui.Settings",
   "Tag:Set": "WaxTag.Set",
   "Tag:SetColor": "WaxTag.SetColor",
   "Tag:SetRange": "WaxTag.SetRange",
@@ -753,6 +759,7 @@
   "DataTable:Change": "WaxDataTable.Change",
   "DataTable:Add": "WaxDataTable.Add",
   "DataTable:Reset": "WaxDataTable.Reset",
+  "DataTable:SetAll": "WaxDataTable.SetAll",
   "DataTable:Changes": "WaxDataTable.Changes",
   "DataTable:Conflicts": "WaxDataTable.Conflicts",
   "game.Data:Table": "game.Data.Table",
@@ -3959,6 +3966,25 @@
       "title": "Themes"
      },
      "use": "ui.AddSettings(container)"
+    },
+    {
+     "id": "ui.Settings",
+     "name": "Settings",
+     "call": "ui.Settings",
+     "params": [
+      {
+       "name": "spec",
+       "type": "WaxSettingsSpec"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxSettings"
+      }
+     ],
+     "text": "A settings window in one call: a window with a control for each field, values that are saved under your mod's name and come back the next time the game starts, presets, a Defaults button, and a signal that says when a value moves. ```lua local settings = ui.Settings({ title = \"Bigger Stacks\", icon = \"layers\", presets = { { \"Balanced\", { multiplier = 2 } }, { \"Lots\", { multiplier = 10 } } }, fields = { { \"multiplier\", \"Stack multiplier\", slider = { min = 1, max = 50, step = 1 }, default = 2 }, { \"ammo\", \"Ammo too\", toggle = true, default = false }, }, }) local function apply() ... end apply() settings.Changed:Connect(apply) ```",
+     "ref": "/docs/reference/ui#ui-settings",
+     "use": "local settings = ui.Settings(spec)"
     }
    ]
   },
@@ -4324,6 +4350,314 @@
      "optional": true,
      "text": "true lets it run while a text box has the keyboard.",
      "use": "local bind = ui.Bind(name, key, function() end, { typing = true })"
+    }
+   ]
+  },
+  {
+   "id": "WaxSettingsField",
+   "name": "WaxSettingsField",
+   "title": "WaxSettingsField",
+   "kind": "data",
+   "group": "ui",
+   "text": "One setting of a settings window. Its first entry is the key, its second the caption. Exactly one of slider, toggle, choices and text says what it is. A table with only `heading` draws a heading between fields instead.",
+   "ref": "/docs/reference/ui#waxsettingsfield",
+   "props": [
+    {
+     "id": "WaxSettingsField.[1]",
+     "name": "[1]",
+     "type": "string",
+     "text": "The key the value is kept under, such as \"multiplier\"."
+    },
+    {
+     "id": "WaxSettingsField.[2]",
+     "name": "[2]",
+     "type": "string",
+     "text": "The caption shown beside the control."
+    },
+    {
+     "id": "WaxSettingsField.default",
+     "name": "default",
+     "type": "any",
+     "text": "What the setting is until the player changes it. A number for a slider, a boolean for a toggle, one of the choices, or a string."
+    },
+    {
+     "id": "WaxSettingsField.slider",
+     "name": "slider",
+     "type": "{ min: number, max: number, step?: number, format?: string, live?: boolean }",
+     "optional": true,
+     "text": "A number between min and max. The value is reported when the mouse lets go, unless `live` is true."
+    },
+    {
+     "id": "WaxSettingsField.toggle",
+     "name": "toggle",
+     "type": "boolean",
+     "optional": true,
+     "text": "True for a switch."
+    },
+    {
+     "id": "WaxSettingsField.choices",
+     "name": "choices",
+     "type": "any[]",
+     "optional": true,
+     "text": "The choices of a dropdown."
+    },
+    {
+     "id": "WaxSettingsField.text",
+     "name": "text",
+     "type": "boolean|{ hint?: string }",
+     "optional": true,
+     "text": "True for a text box, or a table with the greyed text shown while it is empty."
+    },
+    {
+     "id": "WaxSettingsField.help",
+     "name": "help",
+     "type": "string",
+     "optional": true,
+     "text": "A dim line of explanation under the control."
+    },
+    {
+     "id": "WaxSettingsField.heading",
+     "name": "heading",
+     "type": "string",
+     "optional": true,
+     "text": "A heading between fields, on a table of its own."
+    }
+   ]
+  },
+  {
+   "id": "WaxSettingsSpec",
+   "name": "WaxSettingsSpec",
+   "title": "WaxSettingsSpec",
+   "kind": "data",
+   "group": "ui",
+   "ref": "/docs/reference/ui#waxsettingsspec",
+   "users": [
+    "ui.Settings"
+   ],
+   "props": [
+    {
+     "id": "WaxSettingsSpec.title",
+     "name": "title",
+     "type": "string",
+     "text": "The window's title.",
+     "use": "local settings = ui.Settings({ title = \"text\" })"
+    },
+    {
+     "id": "WaxSettingsSpec.fields",
+     "name": "fields",
+     "type": "WaxSettingsField[]",
+     "text": "The settings, in the order they are shown.",
+     "use": "local settings = ui.Settings({ fields = value })"
+    },
+    {
+     "id": "WaxSettingsSpec.presets",
+     "name": "presets",
+     "type": "{ [1]: string, [2]: table<string, any> }[]",
+     "optional": true,
+     "text": "Named sets of values, each `{ \"Balanced\", { multiplier = 2, weight = 0.5 } }`. A Preset dropdown goes at the top; it reads \"Custom\" while the values match none.",
+     "use": "local settings = ui.Settings({ presets = value })"
+    },
+    {
+     "id": "WaxSettingsSpec.icon",
+     "name": "icon",
+     "type": "string",
+     "optional": true,
+     "text": "The window's icon.",
+     "use": "local settings = ui.Settings({ icon = \"text\" })"
+    },
+    {
+     "id": "WaxSettingsSpec.name",
+     "name": "name",
+     "type": "string",
+     "optional": true,
+     "text": "The storage name the values are saved under. \"settings\" when omitted.",
+     "use": "local settings = ui.Settings({ name = \"text\" })"
+    },
+    {
+     "id": "WaxSettingsSpec.section",
+     "name": "section",
+     "type": "string",
+     "optional": true,
+     "text": "The title of the card the fields sit in. \"Settings\" when omitted.",
+     "use": "local settings = ui.Settings({ section = \"text\" })"
+    },
+    {
+     "id": "WaxSettingsSpec.key",
+     "name": "key",
+     "type": "string",
+     "optional": true,
+     "text": "The key that shows and hides the window, as ui.Window takes it.",
+     "use": "local settings = ui.Settings({ key = \"text\" })"
+    },
+    {
+     "id": "WaxSettingsSpec.width",
+     "name": "width",
+     "type": "number",
+     "optional": true,
+     "use": "local settings = ui.Settings({ width = 1 })"
+    },
+    {
+     "id": "WaxSettingsSpec.height",
+     "name": "height",
+     "type": "number",
+     "optional": true,
+     "use": "local settings = ui.Settings({ height = 1 })"
+    },
+    {
+     "id": "WaxSettingsSpec.x",
+     "name": "x",
+     "type": "number",
+     "optional": true,
+     "use": "local settings = ui.Settings({ x = 1 })"
+    },
+    {
+     "id": "WaxSettingsSpec.y",
+     "name": "y",
+     "type": "number",
+     "optional": true,
+     "use": "local settings = ui.Settings({ y = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxSettings",
+   "name": "WaxSettings",
+   "title": "WaxSettings",
+   "kind": "object",
+   "group": "ui",
+   "text": "A settings window and its values.",
+   "ref": "/docs/reference/ui#waxsettings",
+   "makers": [
+    "ui.Settings"
+   ],
+   "use": "local settings = ui.Settings(spec)",
+   "props": [
+    {
+     "id": "WaxSettings.values",
+     "name": "values",
+     "type": "table<string, any>",
+     "text": "The values by key. Read them whenever you need them; they are kept up to date.",
+     "use": "local settings = ui.Settings(spec)\nprint(settings.values)"
+    },
+    {
+     "id": "WaxSettings.window",
+     "name": "window",
+     "type": "WaxWindow",
+     "text": "The window, for SetVisible, SetPosition and anything else of a window.",
+     "use": "local settings = ui.Settings(spec)\nprint(settings.window)"
+    },
+    {
+     "id": "WaxSettings.section",
+     "name": "section",
+     "type": "WaxSection",
+     "text": "The card the controls are in, to add controls of your own after them.",
+     "use": "local settings = ui.Settings(spec)\nprint(settings.section)"
+    },
+    {
+     "id": "WaxSettings.controls",
+     "name": "controls",
+     "type": "table<string, WaxControl>",
+     "text": "The control of each key.",
+     "use": "local settings = ui.Settings(spec)\nprint(settings.controls)"
+    }
+   ],
+   "signals": [
+    {
+     "id": "WaxSettings.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun(key: string, value: any)>",
+     "receives": "key: string, value: any",
+     "text": "Fires with the key and the new value when the player, a preset, Set or Reset changes a setting. Handlers run as tasks and may pause.",
+     "use": "local settings = ui.Settings(spec)\nsettings.Changed:Connect(function(key, value)\n    print(key, value)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxSettings.Get",
+     "name": "Get",
+     "call": "settings:Get",
+     "params": [
+      {
+       "name": "key",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "The value of one setting. An unknown key is an error.",
+     "ref": "/docs/reference/ui#settings-get",
+     "use": "local settings = ui.Settings(spec)\nlocal result = settings:Get(key)"
+    },
+    {
+     "id": "WaxSettings.Set",
+     "name": "Set",
+     "call": "settings:Set",
+     "params": [
+      {
+       "name": "key",
+       "type": "string"
+      },
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Sets one value: the control follows, the value is saved and Changed fires. A number outside a slider's range is kept inside it; a value the field cannot hold is an error. False when nothing moved.",
+     "ref": "/docs/reference/ui#settings-set",
+     "use": "local settings = ui.Settings(spec)\nlocal result = settings:Set(key, value)"
+    },
+    {
+     "id": "WaxSettings.UsePreset",
+     "name": "UsePreset",
+     "call": "settings:UsePreset",
+     "params": [
+      {
+       "name": "name",
+       "type": "string"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Sets every value of a preset. False when the values already matched it.",
+     "ref": "/docs/reference/ui#settings-usepreset",
+     "use": "local settings = ui.Settings(spec)\nlocal result = settings:UsePreset(name)"
+    },
+    {
+     "id": "WaxSettings.Preset",
+     "name": "Preset",
+     "call": "settings:Preset",
+     "returns": [
+      {
+       "type": "string"
+      }
+     ],
+     "text": "The name of the preset the values match, or \"Custom\".",
+     "ref": "/docs/reference/ui#settings-preset",
+     "use": "local settings = ui.Settings(spec)\nlocal result = settings:Preset()"
+    },
+    {
+     "id": "WaxSettings.Reset",
+     "name": "Reset",
+     "call": "settings:Reset",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Puts every default back.",
+     "ref": "/docs/reference/ui#settings-reset",
+     "use": "local settings = ui.Settings(spec)\nlocal result = settings:Reset()"
     }
    ]
   },
@@ -5725,7 +6059,8 @@
        "name": "instant",
        "type": "boolean",
        "optional": true,
-       "text": "True skips the sliding animation, for a switch that is being reused for another row."
+       "text": "True skips the sliding animation, for a switch that is being reused for another row.",
+       "next": true
       }
      ],
      "text": "Turns the switch on or off without firing Changed.",
@@ -5744,6 +6079,46 @@
      ],
      "text": "Changes the text beside the switch.",
      "ref": "/docs/reference/controls#toggle-setcaption",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal toggle = window:Toggle(caption, initial, function(on) end)\ntoggle:SetCaption(text)"
+    },
+    {
+     "id": "WaxToggle.Get",
+     "name": "Get",
+     "call": "toggle:Get",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "Whether the switch is on.",
+     "ref": "/docs/reference/controls#toggle-get-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal toggle = window:Toggle(caption, initial, function(on) end)\nlocal result = toggle:Get()"
+    },
+    {
+     "id": "WaxToggle.Set",
+     "name": "Set",
+     "call": "toggle:Set",
+     "params": [
+      {
+       "name": "on",
+       "type": "boolean"
+      }
+     ],
+     "text": "Flips the switch from code. Changed does not fire.",
+     "ref": "/docs/reference/controls#toggle-set-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal toggle = window:Toggle(caption, initial, function(on) end)\ntoggle:Set(on)"
+    },
+    {
+     "id": "WaxToggle.SetCaption",
+     "name": "SetCaption",
+     "call": "toggle:SetCaption",
+     "params": [
+      {
+       "name": "text",
+       "type": "string"
+      }
+     ],
+     "ref": "/docs/reference/controls#toggle-setcaption-2",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal toggle = window:Toggle(caption, initial, function(on) end)\ntoggle:SetCaption(text)"
     }
    ]
@@ -6007,6 +6382,33 @@
      "text": "Moves the slider (snapped and kept within its range) without firing Changed.",
      "ref": "/docs/reference/controls#slider-set",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal slider = window:Slider(caption, options, function(value) end)\nslider:Set(value)"
+    },
+    {
+     "id": "WaxSlider.Get",
+     "name": "Get",
+     "call": "slider:Get",
+     "returns": [
+      {
+       "type": "number"
+      }
+     ],
+     "text": "The value shown.",
+     "ref": "/docs/reference/controls#slider-get-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slider = window:Slider(caption, options, function(value) end)\nlocal result = slider:Get()"
+    },
+    {
+     "id": "WaxSlider.Set",
+     "name": "Set",
+     "call": "slider:Set",
+     "params": [
+      {
+       "name": "value",
+       "type": "number"
+      }
+     ],
+     "text": "Moves the slider from code, snapped to its step and kept inside its range. Changed does not fire.",
+     "ref": "/docs/reference/controls#slider-set-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal slider = window:Slider(caption, options, function(value) end)\nslider:Set(value)"
     }
    ]
   },
@@ -6193,6 +6595,33 @@
      "text": "Changes the greyed text shown while the box is empty.",
      "ref": "/docs/reference/controls#input-sethint",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, options, function(text) end)\ninput:SetHint(hint)"
+    },
+    {
+     "id": "WaxInput.Get",
+     "name": "Get",
+     "call": "input:Get",
+     "returns": [
+      {
+       "type": "string"
+      }
+     ],
+     "text": "The text in the box.",
+     "ref": "/docs/reference/controls#input-get-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, options, function(text) end)\nlocal result = input:Get()"
+    },
+    {
+     "id": "WaxInput.Set",
+     "name": "Set",
+     "call": "input:Set",
+     "params": [
+      {
+       "name": "text",
+       "type": "string"
+      }
+     ],
+     "text": "Puts text in the box from code. Changed does not fire.",
+     "ref": "/docs/reference/controls#input-set-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal input = window:Input(caption, options, function(text) end)\ninput:Set(text)"
     }
    ]
   },
@@ -6251,6 +6680,33 @@
      ],
      "text": "Selects a choice without firing Changed.",
      "ref": "/docs/reference/controls#dropdown-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal dropdown = window:Dropdown(caption, choices, selected, function(choice) end)\ndropdown:Set(choice)"
+    },
+    {
+     "id": "WaxDropdown.Get",
+     "name": "Get",
+     "call": "dropdown:Get",
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "The chosen entry.",
+     "ref": "/docs/reference/controls#dropdown-get-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal dropdown = window:Dropdown(caption, choices, selected, function(choice) end)\nlocal result = dropdown:Get()"
+    },
+    {
+     "id": "WaxDropdown.Set",
+     "name": "Set",
+     "call": "dropdown:Set",
+     "params": [
+      {
+       "name": "choice",
+       "type": "any"
+      }
+     ],
+     "text": "Chooses an entry from code. Changed does not fire.",
+     "ref": "/docs/reference/controls#dropdown-set-2",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal dropdown = window:Dropdown(caption, choices, selected, function(choice) end)\ndropdown:Set(choice)"
     }
    ]
@@ -6667,6 +7123,33 @@
      ],
      "text": "Sets the key without firing Changed.",
      "ref": "/docs/reference/controls#keybind-set",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal keybind = window:Keybind(caption, key, function(key) end)\nkeybind:Set(key)"
+    },
+    {
+     "id": "WaxKeybind.Get",
+     "name": "Get",
+     "call": "keybind:Get",
+     "returns": [
+      {
+       "type": "string?"
+      }
+     ],
+     "text": "The key shown, or nil for none.",
+     "ref": "/docs/reference/controls#keybind-get-2",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal keybind = window:Keybind(caption, key, function(key) end)\nlocal result = keybind:Get()"
+    },
+    {
+     "id": "WaxKeybind.Set",
+     "name": "Set",
+     "call": "keybind:Set",
+     "params": [
+      {
+       "name": "key",
+       "type": "string?"
+      }
+     ],
+     "text": "Shows another key from code. Changed does not fire.",
+     "ref": "/docs/reference/controls#keybind-set-2",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal keybind = window:Keybind(caption, key, function(key) end)\nkeybind:Set(key)"
     }
    ]
@@ -15307,6 +15790,35 @@
      "use": "local dataTable = game.Data:Table(name)\nlocal count = dataTable:Reset(row, field)"
     },
     {
+     "id": "WaxDataTable.SetAll",
+     "name": "SetAll",
+     "call": "dataTable:SetAll",
+     "params": [
+      {
+       "name": "field",
+       "type": "string"
+      },
+      {
+       "name": "value",
+       "type": "any|fun(was: any, name: string, row: WaxDataRow): any"
+      },
+      {
+       "name": "options",
+       "type": "WaxBulkOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxBulkJob",
+       "name": "job"
+      }
+     ],
+     "text": "Sets one field of every row, spread over frames so the game keeps running: `items:SetAll(\"MaxStack\", function(was) return was * 2 end)`. `value` is the new value for each row, or a function of what the game itself had (never what a mod set before, so running it again with a new factor is right), the row's name, and the row with the fields read. A function that returns nil leaves that row alone. Each row is set as Set does, so the changes belong to your mod and are put back when it unloads. The job runs in a task that starts at the end of this frame: SetAll returns at once, and `job.Done` fires when every row is through.",
+     "ref": "/docs/reference/data#datatable-setall",
+     "use": "local dataTable = game.Data:Table(name)\nlocal job = dataTable:SetAll(field, value, options)"
+    },
+    {
      "id": "WaxDataTable.Changes",
      "name": "Changes",
      "call": "dataTable:Changes",
@@ -15331,6 +15843,136 @@
      "text": "The fields of this table where one mod's Set hides another mod's different result. Two mods that set the same value are in no conflict, and neither is a Change on top of another mod's change.",
      "ref": "/docs/reference/data#datatable-conflicts",
      "use": "local dataTable = game.Data:Table(name)\nlocal dataConflicts = dataTable:Conflicts()"
+    }
+   ]
+  },
+  {
+   "id": "WaxBulkOptions",
+   "name": "WaxBulkOptions",
+   "title": "WaxBulkOptions",
+   "kind": "data",
+   "group": "data",
+   "text": "The options that dataTable:SetAll takes.",
+   "ref": "/docs/reference/data#waxbulkoptions",
+   "users": [
+    "WaxDataTable.SetAll"
+   ],
+   "props": [
+    {
+     "id": "WaxBulkOptions.where",
+     "name": "where",
+     "type": "fun(name: string, row: WaxDataRow): boolean",
+     "optional": true,
+     "text": "Only rows this answers true for are changed. The row holds the field and the `fields` named here.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal job = dataTable:SetAll(field, value, { where = function(name, row) end })"
+    },
+    {
+     "id": "WaxBulkOptions.fields",
+     "name": "fields",
+     "type": "string[]",
+     "optional": true,
+     "text": "Other fields to read into the row that `where` and the function see.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal job = dataTable:SetAll(field, value, { fields = value })"
+    },
+    {
+     "id": "WaxBulkOptions.rows",
+     "name": "rows",
+     "type": "string[]",
+     "optional": true,
+     "text": "Only these rows. Every row of the table when omitted.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal job = dataTable:SetAll(field, value, { rows = value })"
+    },
+    {
+     "id": "WaxBulkOptions.budget",
+     "name": "budget",
+     "type": "number",
+     "optional": true,
+     "text": "Seconds of one frame the job may use before it pauses until the next. 0.001 when omitted.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal job = dataTable:SetAll(field, value, { budget = 1 })"
+    }
+   ]
+  },
+  {
+   "id": "WaxBulkJob",
+   "name": "WaxBulkJob",
+   "title": "WaxBulkJob",
+   "kind": "object",
+   "group": "data",
+   "text": "A change over many rows, running in a task of its own.",
+   "ref": "/docs/reference/data#waxbulkjob",
+   "makers": [
+    "WaxDataTable.SetAll"
+   ],
+   "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)",
+   "props": [
+    {
+     "id": "WaxBulkJob.Field",
+     "name": "Field",
+     "type": "string",
+     "text": "The field being set.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Field)"
+    },
+    {
+     "id": "WaxBulkJob.Total",
+     "name": "Total",
+     "type": "integer",
+     "text": "How many rows the job looks at.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Total)"
+    },
+    {
+     "id": "WaxBulkJob.Count",
+     "name": "Count",
+     "type": "integer",
+     "text": "Rows the function gave a value for so far.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Count)"
+    },
+    {
+     "id": "WaxBulkJob.Changed",
+     "name": "Changed",
+     "type": "integer",
+     "text": "Rows that were written so far. A row that already held the value is not written.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Changed)"
+    },
+    {
+     "id": "WaxBulkJob.Failed",
+     "name": "Failed",
+     "type": "integer",
+     "text": "Rows that could not be read, or where the function raised an error.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Failed)"
+    },
+    {
+     "id": "WaxBulkJob.Problem",
+     "name": "Problem",
+     "type": "string?",
+     "text": "The first failure, as \"row: what went wrong\".",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Problem)"
+    },
+    {
+     "id": "WaxBulkJob.Running",
+     "name": "Running",
+     "type": "boolean",
+     "text": "True until the last row is done.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nprint(bulkJob.Running)"
+    }
+   ],
+   "signals": [
+    {
+     "id": "WaxBulkJob.Done",
+     "name": "Done",
+     "type": "WaxSignal<fun(job: WaxBulkJob)>",
+     "receives": "job: WaxBulkJob",
+     "text": "Fires once when the job is through, with the job.",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nbulkJob.Done:Connect(function(job)\n    print(job)\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxBulkJob.Cancel",
+     "name": "Cancel",
+     "call": "bulkJob:Cancel",
+     "text": "Stops the job after the row it is on. What was written stays, as any Set does.",
+     "ref": "/docs/reference/data#bulkjob-cancel",
+     "use": "local dataTable = game.Data:Table(name)\nlocal bulkJob = dataTable:SetAll(field, value, options)\nbulkJob:Cancel()"
     }
    ]
   },
