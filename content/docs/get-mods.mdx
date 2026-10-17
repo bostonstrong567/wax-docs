@@ -85,6 +85,24 @@ whether you put the folder in while the game ran or while it was closed.
 Nothing checks a zip you put in by hand. [Check a download by hand](/docs/security#check-a-download-by-hand)
 says how to check it yourself.
 
+## Mods from Nexus Mods
+
+<Since version="0.3.15" />
+
+Most Icarus mods on Nexus Mods are not made for Wax. There are three kinds, and each goes in its own place.
+
+| What you downloaded | Where it goes | What happens |
+| --- | --- | --- |
+| A `.EXMOD` or `.EXMODZ` file (a table mod: stack sizes, craft times, prices and the like) | `Icarus\Binaries\Win64\ue4ss\Mods\Wax\mods`, as the file itself or in a folder of its own | It appears on the Mods page switched off. Switch it on and Wax applies its changes to the game's tables, live, and puts them back when you switch it off. |
+| A UE4SS mod (a folder with `Scripts\main.lua`) | `Icarus\Binaries\Win64\ue4ss\Mods` | The Mods page lists it under **Other mods** with a switch. UE4SS starts such mods with the game, so the switch counts at the next start. |
+| A `_P.pak` file | `Icarus\Content\Paks\mods` | The game loads it at start. The Mods page lists it so you know it is there. Wax cannot switch a pak on or off. |
+
+An `.EXMODZ` that also carries game files (meshes, textures, blueprints) is applied for its table changes only;
+the Mods page says so on its card. Those files need a pak, which a mod manager such as Icarus Mod Manager makes.
+
+A blueprint mod (a pak in `Content\Paks\LogicMods`) needs UE4SS's own `BPModLoaderMod`, which Wax does not
+ship. The Mods page says when one is there without it.
+
 ## Manage your mods
 
 Open the Wax menu (F8) and go to **Mods**. Each mod has a card:
