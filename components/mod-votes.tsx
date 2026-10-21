@@ -1,7 +1,7 @@
 'use client';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getVote, sendVote, type Vote, type Voted, type Votes } from '@/lib/market';
+import { forgetMyVotes, getMyVotes, getVote, sendVote, type Vote, type Voted, type Votes } from '@/lib/market';
 
 const PRESSED = 'border-fd-primary bg-fd-primary/10 text-fd-primary';
 const NOT_PRESSED = 'bg-fd-card text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground';
@@ -54,9 +54,19 @@ export function VoteButtons({ id, first, compact = false }: { id: string; first:
   // The visitor's own vote. An answer that comes after a press is dropped.
   useEffect(() => {
     if (compact) {
+      // what this browser last sent stands in until the catalogue answers, which is what holds, votes from the game included
       const mine = remembered(id);
       if (mine !== 0) setVoted((now) => (pressed.current ? now : { votes: now.votes, mine }));
-      return;
+      let gone = false;
+      getMyVotes().then((held) => {
+        if (gone || !held || pressed.current) return;
+        const truth = held[id] ?? 0;
+        remember(id, truth);
+        setVoted((now) => (now.mine === truth ? now : { votes: now.votes, mine: truth }));
+      });
+      return () => {
+        gone = true;
+      };
     }
     const controller = new AbortController();
     getVote(id, controller.signal).then((answer) => {
@@ -81,8 +91,10 @@ export function VoteButtons({ id, first, compact = false }: { id: string; first:
       setVoted(before);
       setError(answer.error);
     } else {
+      // the catalogue's answer is the truth: its counts and the vote it holds for this address
       setVoted(answer);
       remember(id, answer.mine);
+      forgetMyVotes();
     }
   }
 

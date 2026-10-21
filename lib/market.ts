@@ -50,7 +50,7 @@ export type Submission = {
   repo: string;
   ref: string;
   commit: string;
-  mod: { id: string; name: string; version: string; author: string; category: string; summary: string; needs_wax: string };
+  mod: { id: string; name: string; version: string; author: string; category: string; summary: string; needs_wax: string; side: string };
   checks: Check[];
   pictures: number;
   created_at: string;
@@ -99,6 +99,7 @@ function submissionOf(value: unknown): Submission | null {
       category: text(mod.category),
       summary: text(mod.summary),
       needs_wax: text(mod.needs_wax),
+      side: text(mod.side),
     },
     checks: checksOf(given.checks),
     pictures: typeof given.pictures === 'number' && given.pictures > 0 ? Math.floor(given.pictures) : 0,
@@ -163,6 +164,28 @@ export async function getVote(id: string, signal: AbortSignal): Promise<Voted | 
   } catch {
     return null;
   }
+}
+
+// Every listed mod this visitor's address has a vote on, as the catalogue holds them: the same row a vote from the game
+// writes. One request serves every card on the page. Null when the catalogue cannot be reached or is an older one.
+let myVotesAsked: Promise<Record<string, Vote> | null> | null = null;
+export function getMyVotes(): Promise<Record<string, Vote> | null> {
+  // shared by every card, so no card's own abort may end it
+  myVotesAsked ??= getJson<unknown>('/votes/mine', new AbortController().signal)
+    .then((answer) => {
+      const out: Record<string, Vote> = {};
+      for (const [id, vote] of Object.entries(fields(fields(answer).mine))) {
+        if (vote === 1 || vote === -1) out[id] = vote;
+      }
+      return out;
+    })
+    .catch(() => null);
+  return myVotesAsked;
+}
+
+// A cast changes what the catalogue holds, so the next page asks again.
+export function forgetMyVotes() {
+  myVotesAsked = null;
 }
 
 // 0 takes the vote back. An older catalogue answers 404, which reads as not reachable.

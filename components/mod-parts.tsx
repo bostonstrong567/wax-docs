@@ -63,6 +63,27 @@ export function Notice({ text, action, onAction }: { text: string; action?: stri
   );
 }
 
+// Where a mod runs, as the catalogue lists it.
+export const SIDES = [
+  ['host', 'Host'],
+  ['client', 'Client'],
+  ['both', 'Host + client'],
+] as const;
+export type Side = (typeof SIDES)[number][0];
+export const sideOf = (value: unknown): Side | '' => SIDES.find(([key]) => key === value)?.[0] ?? '';
+export const sideWord = (value: unknown) => SIDES.find(([key]) => key === value)?.[1] ?? '';
+
+// A small pill naming the side. Nothing for a catalogue that sends none.
+export function SidePill({ side, title }: { side: unknown; title?: string }) {
+  const word = sideWord(side);
+  if (!word) return null;
+  return (
+    <span title={title ?? `Runs on: ${word.toLowerCase()}`} className="rounded-full border px-2 py-0.5">
+      {word}
+    </span>
+  );
+}
+
 export function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">

@@ -16,6 +16,11 @@ import {
   Notice,
   plain,
   SECOND_ACTION,
+  type Side,
+  SidePill,
+  SIDES,
+  sideOf,
+  sideWord,
   When,
 } from '@/components/mod-parts';
 import { type Draft, NO_DRAFT, SubmissionView, SubmitView } from '@/components/mod-submit';
@@ -32,6 +37,9 @@ type Release = {
   dependencies: string[];
   downloads: number;
   published_at: string;
+  // A catalogue from before sides sends neither.
+  side?: string;
+  features?: { name: string; side: string }[];
 };
 type Mod = {
   id: string;
@@ -53,6 +61,7 @@ type Mod = {
   repo?: string;
   needs_wax?: string;
   votes?: { up: number; down: number };
+  side?: string;
 };
 type Shown = ModPicture & { caption: string };
 type ModList = { total: number; mods: Mod[] };
@@ -73,6 +82,7 @@ type Query = {
   q: string;
   category: string;
   tags: string[];
+  side: Side | '';
   sort: Sort;
   page: number;
   mod: string;
@@ -94,6 +104,7 @@ function readQuery(search: string): Query {
     q: (params.get('q') ?? '').trim().slice(0, 200),
     category: (params.get('category') ?? '').trim(),
     tags: [...new Set(tags.filter(Boolean))].slice(0, 10),
+    side: sideOf((params.get('side') ?? '').trim().toLowerCase()),
     sort: SORTS.find(([key]) => key === params.get('sort'))?.[0] ?? 'updated',
     page: Number.isInteger(page) && page >= 1 ? page : 1,
     mod,
@@ -108,6 +119,7 @@ function searchOf(query: Query, extra: Record<string, string> = {}) {
   if (query.q) params.set('q', query.q);
   if (query.category) params.set('category', query.category);
   for (const tag of query.tags) params.append('tag', tag);
+  if (query.side) params.set('side', query.side);
   if (query.sort !== 'updated') params.set('sort', query.sort);
   if (query.page > 1) params.set('page', String(query.page));
   for (const [key, value] of Object.entries(extra)) params.set(key, value);
@@ -304,6 +316,7 @@ function ModCard(props: { mod: Mod; href: string; onOpen: (event: MouseEvent) =>
       </p>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-fd-muted-foreground">
         {mod.category ? <span className="rounded-full border px-2 py-0.5">{mod.category}</span> : null}
+        <SidePill side={mod.side} />
         <span>{count(mod.downloads, 'download', 'downloads')}</span>
         {mod.reviewed ? <span>Reviewed</span> : null}
         {votes ? (
@@ -379,6 +392,7 @@ function ModPage(props: {
                 <Fact label="Id">
                   <span className="font-mono">{mod.id}</span>
                 </Fact>
+                {sideWord(mod.side) ? <Fact label="Runs on">{sideWord(mod.side)}</Fact> : null}
                 {mod.reviewed ? <Fact label="Status">Reviewed</Fact> : null}
               </dl>
               {votes ? <VoteButtons key={mod.id} id={mod.id} first={votes} /> : null}
@@ -386,6 +400,23 @@ function ModPage(props: {
           </header>
 
           {pictures.length > 0 ? <Gallery key={mod.id} pictures={pictures} /> : null}
+
+          {mod.latest.features && mod.latest.features.length > 0 ? (
+            <section className="flex flex-col gap-2 rounded-xl border bg-fd-card p-5">
+              <h2 className="font-medium">Features</h2>
+              <p className="text-sm text-fd-muted-foreground">
+                Host features count in the game that owns the world. Client features live in each player&apos;s own game.
+              </p>
+              <ul className="flex flex-col gap-1.5 text-sm">
+                {mod.latest.features.map((feature) => (
+                  <li key={feature.name} className="flex flex-wrap items-center gap-2">
+                    <span>{feature.name}</span>
+                    <span className="rounded-full border px-2 py-0.5 text-xs text-fd-muted-foreground">{sideWord(feature.side) || feature.side}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           <section className="flex flex-col items-start gap-3 rounded-xl border bg-fd-card p-5">
             <Actions mod={mod}>
@@ -721,15 +752,15 @@ export function ModBrowser() {
     );
   }
 
-  const filtered = query !== null && (query.q !== '' || query.category !== '' || query.tags.length > 0);
+  const filtered = query !== null && (query.q !== '' || query.category !== '' || query.tags.length > 0 || query.side !== '');
   const found = list.data?.total ?? 0;
   const waiting = !current && !list.data && !list.error;
-  const narrowed = /[?&](q|category|tag)=/.test(list.search ?? '');
+  const narrowed = /[?&](q|category|tag|side)=/.test(list.search ?? '');
   const nothingYet = list.data !== null && found === 0 && !narrowed;
   const set = (patch: Partial<Query>) => query && change({ ...query, ...patch, page: 1 });
   const showAll = () => {
     setText('');
-    set({ q: '', category: '', tags: [] });
+    set({ q: '', category: '', tags: [], side: '' });
   };
   const turn = (page: number) => {
     if (!query) return;
@@ -781,6 +812,21 @@ export function ModBrowser() {
               className="h-10 rounded-lg border bg-fd-card px-3 text-sm text-fd-foreground outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
             >
               {SORTS.filter(([key]) => likedSort || key !== 'votes').map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex shrink-0 items-center gap-2 text-sm text-fd-muted-foreground">
+            Runs on
+            <select
+              value={query?.side ?? ''}
+              onChange={(event) => set({ side: sideOf(event.target.value) })}
+              className="h-10 rounded-lg border bg-fd-card px-3 text-sm text-fd-foreground outline-none focus-visible:ring-2 focus-visible:ring-fd-ring"
+            >
+              <option value="">Any</option>
+              {SIDES.map(([key, label]) => (
                 <option key={key} value={key}>
                   {label}
                 </option>

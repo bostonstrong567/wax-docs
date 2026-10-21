@@ -110,6 +110,8 @@ return {
 | `wax` | No | The lowest Wax version the mod needs. The mod's page shows it as "Needs Wax 0.2.0". |
 | `key` | When the mod has a window | The key that shows and hides the mod's windows, such as `"F6"`. |
 | `keys` | When the mod has a panel or other keys | The mod's other keys, one line each: `"F10: Show or hide the pins"`. |
+| `side` | No | Where the mod runs: `"host"`, `"client"` or `"both"`. Read from the code when left out. See [Where the mod runs](#where-the-mod-runs). |
+| `features` | No | For a mod with features on both sides: one line each, `"host: Take from nearby chests"`. |
 
 `mod.lua` may only hold plain values like the ones above. It cannot call functions.
 
@@ -138,6 +140,36 @@ return {
 - A name in `keys` is the name you give [`ui.Bind`](/docs/gui/hotkeys#let-the-player-choose-the-key):
   `ui.Bind("Show or hide the pins", nil, fn)` takes the key from `mod.lua`.
 - The player can change every one of them on the card. Their choice is kept.
+
+### Where the mod runs
+
+<Since version="0.3.16" />
+
+When players share a world, some of what a mod does only counts in the game that owns it (the host, or a
+dedicated server) and some in every player's own game. `side` says which:
+
+```lua title="mod.lua"
+return {
+    id = "SupplyLine",
+    name = "Supply Line",
+    version = "1.2.0",
+    side = "both",                                           -- "host", "client" or "both"
+    features = { "host: Take from nearby chests", "client: Push everything with one key" },
+}
+```
+
+- `"host"`: the mod changes the world, the tables, the characters or the creatures, with `game.Data`,
+  `game.Recipes`, `game.Creatures:Spawn`, `Give`, `Kill`, hooks and the like. On a client it shows greyed with the
+  note that the host has to run it. Nothing is refused: the game answers for itself.
+- `"client"`: the mod lives in the player's own game, with windows, panels, keys, tags and outlines. It works for
+  that player whoever hosts.
+- `"both"`: some of each. List the features with their sides so the Mods page can grey the ones that cannot run.
+
+When `side` is left out the catalogue reads it from the code, and the check says what it found and which file
+decided. The catalogue lists the side with the mod, the Mods page on the site and the Browse page in the game can
+filter by it, and the [Mods on servers](/docs/mods-on-servers) page tells players what it means. In code,
+`mod.Side("host")` answers whether a feature of that side works on this game, and `ui.NeedsHost(control)` greys a
+control with the tip.
 
 ### The id
 

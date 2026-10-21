@@ -84,6 +84,45 @@ game.Highlight:Configure({ Fill = 0.3, Width = 2 })
 
 `Fill` is how strong the fill is, from 0 to 1. `Width` is the line width, from 1 to 4.
 
+## How far an outline shows
+
+<Since version="0.3.16" />
+
+The game's outline only draws things within 14 metres of you. Farther away the outline is gone, however the
+thing is marked. `Range` moves that limit, for every outline at once:
+
+```lua
+game.Highlight:Configure({ Range = 120 })   -- metres
+
+print(game.Highlight:GetRange())            -- 120
+game.Highlight:Configure({ Range = false }) -- back to the game's own 14
+```
+
+`Range` goes from 1 to 5000 metres. It is the same for every outline, because the game draws them all in one
+pass.
+
+## A tag with the outline
+
+<Since version="0.3.16" />
+
+A mod that outlines something usually names it too. Give the mark a `Tag` and the text sits over the actor,
+shows exactly as far as the outline does, and goes away with it:
+
+```lua
+local mark = game.Highlight:Add(wolf, { Color = "Red", Tag = "Wolf" })
+
+mark:Set({ Tag = "Wolf  Lv 12" })   -- a new text
+mark.Tag:SetColor("#ff5555")        -- it is a tag, as ui.Tag makes
+mark:Remove()                        -- takes the tag off too
+```
+
+`Tag` takes a text, or the same table of options as [`ui.Tag`](/docs/gui/tags): `{ text = "Wolf", color = "Red",
+size = 12 }`. With a `within` of its own the tag keeps that range instead of the outline's. A tag made on its
+own with `ui.Tag` follows the outline's range with `outline = true`.
+
+Before this, a tag made with `ui.Tag` showed up to 100 metres while the outline stopped at 14, so a far creature
+had a name over it and no outline round it.
+
 ## Limits
 
 Wax uses the outline that the game itself draws. That gives it these limits:
@@ -91,6 +130,7 @@ Wax uses the outline that the game itself draws. That gives it these limits:
 - There is room for four colours with a fill and three colours without one at the same time. A colour counts
   once, however many things use it. When there is no room left, the nearest colour in use is shown.
 - An outline always shows through walls.
+- Outlines reach 14 metres unless `Range` says otherwise, and every outline has the same reach.
 - Trees, rocks and bushes cannot be outlined one at a time.
 - The outline needs your character. It is not drawn at the space station.
 

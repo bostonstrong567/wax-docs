@@ -56,10 +56,15 @@
    "text": "game.Items, inventories and what a character carries.",
    "types": [
     "game.Items",
+    "game.Containers",
     "WaxItemStack",
+    "WaxNearbyContainer",
     "WaxInventory",
     "WaxPlayerItems",
-    "WaxItemFacts"
+    "WaxItemFacts",
+    "WaxShareStation",
+    "WaxContainerKind",
+    "WaxNearbyOptions"
    ],
    "members": []
   },
@@ -73,6 +78,15 @@
     "game.Prospect",
     "WaxWeatherEvent",
     "WaxPlayer"
+   ],
+   "members": []
+  },
+  {
+   "id": "mode",
+   "title": "Mode",
+   "text": "game.Mode: a dedicated server, a host, a client or alone, and whether there is a screen.",
+   "types": [
+    "game.Mode"
    ],
    "members": []
   },
@@ -253,6 +267,7 @@
     "WaxFit",
     "WaxNotification",
     "WaxTag",
+    "WaxGameButton",
     "WaxHotkey",
     "WaxBind",
     "WaxSettings",
@@ -274,6 +289,8 @@
     "WaxKeyBind",
     "WaxTextOptions",
     "WaxTagOptions",
+    "WaxGameButtonRoom",
+    "WaxGameButtonSpec",
     "WaxHotkeyOptions",
     "WaxBindOptions",
     "WaxSettingsField",
@@ -494,6 +511,8 @@
   "ui.Tag": "ui.Tag",
   "ui.Notify": "ui.Notify",
   "ui.Windows": "ui.Windows",
+  "ui.GameButton": "ui.GameButton",
+  "ui.NeedsHost": "ui.NeedsHost",
   "ui.Hotkey": "ui.Hotkey",
   "ui.Bind": "ui.Bind",
   "ui.IsKeyDown": "ui.IsKeyDown",
@@ -512,7 +531,11 @@
   "Tag:Set": "WaxTag.Set",
   "Tag:SetColor": "WaxTag.SetColor",
   "Tag:SetRange": "WaxTag.SetRange",
+  "Tag:GetRange": "WaxTag.GetRange",
   "Tag:Remove": "WaxTag.Remove",
+  "GameButton:SetCaption": "WaxGameButton.SetCaption",
+  "GameButton:Remove": "WaxGameButton.Remove",
+  "GameButton:Exists": "WaxGameButton.Exists",
   "Hotkey.Disconnect": "WaxHotkey.Disconnect",
   "Hotkey:SetKey": "WaxHotkey.SetKey",
   "Bind:Get": "WaxBind.Get",
@@ -530,6 +553,7 @@
   "Control:Destroy": "WaxControl.Destroy",
   "Control:SetVisible": "WaxControl.SetVisible",
   "Control:SetEnabled": "WaxControl.SetEnabled",
+  "Control:SetTip": "WaxControl.SetTip",
   "Label:Set": "WaxLabel.Set",
   "Label:SetColor": "WaxLabel.SetColor",
   "Heading:Set": "WaxHeading.Set",
@@ -671,6 +695,7 @@
   "game.Highlight:GetAll": "game.Highlight.GetAll",
   "game.Highlight:Look": "game.Highlight.Look",
   "game.Highlight:Configure": "game.Highlight.Configure",
+  "game.Highlight:GetRange": "game.Highlight.GetRange",
   "game.wrap": "game.wrap",
   "game:Find": "game.Find",
   "game:FindAll": "game.FindAll",
@@ -721,9 +746,14 @@
   "Stack:Activate": "WaxItemStack.Activate",
   "game.Items:Get": "game.Items.Get",
   "game.Items:Has": "game.Items.Has",
+  "game.Items:Share": "game.Items.Share",
   "game.Items:GetNames": "game.Items.GetNames",
   "game.Items:Find": "game.Items.Find",
   "game.Items:Load": "game.Items.Load",
+  "game.Containers:Nearby": "game.Containers.Nearby",
+  "game.Containers:Kinds": "game.Containers.Kinds",
+  "game.Containers:Accepted": "game.Containers.Accepted",
+  "game.Containers:Count": "game.Containers.Count",
   "Inventory:List": "WaxInventory.List",
   "Inventory:Slot": "WaxInventory.Slot",
   "Inventory:Count": "WaxInventory.Count",
@@ -733,6 +763,9 @@
   "Inventory:Give": "WaxInventory.Give",
   "Inventory:Take": "WaxInventory.Take",
   "Inventory:Resize": "WaxInventory.Resize",
+  "Inventory:Push": "WaxInventory.Push",
+  "Inventory:Pull": "WaxInventory.Pull",
+  "Inventory:Move": "WaxInventory.Move",
   "PlayerItems:Count": "WaxPlayerItems.Count",
   "PlayerItems:Has": "WaxPlayerItems.Has",
   "PlayerItems:List": "WaxPlayerItems.List",
@@ -3674,6 +3707,58 @@
      "use": "local windows = ui.Windows()"
     },
     {
+     "id": "ui.GameButton",
+     "name": "GameButton",
+     "call": "ui.GameButton",
+     "params": [
+      {
+       "name": "spec",
+       "type": "WaxGameButtonSpec"
+      },
+      {
+       "name": "on_click",
+       "type": "fun()",
+       "optional": true,
+       "text": "Runs on a click, as a task."
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxGameButton"
+      }
+     ],
+     "text": "A button inside one of the game's own screens, in the game's style. Find the screen's parts from the player's `UserInterface.Menus`; the inventory card's Sort control is `UMG_MainInventory.UMG_Sort`, whose SortButton is the model and whose row holds the Type box and Sort.",
+     "ref": "/docs/reference/ui#ui-gamebutton",
+     "use": "local gameButton = ui.GameButton(spec, function() end)"
+    },
+    {
+     "id": "ui.NeedsHost",
+     "name": "NeedsHost",
+     "call": "ui.NeedsHost",
+     "params": [
+      {
+       "name": "control",
+       "type": "WaxControl"
+      },
+      {
+       "name": "text",
+       "type": "string",
+       "optional": true,
+       "text": "What the tip says instead."
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxControl",
+       "name": "control",
+       "text": "The same control."
+      }
+     ],
+     "text": "Greys a control that cannot work on this game and says why while the mouse rests on it: by default that the host or the server has to run it. The control still takes clicks, so nothing is refused; what it does goes to the game, which answers. Pair it with mod.Side: `if not mod.Side(\"host\") then ui.NeedsHost(button) end`.",
+     "ref": "/docs/reference/ui#ui-needshost",
+     "use": "local result = ui.NeedsHost(control, text)"
+    },
+    {
      "id": "ui.Hotkey",
      "name": "Hotkey",
      "call": "ui.Hotkey",
@@ -4076,6 +4161,22 @@
      "use": "local tag = ui.Tag(target, { within = 1 })"
     },
     {
+     "id": "WaxTagOptions.outline",
+     "name": "outline",
+     "type": "boolean",
+     "optional": true,
+     "text": "True shows the tag exactly as far as game.Highlight draws outlines (game.Highlight:GetRange()), in place of `within`.",
+     "use": "local tag = ui.Tag(target, { outline = true })"
+    },
+    {
+     "id": "WaxTagOptions.fade",
+     "name": "fade",
+     "type": "boolean",
+     "optional": true,
+     "text": "The tag gets smaller with distance and fades out over the last fifth of its range. True when omitted.",
+     "use": "local tag = ui.Tag(target, { fade = true })"
+    },
+    {
      "id": "WaxTagOptions.lift",
      "name": "lift",
      "type": "number",
@@ -4146,12 +4247,25 @@
      "params": [
       {
        "name": "metres",
+       "type": "number|\"outline\""
+      }
+     ],
+     "text": "Sets how near the thing has to be for the tag to show, in metres. \"outline\" makes it show as far as outlines do.",
+     "ref": "/docs/reference/ui#tag-setrange",
+     "use": "local tag = ui.Tag(target, options)\ntag:SetRange(metres)"
+    },
+    {
+     "id": "WaxTag.GetRange",
+     "name": "GetRange",
+     "call": "tag:GetRange",
+     "returns": [
+      {
        "type": "number"
       }
      ],
-     "text": "Sets how near the thing has to be for the tag to show, in metres.",
-     "ref": "/docs/reference/ui#tag-setrange",
-     "use": "local tag = ui.Tag(target, options)\ntag:SetRange(metres)"
+     "text": "How near the thing has to be for the tag to show, in metres.",
+     "ref": "/docs/reference/ui#tag-getrange",
+     "use": "local tag = ui.Tag(target, options)\nlocal result = tag:GetRange()"
     },
     {
      "id": "WaxTag.Remove",
@@ -4160,6 +4274,145 @@
      "text": "Takes the tag off. Safe to call twice, and after the thing it was on is gone.",
      "ref": "/docs/reference/ui#tag-remove",
      "use": "local tag = ui.Tag(target, options)\ntag:Remove()"
+    }
+   ]
+  },
+  {
+   "id": "WaxGameButtonRoom",
+   "name": "WaxGameButtonRoom",
+   "title": "WaxGameButtonRoom",
+   "kind": "data",
+   "group": "ui",
+   "ref": "/docs/reference/ui#waxgamebuttonroom",
+   "props": [
+    {
+     "id": "WaxGameButtonRoom.box",
+     "name": "box",
+     "type": "any",
+     "text": "A SizeBox of the row (one of the game's), such as the Type box beside Sort."
+    },
+    {
+     "id": "WaxGameButtonRoom.width",
+     "name": "width",
+     "type": "number",
+     "text": "The width it gets instead of its own, in the game's units."
+    }
+   ]
+  },
+  {
+   "id": "WaxGameButtonSpec",
+   "name": "WaxGameButtonSpec",
+   "title": "WaxGameButtonSpec",
+   "kind": "data",
+   "group": "ui",
+   "ref": "/docs/reference/ui#waxgamebuttonspec",
+   "users": [
+    "ui.GameButton"
+   ],
+   "props": [
+    {
+     "id": "WaxGameButtonSpec.like",
+     "name": "like",
+     "type": "any",
+     "text": "One of the game's own text buttons (a UMG_BasicButton_2_C, such as a Sort control's SortButton): its fill, font and colours are copied.",
+     "use": "local gameButton = ui.GameButton({ like = value }, function() end)"
+    },
+    {
+     "id": "WaxGameButtonSpec.row",
+     "name": "row",
+     "type": "any",
+     "text": "The HorizontalBox of the game's screen the button goes into, such as the row that holds Type and Sort.",
+     "use": "local gameButton = ui.GameButton({ row = value }, function() end)"
+    },
+    {
+     "id": "WaxGameButtonSpec.caption",
+     "name": "caption",
+     "type": "string",
+     "text": "The words on it, such as \"STASH\". The game's font draws them in capitals.",
+     "use": "local gameButton = ui.GameButton({ caption = \"text\" }, function() end)"
+    },
+    {
+     "id": "WaxGameButtonSpec.width",
+     "name": "width",
+     "type": "number",
+     "optional": true,
+     "text": "Its width in the game's units. 130 when omitted.",
+     "use": "local gameButton = ui.GameButton({ width = 1 }, function() end)"
+    },
+    {
+     "id": "WaxGameButtonSpec.room",
+     "name": "room",
+     "type": "WaxGameButtonRoom[]",
+     "optional": true,
+     "text": "Boxes of the row that give up width, so the row keeps its size.",
+     "use": "local gameButton = ui.GameButton({ room = value }, function() end)"
+    },
+    {
+     "id": "WaxGameButtonSpec.grow",
+     "name": "grow",
+     "type": "boolean",
+     "optional": true,
+     "text": "True for a row of your own that may grow: the size check is skipped.",
+     "use": "local gameButton = ui.GameButton({ grow = true }, function() end)"
+    }
+   ]
+  },
+  {
+   "id": "WaxGameButton",
+   "name": "WaxGameButton",
+   "title": "WaxGameButton",
+   "kind": "object",
+   "group": "ui",
+   "text": "A button inside one of the game's own screens, built from the same parts as the game's buttons, with the game's fill, font and colours. It can never widen the game's header: the row's size is read before and after, and when it would change, everything is undone and an error says how much width the room entries still have to give up. The button is removed when your mod unloads, and a mod that loads again first clears what an earlier life left behind.",
+   "ref": "/docs/reference/ui#waxgamebutton",
+   "makers": [
+    "ui.GameButton"
+   ],
+   "use": "local gameButton = ui.GameButton(spec, function() end)",
+   "signals": [
+    {
+     "id": "WaxGameButton.Clicked",
+     "name": "Clicked",
+     "type": "WaxSignal<fun()>",
+     "text": "Fires on a click: the button pressed and released under the mouse.",
+     "use": "local gameButton = ui.GameButton(spec, function() end)\ngameButton.Clicked:Connect(function()\n    print(\"Clicked\")\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxGameButton.SetCaption",
+     "name": "SetCaption",
+     "call": "gameButton:SetCaption",
+     "params": [
+      {
+       "name": "caption",
+       "type": "string"
+      }
+     ],
+     "text": "Changes the words.",
+     "ref": "/docs/reference/ui#gamebutton-setcaption",
+     "use": "local gameButton = ui.GameButton(spec, function() end)\ngameButton:SetCaption(caption)"
+    },
+    {
+     "id": "WaxGameButton.Remove",
+     "name": "Remove",
+     "call": "gameButton:Remove",
+     "text": "Takes it out of the game's screen and gives the room back.",
+     "ref": "/docs/reference/ui#gamebutton-remove",
+     "use": "local gameButton = ui.GameButton(spec, function() end)\ngameButton:Remove()"
+    },
+    {
+     "id": "WaxGameButton.Exists",
+     "name": "Exists",
+     "call": "gameButton:Exists",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "False once it was removed, or the game threw its screen away.",
+     "ref": "/docs/reference/ui#gamebutton-exists",
+     "use": "local gameButton = ui.GameButton(spec, function() end)\nlocal result = gameButton:Exists()"
     }
    ]
   },
@@ -5519,6 +5772,7 @@
     "title": "Controls"
    },
    "makers": [
+    "ui.NeedsHost",
     "WaxContainer.Separator",
     "WaxContainer.Spacer",
     "WaxContainer.Badge"
@@ -5570,6 +5824,26 @@
      "text": "Greys the control out and stops it reacting, or makes it usable again.",
      "ref": "/docs/reference/controls#control-setenabled",
      "use": "local window = ui.Window({ title = \"Example\" })\nlocal control = window:Toggle(\"Example\")\ncontrol:SetEnabled(enabled)"
+    },
+    {
+     "id": "WaxControl.SetTip",
+     "name": "SetTip",
+     "call": "control:SetTip",
+     "params": [
+      {
+       "name": "text",
+       "type": "string?"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean",
+       "name": "shown"
+      }
+     ],
+     "text": "Help shown while the mouse rests on the control. It needs a part that reports the mouse, which buttons, toggles, sections and key boxes have: for a control without one it answers false and shows nothing. nil or \"\" takes the tip away.",
+     "ref": "/docs/reference/controls#control-settip",
+     "use": "local window = ui.Window({ title = \"Example\" })\nlocal control = window:Toggle(\"Example\")\nlocal shown = control:SetTip(text)"
     }
    ]
   },
@@ -10650,6 +10924,14 @@
      "optional": true,
      "text": "The tint's colour when it is not the outline's. false goes back to the outline's colour.",
      "use": "local connection = game.Creatures:Highlight(kind, { FillColor = value })"
+    },
+    {
+     "id": "WaxHighlightOptions.Tag",
+     "name": "Tag",
+     "type": "string|WaxTagOptions|false",
+     "optional": true,
+     "text": "A line of text over the actor (as ui.Tag makes), shown exactly as far as the outline is unless its own `within` is given. On Set, false takes it off.",
+     "use": "local connection = game.Creatures:Highlight(kind, { Tag = value })"
     }
    ]
   },
@@ -10716,6 +10998,13 @@
      "type": "boolean",
      "text": "False once it was removed or its actor is gone.",
      "use": "local mark = game.Highlight:Add(target, options)\nprint(mark.Active)"
+    },
+    {
+     "id": "WaxHighlightMark.Tag",
+     "name": "Tag",
+     "type": "WaxTag?",
+     "text": "The tag over the actor, when the mark was given one. It goes with the mark.",
+     "use": "local mark = game.Highlight:Add(target, options)\nprint(mark.Tag)"
     }
    ],
    "funcs": [
@@ -10865,17 +11154,30 @@
      "params": [
       {
        "name": "options",
-       "type": "{ Fill?: number, Width?: number }"
+       "type": "{ Fill?: number, Width?: number, Range?: number|false }"
       }
      ],
      "returns": [
       {
-       "type": "{ Fill: number, Width: number }"
+       "type": "{ Fill: number, Width: number, Range: number }"
       }
      ],
-     "text": "Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4).",
+     "text": "Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4), Range how far away an outlined thing can be and still show, in metres (1 to 5000; the game's own 14 until set, and false goes back to it). Tags made with a mark show exactly as far.",
      "ref": "/docs/reference/game#game-highlight-configure",
      "use": "local result = game.Highlight:Configure(options)"
+    },
+    {
+     "id": "game.Highlight.GetRange",
+     "name": "GetRange",
+     "call": "game.Highlight:GetRange",
+     "returns": [
+      {
+       "type": "number"
+      }
+     ],
+     "text": "How far away an outlined thing can be and still show, in metres: what Configure set, else the game's own 14.",
+     "ref": "/docs/reference/game#game-highlight-getrange",
+     "use": "local result = game.Highlight:GetRange()"
     }
    ]
   },
@@ -10962,6 +11264,13 @@
      "use": "print(game.InProspect)"
     },
     {
+     "id": "game.Mode",
+     "name": "Mode",
+     "type": "WaxMode",
+     "text": "How this copy of the game runs: a dedicated server, a host, a client or alone, and whether it has a screen.",
+     "use": "print(game.Mode)"
+    },
+    {
      "id": "game.IsHost",
      "name": "IsHost",
      "type": "boolean",
@@ -11037,6 +11346,13 @@
      "type": "WaxItems",
      "text": "The kinds of item the game has, and the facts of each: its shown name, weight, stack size, durability and picture.",
      "use": "print(game.Items)"
+    },
+    {
+     "id": "game.Containers",
+     "name": "Containers",
+     "type": "WaxContainers",
+     "text": "The structures around the player that hold items, nearest first, and what each one takes.",
+     "use": "print(game.Containers)"
     },
     {
      "id": "game.Recipes",
@@ -11759,6 +12075,9 @@
      "value": "\"IsHost\""
     },
     {
+     "value": "\"Mode\""
+    },
+    {
      "value": "\"Me\""
     },
     {
@@ -12180,6 +12499,34 @@
      "type": "string[]",
      "optional": true,
      "text": "Ids of mods that load first. Each can then be reached with require(\"@Id\")."
+    },
+    {
+     "id": "WaxManifest.key",
+     "name": "key",
+     "type": "string",
+     "optional": true,
+     "text": "The key that shows and hides the mod's windows, such as \"F6\". ui.Window takes it when given no key of its own."
+    },
+    {
+     "id": "WaxManifest.keys",
+     "name": "keys",
+     "type": "string[]",
+     "optional": true,
+     "text": "The mod's other keys, one line each: \"F10: Show or hide the pins\". The name after the colon is the one given to ui.Bind."
+    },
+    {
+     "id": "WaxManifest.side",
+     "name": "side",
+     "type": "\"host\"|\"client\"|\"both\"",
+     "optional": true,
+     "text": "Where the mod's features run: on the host (the game that owns the world, or a dedicated server), on each player's own game, or both. \"both\" when omitted. The catalogue reads it from the code when it is missing. A mod of the host side shows greyed on a client's Mods page, with a tip, and is never refused."
+    },
+    {
+     "id": "WaxManifest.features",
+     "name": "features",
+     "type": "string[]",
+     "optional": true,
+     "text": "The mod's features with their sides, one line each: \"host: Craft from containers\", \"client: Push all\". Each is listed on the mod's card, greyed on a game it cannot run on."
     }
    ]
   },
@@ -12244,6 +12591,20 @@
      "type": "fun()",
      "text": "Loads the mod again at the start of the next frame, as a saved file does.",
      "use": "print(mod.Reload)"
+    },
+    {
+     "id": "mod.side",
+     "name": "side",
+     "type": "\"host\"|\"client\"|\"both\"",
+     "text": "Where the mod runs, as its mod.lua says (\"both\" when it says nothing).",
+     "use": "print(mod.side)"
+    },
+    {
+     "id": "mod.Side",
+     "name": "Side",
+     "type": "fun(side?: \"host\"|\"client\"|\"both\"): boolean",
+     "text": "Whether a feature of that side can work on this game: \"host\" is true on the host of the world and on a dedicated server, \"client\" on any game with a screen, \"both\" always. With no argument it answers for the mod's own side. Use it to grey a control with ui.NeedsHost, never to refuse an action: the game answers for itself.",
+     "use": "print(mod.Side)"
     },
     {
      "id": "mod.Content",
@@ -13723,6 +14084,8 @@
     "WaxInventory.Where",
     "WaxInventory.Give",
     "WaxInventory.Take",
+    "WaxInventory.Push",
+    "WaxInventory.Pull",
     "WaxPlayerItems.Count",
     "WaxPlayerItems.Has",
     "WaxPlayerItems.Give",
@@ -13923,6 +14286,41 @@
      "use": "local items = game.Items\nlocal result = items:Has(name)"
     },
     {
+     "id": "game.Items.Share",
+     "name": "Share",
+     "call": "game.Items:Share",
+     "params": [
+      {
+       "name": "total",
+       "type": "integer",
+       "text": "How many there are to deal out."
+      },
+      {
+       "name": "item",
+       "type": "string|WaxItemStack"
+      },
+      {
+       "name": "stations",
+       "type": "WaxShareStation[]"
+      }
+     ],
+     "returns": [
+      {
+       "type": "table<integer, integer>",
+       "name": "given",
+       "text": "How many each station gets, by its index in the list; stations that get nothing are left out."
+      },
+      {
+       "type": "integer",
+       "name": "left",
+       "text": "What no station had room for."
+      }
+     ],
+     "text": "Deals `total` of an item out over the stations of one kind, as evenly as their room allows, so they all work at once: each gets up to the share that brings it level with the others, one that already holds more than its share gets nothing until the rest catch up, and what the even split leaves over goes to the first (the nearest, when the list is nearest first). Pure sums: nothing is moved. The stack size comes from Get.",
+     "ref": "/docs/reference/items#game-items-share",
+     "use": "local items = game.Items\nlocal given, left = items:Share(total, item, stations)"
+    },
+    {
      "id": "game.Items.GetNames",
      "name": "GetNames",
      "call": "game.Items:GetNames",
@@ -13968,6 +14366,340 @@
      "text": "Reads the name the game shows for every item, so that Find matches those names too. It only works inside a task: it reads within a millisecond a frame and returns when all are read. Rows another mod has read already are not read again. When a mod changes the item tables, or the game makes them again, Find goes by item names alone until Load has run again.",
      "ref": "/docs/reference/items#game-items-load",
      "use": "local items = game.Items\nlocal count = items:Load()"
+    }
+   ]
+  },
+  {
+   "id": "WaxShareStation",
+   "name": "WaxShareStation",
+   "title": "WaxShareStation",
+   "kind": "data",
+   "group": "items",
+   "text": "A station a pull or a stash can fill, as game.Items:Share reads it.",
+   "ref": "/docs/reference/items#waxsharestation",
+   "users": [
+    "game.Items.Share"
+   ],
+   "props": [
+    {
+     "id": "WaxShareStation.stacks",
+     "name": "stacks",
+     "type": "WaxItemStack[]",
+     "text": "What its input inventory holds, as List gives it.",
+     "use": "local items = game.Items\nlocal given, left = items:Share(total, item, { stacks = value })"
+    },
+    {
+     "id": "WaxShareStation.size",
+     "name": "size",
+     "type": "integer",
+     "text": "How many slots it has.",
+     "use": "local items = game.Items\nlocal given, left = items:Share(total, item, { size = 1 })"
+    },
+    {
+     "id": "WaxShareStation.used",
+     "name": "used",
+     "type": "integer",
+     "text": "How many of them hold something.",
+     "use": "local items = game.Items\nlocal given, left = items:Share(total, item, { used = 1 })"
+    },
+    {
+     "id": "WaxShareStation.accepts",
+     "name": "accepts",
+     "type": "fun(item: string): boolean",
+     "optional": true,
+     "text": "Nil takes every item.",
+     "use": "local items = game.Items\nlocal given, left = items:Share(total, item, { accepts = function(item) end })"
+    }
+   ]
+  },
+  {
+   "id": "WaxNearbyContainer",
+   "name": "WaxNearbyContainer",
+   "title": "WaxNearbyContainer",
+   "kind": "object",
+   "group": "items",
+   "text": "A structure near the player that holds items, as game.Containers:Nearby gives it.",
+   "ref": "/docs/reference/items#waxnearbycontainer",
+   "makers": [
+    "game.Containers.Nearby"
+   ],
+   "props": [
+    {
+     "id": "WaxNearbyContainer.Row",
+     "name": "Row",
+     "type": "string",
+     "text": "Its item in D_ItemsStatic, such as \"Kit_Stone_Furnace\" or \"Storage_Metal_Cupboard\".",
+     "use": "print(nearbyContainer.Row)"
+    },
+    {
+     "id": "WaxNearbyContainer.Name",
+     "name": "Name",
+     "type": "string",
+     "text": "The name the game shows for it.",
+     "use": "print(nearbyContainer.Name)"
+    },
+    {
+     "id": "WaxNearbyContainer.Kind",
+     "name": "Kind",
+     "type": "\"storage\"|\"station\"|\"cargo\"",
+     "text": "A station has an input inventory a processor works from; a cargo animal is a tamed creature with a cargo inventory (its Row is \"cargo:<set-up row>\", its Name \"Cargo: <kind>\"); everything else is storage.",
+     "use": "print(nearbyContainer.Kind)"
+    },
+    {
+     "id": "WaxNearbyContainer.Distance",
+     "name": "Distance",
+     "type": "number",
+     "text": "Metres from the player.",
+     "use": "print(nearbyContainer.Distance)"
+    },
+    {
+     "id": "WaxNearbyContainer.Actor",
+     "name": "Actor",
+     "type": "WaxInstance",
+     "text": "The structure itself.",
+     "use": "print(nearbyContainer.Actor)"
+    },
+    {
+     "id": "WaxNearbyContainer.Inventories",
+     "name": "Inventories",
+     "type": "WaxInventory[]",
+     "text": "Its inventories that take items: not the fuel slot, not a remove-only or client-side one.",
+     "use": "print(nearbyContainer.Inventories)"
+    },
+    {
+     "id": "WaxNearbyContainer.Fuel",
+     "name": "Fuel",
+     "type": "WaxInventory[]",
+     "text": "Its fuel inventories.",
+     "use": "print(nearbyContainer.Fuel)"
+    },
+    {
+     "id": "WaxNearbyContainer.Inputs",
+     "name": "Inputs",
+     "type": "WaxInventory?",
+     "text": "A station's input inventory.",
+     "use": "print(nearbyContainer.Inputs)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxNearbyContainer.Accepts",
+     "name": "Accepts",
+     "call": "nearbyContainer:Accepts",
+     "params": [
+      {
+       "name": "item",
+       "type": "string|WaxItemStack"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True when a stash or a pull of the item may go into it: for a station, when one of the recipes of its recipe set takes the item; for storage, when it has an inventory that takes items.",
+     "ref": "/docs/reference/items#nearbycontainer-accepts",
+     "use": "local result = nearbyContainer:Accepts(item)"
+    },
+    {
+     "id": "WaxNearbyContainer.OwnedBy",
+     "name": "OwnedBy",
+     "call": "nearbyContainer:OwnedBy",
+     "params": [
+      {
+       "name": "state",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "For a cargo animal, true when it belongs to the player whose PlayerState is given (the game's own IsMountOwner); true for every structure.",
+     "ref": "/docs/reference/items#nearbycontainer-ownedby",
+     "use": "local result = nearbyContainer:OwnedBy(state)"
+    }
+   ]
+  },
+  {
+   "id": "WaxContainerKind",
+   "name": "WaxContainerKind",
+   "title": "WaxContainerKind",
+   "kind": "data",
+   "group": "items",
+   "text": "What game.Containers:Kinds gives back.",
+   "ref": "/docs/reference/items#waxcontainerkind",
+   "makers": [
+    "game.Containers.Kinds"
+   ],
+   "props": [
+    {
+     "id": "WaxContainerKind.Row",
+     "name": "Row",
+     "type": "string",
+     "use": "local containerKinds = game.Containers:Kinds(range, options)\nprint(containerKinds[1].Row)"
+    },
+    {
+     "id": "WaxContainerKind.Name",
+     "name": "Name",
+     "type": "string",
+     "use": "local containerKinds = game.Containers:Kinds(range, options)\nprint(containerKinds[1].Name)"
+    },
+    {
+     "id": "WaxContainerKind.Kind",
+     "name": "Kind",
+     "type": "\"storage\"|\"station\"|\"cargo\"",
+     "use": "local containerKinds = game.Containers:Kinds(range, options)\nprint(containerKinds[1].Kind)"
+    },
+    {
+     "id": "WaxContainerKind.Count",
+     "name": "Count",
+     "type": "integer",
+     "text": "How many of the kind are in range.",
+     "use": "local containerKinds = game.Containers:Kinds(range, options)\nprint(containerKinds[1].Count)"
+    }
+   ]
+  },
+  {
+   "id": "WaxNearbyOptions",
+   "name": "WaxNearbyOptions",
+   "title": "WaxNearbyOptions",
+   "kind": "data",
+   "group": "items",
+   "text": "The options that game.Containers:Nearby takes.",
+   "ref": "/docs/reference/items#waxnearbyoptions",
+   "users": [
+    "game.Containers.Nearby",
+    "game.Containers.Kinds"
+   ],
+   "props": [
+    {
+     "id": "WaxNearbyOptions.kind",
+     "name": "kind",
+     "type": "\"storage\"|\"station\"|\"cargo\"",
+     "optional": true,
+     "text": "Only structures of that kind.",
+     "use": "local nearbyContainers = game.Containers:Nearby(range, { kind = \"storage\" })"
+    },
+    {
+     "id": "WaxNearbyOptions.holding",
+     "name": "holding",
+     "type": "boolean",
+     "optional": true,
+     "text": "Only structures with something in them.",
+     "use": "local nearbyContainers = game.Containers:Nearby(range, { holding = true })"
+    }
+   ]
+  },
+  {
+   "id": "game.Containers",
+   "name": "WaxContainers",
+   "title": "game.Containers",
+   "kind": "namespace",
+   "group": "items",
+   "text": "The structures around the player that hold items: chests, cupboards, pouches, benches, furnaces and the like, kept by a list that follows the world (nothing is looked for until the first call, and after it a structure joins the moment it appears and leaves when it goes).",
+   "ref": "/docs/reference/items#game-containers",
+   "signals": [
+    {
+     "id": "game.Containers.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun()>",
+     "text": "Fires when a structure appeared or went away, and once on a map change.",
+     "use": "game.Containers.Changed:Connect(function()\n    print(\"Changed\")\nend)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "game.Containers.Nearby",
+     "name": "Nearby",
+     "call": "game.Containers:Nearby",
+     "params": [
+      {
+       "name": "range",
+       "type": "number",
+       "optional": true,
+       "text": "Metres. 30 when omitted."
+      },
+      {
+       "name": "options",
+       "type": "WaxNearbyOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxNearbyContainer[]"
+      }
+     ],
+     "text": "The structures within `range` metres that can hold items, nearest first.",
+     "ref": "/docs/reference/items#game-containers-nearby",
+     "use": "local nearbyContainers = game.Containers:Nearby(range, options)"
+    },
+    {
+     "id": "game.Containers.Kinds",
+     "name": "Kinds",
+     "call": "game.Containers:Kinds",
+     "params": [
+      {
+       "name": "range",
+       "type": "number",
+       "optional": true
+      },
+      {
+       "name": "options",
+       "type": "WaxNearbyOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxContainerKind[]"
+      }
+     ],
+     "text": "The kinds of structure in range and how many of each, by name.",
+     "ref": "/docs/reference/items#game-containers-kinds",
+     "use": "local containerKinds = game.Containers:Kinds(range, options)"
+    },
+    {
+     "id": "game.Containers.Accepted",
+     "name": "Accepted",
+     "call": "game.Containers:Accepted",
+     "params": [
+      {
+       "name": "row",
+       "type": "string",
+       "text": "A structure's item row, such as \"Kit_Stone_Furnace\"."
+      }
+     ],
+     "returns": [
+      {
+       "type": "table<string, string>?",
+       "name": "accepted",
+       "text": "Nil for a structure that is no station, or while the recipes are still being read."
+      },
+      {
+       "type": "string?",
+       "name": "why",
+       "text": "\"not a station\" or \"reading\"; the recipe set's name when the first value is given."
+      }
+     ],
+     "text": "What a station of this item row can process: every input of the recipes in its recipe set, as { [name in lower case] = the game's spelling }, read from D_ItemsStatic, D_Processing and D_ProcessorRecipes once a set. The first read of the recipes pauses the task it is in; outside a task it answers nil and \"reading\" until a task has read them.",
+     "ref": "/docs/reference/items#game-containers-accepted",
+     "use": "local accepted, why = game.Containers:Accepted(row)"
+    },
+    {
+     "id": "game.Containers.Count",
+     "name": "Count",
+     "call": "game.Containers:Count",
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "How many structures that hold items the list knows of, in the whole world.",
+     "ref": "/docs/reference/items#game-containers-count",
+     "use": "local result = game.Containers:Count()"
     }
    ]
   },
@@ -14235,6 +14967,100 @@
      "text": "Gives the inventory this many slots. Slots are added and taken at its end. A slot that holds something is never taken, nor any slot before it: the inventory then keeps as many as it needs, and the second value says so. Size, List and the others follow in the same frame. It lasts as long as the inventory does: one the game makes anew, as on a map change, has the number of its row of D_InventoryInfo again. It has been tried on the station's loadout, from 15 to 50 slots and back.",
      "ref": "/docs/reference/items#inventory-resize",
      "use": "local backpack = game.Me.Backpack\nlocal size, why = backpack:Resize(slots)"
+    },
+    {
+     "id": "WaxInventory.Push",
+     "name": "Push",
+     "call": "inventory:Push",
+     "params": [
+      {
+       "name": "item",
+       "type": "string|WaxItemStack|WaxItemFacts"
+      },
+      {
+       "name": "target",
+       "type": "Inventory|WaxInventory",
+       "text": "The inventory it goes into."
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "moved",
+       "text": "How many went. 0 when nothing did."
+      },
+      {
+       "type": "string?",
+       "name": "why",
+       "text": "\"asked\" outside a task, else why nothing went."
+      }
+     ],
+     "text": "Every stack of an item in this inventory goes into another, by the game's own \"transfer all of a type\": the call its own Transfer Like button makes, so it works in someone else's session as well. The stacks there are topped up first, then free slots are filled. Inside a task it waits for the game, up to 2.5 seconds, and answers how many went; outside a task it answers nil and \"asked\" at once.",
+     "ref": "/docs/reference/items#inventory-push",
+     "use": "local backpack = game.Me.Backpack\nlocal moved, why = backpack:Push(item, target)"
+    },
+    {
+     "id": "WaxInventory.Pull",
+     "name": "Pull",
+     "call": "inventory:Pull",
+     "params": [
+      {
+       "name": "item",
+       "type": "string|WaxItemStack|WaxItemFacts"
+      },
+      {
+       "name": "source",
+       "type": "Inventory|WaxInventory"
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "moved"
+      },
+      {
+       "type": "string?",
+       "name": "why"
+      }
+     ],
+     "text": "The same the other way: every stack of the item in `source` comes into this inventory.",
+     "ref": "/docs/reference/items#inventory-pull",
+     "use": "local backpack = game.Me.Backpack\nlocal moved, why = backpack:Pull(item, source)"
+    },
+    {
+     "id": "WaxInventory.Move",
+     "name": "Move",
+     "call": "inventory:Move",
+     "params": [
+      {
+       "name": "slot",
+       "type": "integer",
+       "text": "The slot of this inventory the stack is in, counted from 1."
+      },
+      {
+       "name": "target",
+       "type": "Inventory|WaxInventory"
+      },
+      {
+       "name": "amount",
+       "type": "integer",
+       "optional": true,
+       "text": "How many of the stack. The whole stack when omitted. More than the room there is cut down."
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer?",
+       "name": "moved"
+      },
+      {
+       "type": "string?",
+       "name": "why"
+      }
+     ],
+     "text": "Some of one stack to another inventory, by the game's own \"shift\": onto a stack of the same item there with room, else into an empty slot. Inside a task it waits for the game and answers how many went; outside a task nil and \"asked\".",
+     "ref": "/docs/reference/items#inventory-move",
+     "use": "local backpack = game.Me.Backpack\nlocal moved, why = backpack:Move(slot, target, amount)"
     }
    ]
   },
@@ -21309,6 +22135,59 @@
      "text": "The paths of the game's sounds whose path holds every word given. At most 200, then how many there were.",
      "ref": "/docs/reference/effects#game-sounds-find",
      "use": "local paths, total = game.Sounds:Find(text)"
+    }
+   ]
+  },
+  {
+   "id": "game.Mode",
+   "name": "WaxMode",
+   "title": "game.Mode",
+   "kind": "namespace",
+   "group": "mode",
+   "text": "How this copy of the game runs, game.Mode. It is read when Wax starts and again when the map changes.",
+   "ref": "/docs/reference/mode#game-mode",
+   "guide": {
+    "href": "/docs/dedicated-servers",
+    "title": "Dedicated servers"
+   },
+   "props": [
+    {
+     "id": "game.Mode.kind",
+     "name": "kind",
+     "type": "\"server\"|\"host\"|\"client\"|\"single\"",
+     "text": "\"server\": a dedicated server, with no screen and nobody at the keyboard. \"host\": a player hosting a world from the game. \"client\": joined someone else's world. \"single\": alone.",
+     "use": "print(game.Mode.kind)"
+    },
+    {
+     "id": "game.Mode.IsServer",
+     "name": "IsServer",
+     "type": "boolean",
+     "text": "True on a dedicated server.",
+     "use": "print(game.Mode.IsServer)"
+    },
+    {
+     "id": "game.Mode.IsAuthority",
+     "name": "IsAuthority",
+     "type": "boolean",
+     "text": "True where the session's rules run: a dedicated server, a host, or alone. False for a client.",
+     "use": "print(game.Mode.IsAuthority)"
+    },
+    {
+     "id": "game.Mode.HasScreen",
+     "name": "HasScreen",
+     "type": "boolean",
+     "text": "False on a dedicated server, where there is no interface: `ui` is nil there, and nothing of a mod can be shown or pressed. True in a game, from its first frame.",
+     "use": "print(game.Mode.HasScreen)"
+    }
+   ],
+   "signals": [
+    {
+     "id": "game.Mode.Changed",
+     "name": "Changed",
+     "type": "WaxSignal<fun(kind: string, before: string)>",
+     "receives": "kind: string, before: string",
+     "text": "Fires after a map change when the kind is not what it was, with the new kind and the one before.",
+     "use": "game.Mode.Changed:Connect(function(kind, before)\n    print(kind, before)\nend)"
     }
    ]
   },

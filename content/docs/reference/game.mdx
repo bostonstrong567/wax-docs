@@ -28,6 +28,7 @@ Type name: `WaxGame`.
 | `Viewport` | [`IcarusGameViewportClient`](/explorer?game=IcarusGameViewportClient) | The game viewport. |
 | `MapName` | `string?` | The name of the current world. |
 | `InProspect` | `boolean` | True while you are in a prospect. |
+| `Mode` | [`WaxMode`](/docs/reference/mode#game-mode) | How this copy of the game runs: a dedicated server, a host, a client or alone, and whether it has a screen. |
 | `IsHost` | `boolean` | True when this game runs the session's rules: you play alone or you are the host. False when you are a client in someone else's game, and while there is no world. |
 | `Players` | [`WaxPlayers`](/docs/reference/game#game-players) | The players in the session and the characters they control, with signals for when they come and go. |
 | `Creatures` | [`WaxCreatures`](/docs/reference/game#game-creatures) | The animals and enemies in the world, kept as a live list. A kind is named the way the game names it: "Wolf", "Conifer_Wolf", "Cave Worm". Letter case, spaces and underscores do not matter. A wrong name raises an error that suggests the right one. |
@@ -39,6 +40,7 @@ Type name: `WaxGame`.
 | `Frame` | [`WaxFrameSignal`](/docs/reference/watch#game-frame) | Fires once every frame with the seconds since the frame before. For work that has to run every frame. |
 | `Me` | [`WaxMe`](/docs/reference/character#game-me) | The local player's character, whichever one that is: its fields and functions, and signals for its health, food, level and the like. It is there with no character too, and says so. |
 | `Items` | [`WaxItems`](/docs/reference/items#game-items) | The kinds of item the game has, and the facts of each: its shown name, weight, stack size, durability and picture. |
+| `Containers` | [`WaxContainers`](/docs/reference/items#game-containers) | The structures around the player that hold items, nearest first, and what each one takes. |
 | `Recipes` | [`WaxRecipes`](/docs/reference/recipes#game-recipes) | The game's crafting recipes: finding them, and changing what they take, what they give, how long they take and where they are made. |
 | `Assets` | [`WaxAssets`](/docs/reference/assets#game-assets) | The game's assets by path, pictures from a mod's own files, materials made from the game's, and shapes made of numbers, each kept in memory for the mod that asked. |
 | `Blueprints` | [`WaxBlueprints`](/docs/reference/blueprints#game-blueprints) | Things described in Lua and spawned: an actor of a class the game has, with parts, assets and functions of your own. The game does not save them. |
@@ -619,19 +621,31 @@ game.Highlight:Look(options?: WaxHighlightOptions): WaxHighlightLook
 
 ### `game.Highlight:Configure(options)` [#game-highlight-configure]
 
-Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4).
+Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4), Range how far away an outlined thing can be and still show, in metres (1 to 5000; the game's own 14 until set, and false goes back to it). Tags made with a mark show exactly as far.
 
 ```lua
-game.Highlight:Configure(options: { Fill?: number, Width?: number }): { Fill: number, Width: number }
+game.Highlight:Configure(options: { Fill?: number, Width?: number, Range?: number|false }): { Fill: number, Width: number, Range: number }
 ```
 
 | Parameter | Type |
 | --- | --- |
-| `options` | `{ Fill?: number, Width?: number }` |
+| `options` | `{ Fill?: number, Width?: number, Range?: number\|false }` |
 
-**Returns** `{ Fill: number, Width: number }`
+**Returns** `{ Fill: number, Width: number, Range: number }`
 
 <InExplorer id="game.Highlight.Configure" />
+
+### `game.Highlight:GetRange()` [#game-highlight-getrange]
+
+How far away an outlined thing can be and still show, in metres: what Configure set, else the game's own 14.
+
+```lua
+game.Highlight:GetRange(): number
+```
+
+**Returns** `number`
+
+<InExplorer id="game.Highlight.GetRange" />
 
 ## `game.Crafting` [#game-crafting]
 
@@ -1230,6 +1244,7 @@ You get one from [`game.Highlight:Add`](/docs/reference/game#game-highlight-add)
 | --- | --- | --- |
 | `Instance` | [`WaxInstance`](/docs/reference/game#waxinstance) | An engine object. Every class of the game (Actor, [`Pawn`](/explorer?game=Pawn), [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) ...) is an Instance: it has what is listed here, and adds the properties and functions of its own class and of the classes that one is built on. A member the editor does not know is still read from the object, so nothing here stops you using it. |
 | `Active` | `boolean` | False once it was removed or its actor is gone. |
+| `Tag` | [`WaxTag?`](/docs/reference/ui#waxtag) | The tag over the actor, when the mark was given one. It goes with the mark. |
 
 ### `mark:Remove()` [#mark-remove]
 
@@ -1356,6 +1371,7 @@ Used by [`game.Creatures:Highlight`](/docs/reference/game#game-creatures-highlig
 | `Color` | `string` \| `{ R: number, G: number, B: number }` | A name from game.Highlight.Colors, "#rrggbb", or values from 0 to 1. "Red" when omitted. |
 | `Fill` | `boolean` | Also tints the whole model. True when omitted. |
 | `FillColor` | `string` \| `{ R: number, G: number, B: number }` \| `false` | The tint's colour when it is not the outline's. false goes back to the outline's colour. |
+| `Tag` | `string` \| [`WaxTagOptions`](/docs/reference/ui#waxtagoptions) \| `false` | A line of text over the actor (as [`ui.Tag`](/docs/reference/ui#ui-tag) makes), shown exactly as far as the outline is unless its own `within` is given. On Set, false takes it off. |
 
 ## WaxListedRecipe [#waxlistedrecipe]
 
@@ -1419,6 +1435,6 @@ One of [`IcarusNPCCharacter`](/explorer?game=IcarusNPCCharacter) or [`IcarusPawn
 
 ### WaxGameMember [#waxgamemember]
 
-One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"Creatures"`, `"Highlight"`, `"Data"`, `"MapChanged"`, `"IsHost"`, `"Me"`, `"Items"`, `"Time"`, `"Weather"`, `"Prospect"`.
+One of `"World"`, `"GameInstance"`, `"GameState"`, `"GameMode"`, `"LocalPlayer"`, `"Character"`, `"Engine"`, `"Viewport"`, `"MapName"`, `"InProspect"`, `"Players"`, `"Creatures"`, `"Highlight"`, `"Data"`, `"MapChanged"`, `"IsHost"`, `"Mode"`, `"Me"`, `"Items"`, `"Time"`, `"Weather"`, `"Prospect"`.
 
 <InExplorer id="WaxGameMember" />

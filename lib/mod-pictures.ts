@@ -10,6 +10,13 @@ const PICTURES: Record<string, { file: string; alt: string; width: number; heigh
     { file: 'look.webp', alt: 'Four wolves tagged through the trees with their level, health and distance.', width: 1920, height: 1080 },
     { file: 'creatures.webp', alt: 'The list of creature kinds, each with its own switch.', width: 1920, height: 1080 },
   ],
+  QuickStash: [
+    { file: '01-cover.webp', alt: 'Quick Stash: STASH and PULL on your inventory card and PULL in a bench’s own header, inside the game’s screens.', width: 1920, height: 1080 },
+    { file: '02-inventory.webp', alt: 'The inventory card with STASH and PULL beside Sort: a stash sends what you carry to the containers that hold it, a pull brings any item in range back.', width: 1920, height: 1080 },
+    { file: '03-list.webp', alt: 'The list a right click on PULL opens on the inventory card: everything held in range with its count and where it is, a search box, a click pulls the item.', width: 1920, height: 1080 },
+    { file: '04-settings.webp', alt: 'The settings window: where a stash goes, the range, where a pull comes from, how it spreads over stations, and every kind of structure in range with a switch.', width: 1920, height: 1080 },
+    { file: '05-outlines.webp', alt: 'Show what is in range: the crate outlined in blue, the benches and the furnace in orange, each with its name.', width: 1920, height: 1080 },
+  ],
   RecipeBrowser: [
     { file: '01-cover.jpg', alt: 'The Items list open beside the inventory, on the first page of every item.', width: 2560, height: 1440 },
     { file: '02-materials.jpg', alt: 'Materials for one Automated Defense System, gathered and made in order, with the time and experience.', width: 640, height: 2417 },

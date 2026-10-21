@@ -512,7 +512,7 @@ container:Console(options?: WaxConsoleOptions): WaxConsole
 
 What every control has.
 
-You get one from [`container:Separator`](/docs/reference/controls#container-separator), [`container:Spacer`](/docs/reference/controls#container-spacer), [`container:Badge`](/docs/reference/controls#container-badge). Below, `control` stands for one of these.
+You get one from [`ui.NeedsHost`](/docs/reference/ui#ui-needshost), [`container:Separator`](/docs/reference/controls#container-separator), [`container:Spacer`](/docs/reference/controls#container-spacer), [`container:Badge`](/docs/reference/controls#container-badge). Below, `control` stands for one of these.
 
 <InExplorer id="WaxControl" />
 
@@ -563,6 +563,22 @@ control:SetEnabled(enabled: boolean)
 **Returns** nothing.
 
 <InExplorer id="WaxControl.SetEnabled" />
+
+### `control:SetTip(text)` [#control-settip]
+
+Help shown while the mouse rests on the control. It needs a part that reports the mouse, which buttons, toggles, sections and key boxes have: for a control without one it answers false and shows nothing. nil or "" takes the tip away.
+
+```lua
+control:SetTip(text: string?): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `text` | `string?` |
+
+**Returns** `boolean` (`shown`)
+
+<InExplorer id="WaxControl.SetTip" />
 
 ## WaxLabel [#waxlabel]
 

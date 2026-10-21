@@ -297,6 +297,83 @@ end
 - The new size stays when your mod unloads. Put it back in [`mod.OnUnload`](/docs/mods#when-your-mod-unloads).
 - It was tried on the station's loadout, from 15 slots to 50 and back.
 
+## Moving stacks between inventories
+
+<Since version="0.3.16" />
+
+`inventory:Push(item, target)` sends every stack of an item from one inventory into another with the game's own
+"transfer all of a type", the call behind its Transfer Like button, so it goes through the server and works in
+someone else's session as well. `inventory:Pull(item, source)` is the same the other way, and
+`inventory:Move(slot, target, amount)` moves part of one stack with the game's "shift": onto a stack of the same
+item there, else into an empty slot.
+
+```lua title="init.lua"
+task.spawn(function()
+    local pack = game.Me.Backpack
+    local crate = game.Containers:Nearby(30, { kind = "storage" })[1]
+    if crate then
+        local moved, why = pack:Push("Wood", crate.Inventories[1])
+        print("moved", moved, why or "")
+    end
+end)
+```
+
+- Inside a task the call waits for the game, up to 2.5 seconds, and answers how many went: on a server the
+  items arrive after a round trip. Outside a task it answers `nil, "asked"` at once.
+- The stacks in the target are topped up first, then its free slots. What does not fit stays.
+- Equipped items, the hotbar and tools are whatever the inventory holds: push from `Backpack` to leave them alone.
+- Seen in a client's game on a dedicated server: 19 rope out of a bench and back in a quarter of a second.
+
+### Sharing over several stations
+
+`game.Items:Share(total, item, stations)` deals an amount out over stations of one kind as evenly as their room
+allows, so three furnaces smelt at once instead of one. It is pure sums: it answers how many each station gets,
+by its index, and what no station had room for. A station that already holds more than its share gets nothing
+until the others catch up; the remainder goes to the first station, the nearest when the list is nearest first.
+
+```lua title="init.lua"
+local furnaces = {}
+for _, found in ipairs(game.Containers:Nearby(30, { kind = "station" })) do
+    if found.Row == "Kit_Stone_Furnace" then
+        furnaces[#furnaces + 1] = { stacks = found.Inputs:List(), size = found.Inputs.Size, used = found.Inputs.Used }
+    end
+end
+local given, left = game.Items:Share(90, "Metal_Ore", furnaces)   -- { 30, 30, 30 }, 0
+```
+
+## The structures around you
+
+<Since version="0.3.16" />
+
+`game.Containers` is the list of chests, cupboards, pouches, benches and furnaces that hold items, kept by a list
+that follows the world: nothing is looked for until the first call, and after it a structure joins the moment it
+appears and leaves when it goes. `Nearby(range)` gives those within reach, nearest first, each with its name, its
+distance, its inventories and whether it takes an item.
+
+```lua title="init.lua"
+for _, found in ipairs(game.Containers:Nearby(30)) do
+    print(found.Name, found.Kind, math.floor(found.Distance), #found.Inventories, found:Accepts("Wood"))
+end
+for _, kind in ipairs(game.Containers:Kinds(30)) do
+    print(kind.Name, kind.Count)
+end
+```
+
+- `Kind` is `"station"` for a structure with a processor and its input inventory, `"cargo"` for a tamed animal
+  with saddle bags, else `"storage"`.
+- `OwnedBy(state)` is true for a cargo animal that belongs to the player whose `PlayerState` is given, and true
+  for every structure. A mod that moves items should only use animals the local player owns:
+  `record:OwnedBy(game.LocalPlayer.Raw.PlayerState)`.
+- `Accepts(item)` is true for storage with an inventory that takes items, and for a station when one of the recipes
+  of its recipe set takes the item: a stone furnace takes iron ore and not aluminium ore.
+  `game.Containers:Accepted(row)` is the whole list for a station's item row; its first read of the recipes pauses
+  the task it is in.
+- Fuel slots, water tanks, graves, mission devices and the drop ship are left out of `Inventories`; a fuel slot is
+  under `Fuel`.
+- `Changed` fires when a structure appears or goes. The settings window of a mod can list `Kinds` once a second
+  while it shows and leave the rest alone.
+- The structure's own actor is `Actor`, for anything else about it.
+
 Signals for items that come and go are on [Events of the game](/docs/events#items).
 
 Every field and function is listed in the [Items and inventories reference](/docs/reference/items).

@@ -1,0 +1,75 @@
+---
+title: Buttons in the game's screens
+description: "Put a button of your own inside one of the game's headers, built from the game's own parts, without widening anything."
+icon: SquareMousePointer
+---
+
+<NextVersion />
+
+<Since version="0.3.16" />
+
+`ui.GameButton` puts a button into one of the game's own screens: the inventory card's header, a bench's device
+inventory, anywhere the game has a row of its text buttons. It is built from the same widgets the game builds its
+buttons from, with the fill, font and colours copied from a button that is already there, so it looks like the
+game's and follows the game's scale.
+
+```lua title="init.lua"
+-- the inventory card: the Sort control, its row, and the Type box beside it
+local function sort_control()
+    local player = game.LocalPlayer.Raw
+    local menus = player.UserInterface.Menus
+    for index = 0, menus:GetChildrenCount() - 1 do
+        local screen = menus:GetChildAt(index)
+        if screen:GetFullName():find("UMG_MainMenu", 1, true) then return screen.UMG_MainInventory.UMG_Sort end
+    end
+end
+
+local sort = sort_control()
+local model = sort.SortButton
+local button = ui.GameButton({
+    like = model,                                   -- the game's button whose look is copied
+    row = model:GetParent():GetParent(),            -- the row that holds Type and Sort
+    caption = "STASH",
+    width = 130,
+    room = {                                        -- what gives up width, so the row stays 450 wide
+        { box = sort.ComboBox:GetParent(), width = 170 },
+        { box = model.SizeBox, width = 150 },
+    },
+}, function()
+    ui.Notify("Stashed.")
+end)
+```
+
+## What it promises
+
+- **The header never grows.** The row's size is read before and after the button goes in. When it would change,
+  the button is taken out again, the boxes get their widths back, and an error says how much width the `room`
+  entries still have to give up. Give up as much as the button takes: the Type box and Sort above lose 80 and 50
+  for a button of 130.
+- **It looks like the game's.** The fill is the game's own material in its normal, hovered and pressed states,
+  the font is the font of the model button at the same size, the caption turns dark under the mouse as the game's
+  captions do, and the height is the model's.
+- **It goes away with your mod.** The button is removed when your mod unloads or reloads, and a mod that loads
+  again first clears what an earlier life of it left in the row, by name.
+- **The game can throw the screen away.** After a map change the game builds its screens anew. `Exists()` says
+  false then; make the button again when the screen is back. Nothing of the old one is touched.
+
+## The handle
+
+| | |
+|---|---|
+| `button.Clicked` | A signal: the button was pressed and released under the mouse. |
+| `button:SetCaption(words)` | Changes the words. |
+| `button:Remove()` | Takes it out and gives the room back. |
+| `button:Exists()` | False once it was removed or its screen is gone. |
+
+## Finding the game's parts
+
+The game's menu screens hang off the player controller's `UserInterface.Menus`. The inventory tab is
+`UMG_MainMenu.UMG_MainInventory`; its Sort control is `UMG_Sort`, a `UMG_Sort_C` with a `ComboBox` (the Type box)
+and a `SortButton`. A bench screen is `UMG_Processor_C`, with `UMG_DeviceInventory.UMG_Sort` built the same way.
+The [Explorer](/explorer) lists every class with its members, and the Wax panel's Explorer page shows the live
+widgets of the screen that is open.
+
+A click reaches your function as a task, so it may wait. A stack the player holds on the cursor drops back into
+its slot on the same click; wait a moment before reading inventories.

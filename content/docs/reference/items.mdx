@@ -48,6 +48,27 @@ game.Items:Has(name: string): boolean
 
 <InExplorer id="game.Items.Has" />
 
+### `game.Items:Share(total, item, stations)` [#game-items-share]
+
+Deals `total` of an item out over the stations of one kind, as evenly as their room allows, so they all work at once: each gets up to the share that brings it level with the others, one that already holds more than its share gets nothing until the rest catch up, and what the even split leaves over goes to the first (the nearest, when the list is nearest first). Pure sums: nothing is moved. The stack size comes from Get.
+
+```lua
+game.Items:Share(total: integer, item: string|WaxItemStack, stations: WaxShareStation[]): table<integer, integer>, integer
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `total` | `integer` | How many there are to deal out. |
+| `item` | `string` \| [`WaxItemStack`](/docs/reference/items#waxitemstack) |  |
+| `stations` | [`WaxShareStation[]`](/docs/reference/items#waxsharestation) |  |
+
+**Returns**
+
+- `table<integer, integer>` (`given`) How many each station gets, by its index in the list; stations that get nothing are left out.
+- `integer` (`left`) What no station had room for.
+
+<InExplorer id="game.Items.Share" />
+
 ### `game.Items:GetNames()` [#game-items-getnames]
 
 The name of every item, spelled and ordered as the game has them.
@@ -87,6 +108,83 @@ game.Items:Load(): integer
 **Returns** `integer` (`count`) How many items have a shown name.
 
 <InExplorer id="game.Items.Load" />
+
+## `game.Containers` [#game-containers]
+
+The structures around the player that hold items: chests, cupboards, pouches, benches, furnaces and the like, kept by a list that follows the world (nothing is looked for until the first call, and after it a structure joins the moment it appears and leaves when it goes).
+
+Type name: `WaxContainers`.
+
+<InExplorer id="game.Containers" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Changed` | nothing | Fires when a structure appeared or went away, and once on a map change. |
+
+### `game.Containers:Nearby(range?, options?)` [#game-containers-nearby]
+
+The structures within `range` metres that can hold items, nearest first.
+
+```lua
+game.Containers:Nearby(range?: number, options?: WaxNearbyOptions): WaxNearbyContainer[]
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `range` (optional) | `number` | Metres. 30 when omitted. |
+| `options` (optional) | [`WaxNearbyOptions`](/docs/reference/items#waxnearbyoptions) |  |
+
+**Returns** [`WaxNearbyContainer[]`](/docs/reference/items#waxnearbycontainer)
+
+<InExplorer id="game.Containers.Nearby" />
+
+### `game.Containers:Kinds(range?, options?)` [#game-containers-kinds]
+
+The kinds of structure in range and how many of each, by name.
+
+```lua
+game.Containers:Kinds(range?: number, options?: WaxNearbyOptions): WaxContainerKind[]
+```
+
+| Parameter | Type |
+| --- | --- |
+| `range` (optional) | `number` |
+| `options` (optional) | [`WaxNearbyOptions`](/docs/reference/items#waxnearbyoptions) |
+
+**Returns** [`WaxContainerKind[]`](/docs/reference/items#waxcontainerkind)
+
+<InExplorer id="game.Containers.Kinds" />
+
+### `game.Containers:Accepted(row)` [#game-containers-accepted]
+
+What a station of this item row can process: every input of the recipes in its recipe set, as \{ [name in lower case] = the game's spelling \}, read from D_ItemsStatic, D_Processing and D_ProcessorRecipes once a set. The first read of the recipes pauses the task it is in; outside a task it answers nil and "reading" until a task has read them.
+
+```lua
+game.Containers:Accepted(row: string): table<string, string>?, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `row` | `string` | A structure's item row, such as "Kit_Stone_Furnace". |
+
+**Returns**
+
+- `table<string, string>?` (`accepted`) Nil for a structure that is no station, or while the recipes are still being read.
+- `string?` (`why`) "not a station" or "reading"; the recipe set's name when the first value is given.
+
+<InExplorer id="game.Containers.Accepted" />
+
+### `game.Containers:Count()` [#game-containers-count]
+
+How many structures that hold items the list knows of, in the whole world.
+
+```lua
+game.Containers:Count(): integer
+```
+
+**Returns** `integer`
+
+<InExplorer id="game.Containers.Count" />
 
 ## WaxItemStack [#waxitemstack]
 
@@ -132,6 +230,57 @@ stack:Activate(use?: string)
 **Returns** nothing.
 
 <InExplorer id="WaxItemStack.Activate" />
+
+## WaxNearbyContainer [#waxnearbycontainer]
+
+A structure near the player that holds items, as [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby) gives it.
+
+You get one from [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby). Below, `nearbyContainer` stands for one of these.
+
+<InExplorer id="WaxNearbyContainer" />
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `Row` | `string` | Its item in D_ItemsStatic, such as "Kit_Stone_Furnace" or "Storage_Metal_Cupboard". |
+| `Name` | `string` | The name the game shows for it. |
+| `Kind` | `"storage"` \| `"station"` \| `"cargo"` | A station has an input inventory a processor works from; a cargo animal is a tamed creature with a cargo inventory (its Row is "cargo:\<set-up row>", its Name "Cargo: \<kind>"); everything else is storage. |
+| `Distance` | `number` | Metres from the player. |
+| `Actor` | [`WaxInstance`](/docs/reference/game#waxinstance) | The structure itself. |
+| `Inventories` | [`WaxInventory[]`](/docs/reference/items#waxinventory) | Its inventories that take items: not the fuel slot, not a remove-only or client-side one. |
+| `Fuel` | [`WaxInventory[]`](/docs/reference/items#waxinventory) | Its fuel inventories. |
+| `Inputs` | [`WaxInventory?`](/docs/reference/items#waxinventory) | A station's input inventory. |
+
+### `nearbyContainer:Accepts(item)` [#nearbycontainer-accepts]
+
+True when a stash or a pull of the item may go into it: for a station, when one of the recipes of its recipe set takes the item; for storage, when it has an inventory that takes items.
+
+```lua
+nearbyContainer:Accepts(item: string|WaxItemStack): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `item` | `string` \| [`WaxItemStack`](/docs/reference/items#waxitemstack) |
+
+**Returns** `boolean`
+
+<InExplorer id="WaxNearbyContainer.Accepts" />
+
+### `nearbyContainer:OwnedBy(state)` [#nearbycontainer-ownedby]
+
+For a cargo animal, true when it belongs to the player whose [`PlayerState`](/explorer?game=PlayerState) is given (the game's own IsMountOwner); true for every structure.
+
+```lua
+nearbyContainer:OwnedBy(state: any): boolean
+```
+
+| Parameter | Type |
+| --- | --- |
+| `state` | `any` |
+
+**Returns** `boolean`
+
+<InExplorer id="WaxNearbyContainer.OwnedBy" />
 
 ## WaxInventory [#waxinventory]
 
@@ -302,6 +451,67 @@ inventory:Resize(slots: integer): integer, string?
 
 <InExplorer id="WaxInventory.Resize" />
 
+### `inventory:Push(item, target)` [#inventory-push]
+
+Every stack of an item in this inventory goes into another, by the game's own "transfer all of a type": the call its own Transfer Like button makes, so it works in someone else's session as well. The stacks there are topped up first, then free slots are filled. Inside a task it waits for the game, up to 2.5 seconds, and answers how many went; outside a task it answers nil and "asked" at once.
+
+```lua
+inventory:Push(item: string|WaxItemStack|WaxItemFacts, target: Inventory|WaxInventory): integer?, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `item` | `string` \| [`WaxItemStack`](/docs/reference/items#waxitemstack) \| [`WaxItemFacts`](/docs/reference/items#waxitemfacts) |  |
+| `target` | [`Inventory`](/explorer?game=Inventory) \| [`WaxInventory`](/docs/reference/items#waxinventory) | The inventory it goes into. |
+
+**Returns**
+
+- `integer?` (`moved`) How many went. 0 when nothing did.
+- `string?` (`why`) "asked" outside a task, else why nothing went.
+
+<InExplorer id="WaxInventory.Push" />
+
+### `inventory:Pull(item, source)` [#inventory-pull]
+
+The same the other way: every stack of the item in `source` comes into this inventory.
+
+```lua
+inventory:Pull(item: string|WaxItemStack|WaxItemFacts, source: Inventory|WaxInventory): integer?, string?
+```
+
+| Parameter | Type |
+| --- | --- |
+| `item` | `string` \| [`WaxItemStack`](/docs/reference/items#waxitemstack) \| [`WaxItemFacts`](/docs/reference/items#waxitemfacts) |
+| `source` | [`Inventory`](/explorer?game=Inventory) \| [`WaxInventory`](/docs/reference/items#waxinventory) |
+
+**Returns**
+
+- `integer?` (`moved`)
+- `string?` (`why`)
+
+<InExplorer id="WaxInventory.Pull" />
+
+### `inventory:Move(slot, target, amount?)` [#inventory-move]
+
+Some of one stack to another inventory, by the game's own "shift": onto a stack of the same item there with room, else into an empty slot. Inside a task it waits for the game and answers how many went; outside a task nil and "asked".
+
+```lua
+inventory:Move(slot: integer, target: Inventory|WaxInventory, amount?: integer): integer?, string?
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `slot` | `integer` | The slot of this inventory the stack is in, counted from 1. |
+| `target` | [`Inventory`](/explorer?game=Inventory) \| [`WaxInventory`](/docs/reference/items#waxinventory) |  |
+| `amount` (optional) | `integer` | How many of the stack. The whole stack when omitted. More than the room there is cut down. |
+
+**Returns**
+
+- `integer?` (`moved`)
+- `string?` (`why`)
+
+<InExplorer id="WaxInventory.Move" />
+
 ## WaxPlayerItems [#waxplayeritems]
 
 What Wax adds to a player's character for the things it carries: every Instance whose class is [`IcarusPlayerCharacter`](/explorer?game=IcarusPlayerCharacter) or is built on it, and game.Me. Each inventory is an Instance of the game's Inventory with what WaxInventory lists, and is nil when the character has no such inventory, as the character in the station has no backpack. An inventory Wax cannot read is left out of Count, Has and List.
@@ -412,7 +622,7 @@ playerItems:Take(item: string|WaxItemStack|WaxItemFacts, count?: integer): integ
 
 What a kind of item is, from the game's own tables. The table is yours: changing it changes nothing in the game.
 
-Returned by [`game.Items:Get`](/docs/reference/items#game-items-get). Used by [`game.Items:Get`](/docs/reference/items#game-items-get), [`inventory:Count`](/docs/reference/items#inventory-count), [`inventory:Has`](/docs/reference/items#inventory-has), [`inventory:Where`](/docs/reference/items#inventory-where), [`inventory:Give`](/docs/reference/items#inventory-give), [`inventory:Take`](/docs/reference/items#inventory-take), [`playerItems:Count`](/docs/reference/items#playeritems-count), [`playerItems:Has`](/docs/reference/items#playeritems-has) and others.
+Returned by [`game.Items:Get`](/docs/reference/items#game-items-get). Used by [`game.Items:Get`](/docs/reference/items#game-items-get), [`inventory:Count`](/docs/reference/items#inventory-count), [`inventory:Has`](/docs/reference/items#inventory-has), [`inventory:Where`](/docs/reference/items#inventory-where), [`inventory:Give`](/docs/reference/items#inventory-give), [`inventory:Take`](/docs/reference/items#inventory-take), [`inventory:Push`](/docs/reference/items#inventory-push), [`inventory:Pull`](/docs/reference/items#inventory-pull) and others.
 
 <InExplorer id="WaxItemFacts" />
 
@@ -425,3 +635,42 @@ Returned by [`game.Items:Get`](/docs/reference/items#game-items-get). Used by [`
 | `MaxStack` | `integer?` | How many fit in one stack. nil for an item the game keeps no such facts about. |
 | `MaxDurability` | `integer?` | Its durability when new. nil for an item the game gives no durability. |
 | `Icon` | `string?` | The path of its picture in the game's files. nil when it has none. |
+
+## WaxShareStation [#waxsharestation]
+
+A station a pull or a stash can fill, as [`game.Items:Share`](/docs/reference/items#game-items-share) reads it.
+
+Used by [`game.Items:Share`](/docs/reference/items#game-items-share).
+
+<InExplorer id="WaxShareStation" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `stacks` | [`WaxItemStack[]`](/docs/reference/items#waxitemstack) | What its input inventory holds, as List gives it. |
+| `size` | `integer` | How many slots it has. |
+| `used` | `integer` | How many of them hold something. |
+| `accepts` (optional) | `fun(item: string): boolean` | Nil takes every item. |
+
+## WaxContainerKind [#waxcontainerkind]
+
+Returned by [`game.Containers:Kinds`](/docs/reference/items#game-containers-kinds).
+
+<InExplorer id="WaxContainerKind" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `Row` | `string` |  |
+| `Name` | `string` |  |
+| `Kind` | `"storage"` \| `"station"` \| `"cargo"` |  |
+| `Count` | `integer` | How many of the kind are in range. |
+
+## WaxNearbyOptions [#waxnearbyoptions]
+
+Used by [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby), [`game.Containers:Kinds`](/docs/reference/items#game-containers-kinds).
+
+<InExplorer id="WaxNearbyOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `kind` | `"storage"` \| `"station"` \| `"cargo"` | Only structures of that kind. |
+| `holding` | `boolean` | Only structures with something in them. |

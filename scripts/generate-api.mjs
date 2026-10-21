@@ -151,6 +151,14 @@ const PAGES = {
     description: 'game.Effects and game.Sounds: particles, lights, trails, camera shakes and the game\'s sounds.',
     lead: ['WaxEffects', 'WaxSounds'],
   },
+  'mode.lua': {
+    slug: 'mode',
+    icon: 'HardDrive',
+    title: 'Mode',
+    description: 'game.Mode: a dedicated server, a host, a client or alone, and whether there is a screen.',
+    lead: ['WaxMode'],
+    note: '<Since version="0.3.16" />',
+  },
   'creature_models.lua': {
     slug: 'creature-models',
     icon: 'Rotate3d',
@@ -190,6 +198,7 @@ const GROUPS = [
   { id: 'stats', title: 'Stats', file: 'stats.lua', text: 'The numbers the game keeps for a character, and the modifiers that are on it.' },
   { id: 'items', title: 'Items', file: 'items.lua', text: 'game.Items, inventories and what a character carries.' },
   { id: 'session', title: 'Session', file: 'session.lua', text: 'game.Time, game.Weather, game.Prospect and the players of the session.' },
+  { id: 'mode', title: 'Mode', file: 'mode.lua', text: 'game.Mode: a dedicated server, a host, a client or alone, and whether there is a screen.' },
   { id: 'creature', title: 'Creatures', file: 'creature.lua', text: 'The fields of a creature, spawning one, and what the tables of the game say about a kind.' },
   { id: 'creature-models', title: 'Models', file: 'creature_models.lua', text: 'What game.Creatures:GetModel gives for the 3D model control.' },
   { id: 'data', title: 'Tables', file: 'data.lua', text: 'game.Data: the tables of the game, read as plain Lua and changed for as long as a mod is loaded.' },
@@ -241,6 +250,7 @@ const GUIDES = [
   [/^WaxStorage$/, '/docs/storage'],
   [/^WaxLog/, '/docs/logging'],
   [/^Wax(ModInfo|Manifest|File)$/, '/docs/mods'],
+  [/^WaxMode$/, '/docs/dedicated-servers'],
 ];
 const FILE_GUIDES = { 'controls.lua': '/docs/gui/controls' };
 // Functions explained on another page than their type, by Explorer id.

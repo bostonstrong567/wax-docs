@@ -34,7 +34,24 @@ ui.Tag({ X = here.X, Y = here.Y, Z = here.Z }, { text = "Camp", within = 500 })
 | `color` | The text colour. White when left out. |
 | `size` | The text size. |
 | `within` | The tag only shows when the thing is this many metres away or nearer. 100 when left out. |
+| `outline` | `true` shows the tag exactly as far as outlines show (`game.Highlight:GetRange()`), in place of `within`. |
+| `fade` | The tag gets smaller with distance and fades out over the last fifth of its range, as the game's own markers do. `true` when left out. |
 | `lift` | How far above the thing's middle the tag sits, in centimetres. Wax works it out when left out. |
+
+## Tags and outlines
+
+<Since version="0.3.16" />
+
+The game only draws an outline within 14 metres (see [Outlines](/docs/outlines)). A tag with `outline = true`
+shows exactly as far as that, and follows `game.Highlight:Configure({ Range = ... })` when a mod moves the limit.
+The shortest way to an outline with a name over it is the mark's own `Tag` option:
+
+```lua
+game.Highlight:Add(wolf, { Color = "Red", Tag = "Wolf" })
+```
+
+`tag:SetRange("outline")` does the same for a tag that already exists, and `tag:GetRange()` says how far it
+shows now.
 
 ## Changing a tag
 

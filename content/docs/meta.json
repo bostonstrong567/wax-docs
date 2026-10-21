@@ -8,6 +8,8 @@
     "first-mod",
     "mods",
     "get-mods",
+    "mods-on-servers",
+    "dedicated-servers",
     "publish-a-mod",
     "hot-reload",
     "menu",
@@ -44,6 +46,7 @@
     "logging",
     "---Interface---",
     "...gui",
+    "game-buttons",
     "---Reference---",
     "...reference"
   ]

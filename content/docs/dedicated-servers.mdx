@@ -1,0 +1,147 @@
+---
+title: Dedicated servers
+description: "Wax on a dedicated server: how to put it in, how to add a mod with no screen, how mods update themselves there, and what a server can and cannot do."
+icon: HardDrive
+---
+
+<Since version="0.3.16" />
+
+A dedicated server runs the game with no screen and nobody at the keyboard. Wax runs in it all the same: the
+same UE4SS, the same Wax folder, the same mods from the catalogue. What is different is that nothing can be
+shown or pressed, so a mod is added with a script instead of a button, and the Mods page is a list on the
+command line.
+
+## What works on a server
+
+A dedicated server owns the world, so everything a host's game does, it does too: table changes (stack sizes,
+recipes, prices), spawning, giving items, hooks on the game's own events, `game.Data`, `game.Players`,
+`game.Creatures`, tasks and signals. Mods from the catalogue update themselves. The page
+[Mods on servers](/docs/mods-on-servers) says how a server tells joining players which mods to have.
+
+What a server has not got is a screen. `ui` is nil there: no windows, panels, keys, notifications, outlines,
+tags or pictures. A mod that only draws (Prospector's Codex, Entity ESP) has nothing to do on a server, and a
+mod that both changes the world and draws runs its world half. A mod asks with `game.Mode`:
+
+```lua title="init.lua"
+if game.Mode.HasScreen then
+    ui.Window({ title = "Supply Line" })
+end
+if game.Mode.IsServer then
+    log:info("running on the dedicated server, map %s", game.MapName)
+end
+```
+
+| Field | What it says |
+| --- | --- |
+| `game.Mode.kind` | `"server"` on a dedicated server, `"host"` for a player hosting a world in the game, `"client"` when joined to someone's world, `"single"` alone. |
+| `game.Mode.IsServer` | True on a dedicated server. |
+| `game.Mode.IsAuthority` | True where the world's rules run: a server, a host, or alone. |
+| `game.Mode.HasScreen` | False on a dedicated server. Where it is false, `ui` is nil. |
+| `game.Mode.Changed` | Fires after a map change when the kind is not what it was. |
+
+## Put Wax in
+
+The dedicated server is a Steam download of its own (app 2089300). Its program is
+`Icarus\Binaries\Win64\IcarusServer-Win64-Shipping.exe`, and Wax goes beside it exactly as in the game.
+
+<Steps>
+<Step>
+
+### Copy the files
+
+Take `Wax-<version>-manual.zip` from the [latest release](https://github.com/bostonstrong567/icarus-wax/releases/latest)
+and copy everything inside its `game` folder into `Icarus\Binaries\Win64` of the server, next to
+`IcarusServer-Win64-Shipping.exe`. When you are done, `dwmapi.dll` and the `ue4ss` folder sit there. The
+installer and `Wax Setup.exe` look for the game, not the server, so on a server the files are copied by hand.
+
+</Step>
+<Step>
+
+### On Linux, tell Wine to take the proxy
+
+Most dedicated servers run under Wine. Wine has a `dwmapi.dll` of its own and takes that one unless it is told
+otherwise, and then Wax never loads. Put this in the environment the server starts with:
+
+```text
+WINEDLLOVERRIDES=dwmapi=n,b
+```
+
+In a systemd unit that is one line, `Environment=WINEDLLOVERRIDES=dwmapi=n,b`. On Windows nothing is needed.
+
+</Step>
+<Step>
+
+### Start the server and read the log
+
+Wax writes `ue4ss\Mods\Wax\run\session.log` beside its files. A good start reads like this, a few seconds
+after the server starts:
+
+```text
+[wax] coroutine helper loaded: tasks can call the engine
+[wax.mode] mode: server (no screen)
+[wax] no screen, so the interface is not started: this is a dedicated server
+[wax] core started
+[wax.game] map changed: Terrain_019
+```
+
+`ue4ss\UE4SS.log` is UE4SS's own log. Its first lines say which program it loaded into.
+
+</Step>
+</Steps>
+
+## Add a mod
+
+A server has no Mods page, so a mod is added with `wax-mod.sh`, a shell script that comes with Wax 0.3.16. It
+needs `bash`, `curl`, `unzip`, `openssl` and `python3`, which a Linux server has. It does what the
+**Add to game** button does on a PC: asks the catalogue, downloads the mod, checks the owner's signature on it
+against the same key, keeps the same rules for what a mod may hold, puts the folder in `mods`, and tells the
+running server.
+
+```bash
+export WAX_DIR=/path/to/Icarus/Binaries/Win64/ue4ss/Mods/Wax
+./wax-mod.sh add CargoHold          # the newest version
+./wax-mod.sh add CargoHold 1.0.0    # one version
+./wax-mod.sh list
+./wax-mod.sh remove CargoHold
+```
+
+- A mod added this way is **switched on**. In the game a new mod waits switched off until you flip its
+  switch; a server has nobody to flip it, so the script's request is what counts as your hand. The running
+  server takes the mod within a second and says so: `Cargo Hold 1.0.0 is loaded and was switched on`.
+- When the server is not running, the request waits in Wax's `run\in` folder, and the server takes it as soon
+  as it has started. `list` says `not known yet` for such a mod until then.
+- A folder that turns up in `mods` on its own, copied in by hand, is still held switched off, as in the game. To run a
+  mod of your own on a server, add it with the script once (it then has to be in the catalogue), or start the
+  server once with the folder there and set it on in `saved\wax.mods.lua`: take its id out of `disabled` and put
+  it under `known`.
+- `remove` renames the folder to `.removed-<Id>-<time>` and the running server unloads the mod. Delete the
+  folder when you are sure.
+
+On a Windows server the same is done with the link importer: `Wax-Import.ps1` in the Wax folder takes a
+`wax://install/<Id>` link, and the mod it puts in is switched on by the server the same way.
+
+## Updates
+
+A mod the script added carries `wax.origin`, as one added with the button does, and the server keeps it up to
+date by itself: it asks the catalogue 20 seconds after it starts and then every ten minutes (a game asks every
+six hours, because a player can press **Check now**). A newer version is downloaded, checked, swapped in and
+loaded in place, with no restart: the server's log says `CargoHold was updated to 1.0.1. The version before is
+kept as mods/.removed-CargoHold-<time>`. The `.removed-` folders can be deleted at any time.
+
+The settings are the same as in the game, in `saved\wax.updates.lua`: `look = false` stops every request,
+`auto = false` only looks and never swaps, and `every = 3600` sets the seconds between two looks (at least 60).
+
+Wax itself is not updated on a server. A new version is copied in by hand, as in "Put Wax in", with the server
+stopped.
+
+## What to know
+
+- A server runs one world at a time, and `game.MapChanged` fires when it loads a prospect, as in the game.
+  Before that the map is `DedicatedServerEntry`.
+- `game.LocalPlayer` and `game.Character` are nil on a server: there is no player of its own.
+  `game.Players:GetPlayers()` lists the players that joined.
+- The log has no notifications to fall back on, so everything a mod would show goes to `session.log`
+  through `log:info` and the rest. A mod's error there is one line; `grep "\[error\]" session.log` finds them.
+- Developer mode (`dev.txt` in the Wax folder) works on a server too: Lua sent through `run\in` runs in it.
+  Leave it off on a server that others can reach.
+- The catalogue is asked over HTTPS with the Windows library Wax uses on a PC. Under Wine that works as it is.

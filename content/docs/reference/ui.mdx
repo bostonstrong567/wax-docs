@@ -366,6 +366,40 @@ ui.Windows(): WaxWindow[]
 
 <InExplorer id="ui.Windows" />
 
+### `ui.GameButton(spec, on_click?)` [#ui-gamebutton]
+
+A button inside one of the game's own screens, in the game's style. Find the screen's parts from the player's `UserInterface.Menus`; the inventory card's Sort control is `UMG_MainInventory.UMG_Sort`, whose SortButton is the model and whose row holds the Type box and Sort.
+
+```lua
+ui.GameButton(spec: WaxGameButtonSpec, on_click?: fun()): WaxGameButton
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `spec` | [`WaxGameButtonSpec`](/docs/reference/ui#waxgamebuttonspec) |  |
+| `on_click` (optional) | `fun()` | Runs on a click, as a task. |
+
+**Returns** [`WaxGameButton`](/docs/reference/ui#waxgamebutton)
+
+<InExplorer id="ui.GameButton" />
+
+### `ui.NeedsHost(control, text?)` [#ui-needshost]
+
+Greys a control that cannot work on this game and says why while the mouse rests on it: by default that the host or the server has to run it. The control still takes clicks, so nothing is refused; what it does goes to the game, which answers. Pair it with mod.Side: `if not mod.Side("host") then ui.NeedsHost(button) end`.
+
+```lua
+ui.NeedsHost(control: WaxControl, text?: string): WaxControl
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `control` | [`WaxControl`](/docs/reference/controls#waxcontrol) |  |
+| `text` (optional) | `string` | What the tip says instead. |
+
+**Returns** [`WaxControl`](/docs/reference/controls#waxcontrol) (`control`) The same control.
+
+<InExplorer id="ui.NeedsHost" />
+
 ### `ui.Hotkey(key, callback, options?)` [#ui-hotkey]
 
 Runs `callback` when the key is pressed during play. The hotkey is removed when the mod reloads.
@@ -1550,19 +1584,31 @@ tag:SetColor(color: WaxColor|string)
 
 ### `tag:SetRange(metres)` [#tag-setrange]
 
-Sets how near the thing has to be for the tag to show, in metres.
+Sets how near the thing has to be for the tag to show, in metres. "outline" makes it show as far as outlines do.
 
 ```lua
-tag:SetRange(metres: number)
+tag:SetRange(metres: number|"outline")
 ```
 
 | Parameter | Type |
 | --- | --- |
-| `metres` | `number` |
+| `metres` | `number` \| `"outline"` |
 
 **Returns** nothing.
 
 <InExplorer id="WaxTag.SetRange" />
+
+### `tag:GetRange()` [#tag-getrange]
+
+How near the thing has to be for the tag to show, in metres.
+
+```lua
+tag:GetRange(): number
+```
+
+**Returns** `number`
+
+<InExplorer id="WaxTag.GetRange" />
 
 ### `tag:Remove()` [#tag-remove]
 
@@ -1575,6 +1621,58 @@ tag:Remove()
 **Returns** nothing.
 
 <InExplorer id="WaxTag.Remove" />
+
+## WaxGameButton [#waxgamebutton]
+
+A button inside one of the game's own screens, built from the same parts as the game's buttons, with the game's fill, font and colours. It can never widen the game's header: the row's size is read before and after, and when it would change, everything is undone and an error says how much width the room entries still have to give up. The button is removed when your mod unloads, and a mod that loads again first clears what an earlier life left behind.
+
+You get one from [`ui.GameButton`](/docs/reference/ui#ui-gamebutton). Below, `gameButton` stands for one of these.
+
+<InExplorer id="WaxGameButton" />
+
+| Signal | Handler receives | Description |
+| --- | --- | --- |
+| `Clicked` | nothing | Fires on a click: the button pressed and released under the mouse. |
+
+### `gameButton:SetCaption(caption)` [#gamebutton-setcaption]
+
+Changes the words.
+
+```lua
+gameButton:SetCaption(caption: string)
+```
+
+| Parameter | Type |
+| --- | --- |
+| `caption` | `string` |
+
+**Returns** nothing.
+
+<InExplorer id="WaxGameButton.SetCaption" />
+
+### `gameButton:Remove()` [#gamebutton-remove]
+
+Takes it out of the game's screen and gives the room back.
+
+```lua
+gameButton:Remove()
+```
+
+**Returns** nothing.
+
+<InExplorer id="WaxGameButton.Remove" />
+
+### `gameButton:Exists()` [#gamebutton-exists]
+
+False once it was removed, or the game threw its screen away.
+
+```lua
+gameButton:Exists(): boolean
+```
+
+**Returns** `boolean`
+
+<InExplorer id="WaxGameButton.Exists" />
 
 ## WaxHotkey [#waxhotkey]
 
@@ -2196,7 +2294,33 @@ Used by [`ui.Tag`](/docs/reference/ui#ui-tag).
 | `color` | [`WaxColor`](/docs/reference/ui#waxcolor) \| `string` |  |
 | `size` | `number` |  |
 | `within` | `number` | Metres. Farther away than this the tag is not shown. Default 100. |
+| `outline` | `boolean` | True shows the tag exactly as far as game.Highlight draws outlines ([`game.Highlight:GetRange()`](/docs/reference/game#game-highlight-getrange)), in place of `within`. |
+| `fade` | `boolean` | The tag gets smaller with distance and fades out over the last fifth of its range. True when omitted. |
 | `lift` | `number` | How far above the thing's middle the tag sits, in centimetres. Worked out from the thing when omitted. |
+
+## WaxGameButtonRoom [#waxgamebuttonroom]
+
+<InExplorer id="WaxGameButtonRoom" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `box` | `any` | A [`SizeBox`](/explorer?game=SizeBox) of the row (one of the game's), such as the Type box beside Sort. |
+| `width` | `number` | The width it gets instead of its own, in the game's units. |
+
+## WaxGameButtonSpec [#waxgamebuttonspec]
+
+Used by [`ui.GameButton`](/docs/reference/ui#ui-gamebutton).
+
+<InExplorer id="WaxGameButtonSpec" />
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `like` | `any` | One of the game's own text buttons (a [`UMG_BasicButton_2_C`](/explorer?game=UMG_BasicButton_2_C), such as a Sort control's SortButton): its fill, font and colours are copied. |
+| `row` | `any` | The [`HorizontalBox`](/explorer?game=HorizontalBox) of the game's screen the button goes into, such as the row that holds Type and Sort. |
+| `caption` | `string` | The words on it, such as "STASH". The game's font draws them in capitals. |
+| `width` (optional) | `number` | Its width in the game's units. 130 when omitted. |
+| `room` (optional) | [`WaxGameButtonRoom[]`](/docs/reference/ui#waxgamebuttonroom) | Boxes of the row that give up width, so the row keeps its size. |
+| `grow` (optional) | `boolean` | True for a row of your own that may grow: the size check is skipped. |
 
 ## WaxHotkeyOptions [#waxhotkeyoptions]
 

@@ -1,0 +1,99 @@
+---
+title: Mods on servers
+description: "Which mods run on the host and which on every player, how a host asks joining players to have a mod, and what a dedicated server needs."
+icon: Server
+---
+
+<Since version="0.3.16" />
+
+A mod runs inside one game: yours. When you play with others, some of what a mod does only counts in the game
+that owns the world, and some counts in every player's own game. This page says which is which, how a host tells
+joining players which mods to have, and how the same works on a dedicated server.
+
+## Where a mod runs
+
+The game that owns the world is the **host**: the player who started the world in the game, or a dedicated
+server. Every other player is a **client**. What a mod changes in the world, the tables and the characters is done
+by the host's game; a client's game shows what the host sends it.
+
+- **Host** features change the world: table changes (stack sizes, recipes, prices), spawning creatures, giving
+  items, hooks on the game's own events. On a client these calls go to the game, which answers for itself; most
+  of them do nothing there. A mod of this kind shows on a client's Mods page with the pill **Needs the host**, and
+  its switch and card say so while the mouse rests on them. The switch still works: nothing is refused, so you can
+  keep the mod on for the next world you host.
+- **Client** features live in your own game: windows, panels, keys, outlines, tags. They work for you whoever
+  hosts, and the host sees nothing of them.
+- **Host + client** is a mod with some of each. Its card lists each feature with its side, and greys the ones
+  this game cannot run.
+
+A mod says where it runs in its `mod.lua` (`side` and `features`, described on
+[Publish a mod](/docs/publish-a-mod#where-the-mod-runs)). The catalogue reads the side from the code when a mod
+does not say, and the Mods page of the site and the Browse page in the game can filter by it.
+
+## Hosting a world in the game
+
+You start the world, so your game is the host and every mod you switch on runs in full. Players who join bring
+their own games and their own mods. For a host mod, that is all there is to it: the world is yours, and the mod
+works for everyone in it. For a mod that has a client half, such as a panel each player opens, the other players
+need the mod too.
+
+### Require a mod
+
+On the **Mods** page of the Wax menu, each card of a host has the switch **Required to join**. Switch it on for a
+mod you want every player to have. When a player joins, Wax on your game tells theirs the list, with the versions
+you have, a few seconds after they arrive. It goes as one chat line to that player alone, which Wax on their game
+reads for itself and takes off their chat box.
+
+What their game does with the list is their choice, made with the setting below. The game itself knows nothing
+of Wax, so a player who lacks the mod still joins: "required" is what you ask of them, not a lock on the door.
+A player without Wax joins as before, and sees your line in their chat box as a short line of text.
+
+The list is kept in `saved\wax.server.lua` in Wax's folder, and sent again to everyone in the session when you
+change it.
+
+## Joining a world
+
+When the host requires mods, your game follows the setting **Mods a server requires** on the Settings page of
+the Wax menu:
+
+| Setting | What happens |
+| --- | --- |
+| **Install and enable** (the default) | A mod you lack is fetched from the Wax catalogue, signed and checked like every mod from there, put in your mods folder and switched on. A notification names it: "Installed Supply Line 1.0.0: the host requires it." A mod you have but switched off is switched on. One that is older than the host's is updated when the catalogue has the newer version. |
+| **Ask** | A notification names the mods, and the Mods page lists them with an **Install** button each. Nothing is put in until you press it. |
+| **Ignore** | Nothing happens. The log says what the host asked. |
+
+This is the one time Wax switches a mod on without your hand, and only with the first setting. A mod that is not in
+the catalogue, or that needs a newer Wax than yours, is named in a notification so you can ask the host for it;
+nothing is put in from the host's own files.
+
+## Dedicated servers
+
+A dedicated server has no screen and no Mods page. It reads the same file a host's game writes:
+
+```lua title="saved\wax.server.lua"
+return {
+    required = { "SupplyLine", "BiggerStacks" },
+}
+```
+
+Edit it in Wax's `saved` folder on the server; it is read again every ten seconds while the server runs, so a
+change is sent to the players in the session without a restart. The ids are the mods' folder names. A mod the
+server has is sent with its version; one it does not have is sent by name alone, and players get the newest
+version the catalogue has.
+
+How Wax is put on a dedicated server is on [Dedicated servers](/docs/dedicated-servers).
+
+## For mod authors
+
+- Say where your mod runs in `mod.lua`: `side = "host"`, `"client"` or `"both"`, and list the features of a mixed
+  mod as `features = { "host: Take from nearby chests", "client: Push all" }`.
+- Ask in code with `mod.Side("host")`: true on the host of the world and on a dedicated server. Use it to grey a
+  control, never to refuse an action.
+- Grey a control with `ui.NeedsHost(control)`: it is drawn dimmer and says, while the mouse rests on it, that the
+  host or the server has to run it. The control still takes clicks.
+
+```lua title="init.lua"
+local window = ui.Window({ title = "Supply Line" })
+local push = window:Button("Push everything to chests", function() pushAll() end)
+if not mod.Side("host") then ui.NeedsHost(push) end
+```
