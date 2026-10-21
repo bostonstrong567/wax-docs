@@ -374,6 +374,27 @@ end
   while it shows and leave the rest alone.
 - The structure's own actor is `Actor`, for anything else about it.
 
+### From a place, and what is held
+
+<Since version="0.3.18" />
+
+`Around(place, range)` is the same list measured from a place in the game's own units instead of from the player:
+a station, a build site, a spot on a dedicated server that has no player of its own to measure from. `Totals(inventory)`
+is what an inventory holds by item row in lower case, from one pass over its stacks that is kept until the inventory's
+slots used or items held change, so asking every frame costs two cheap reads at most. `Held(item, range)` adds the
+totals of every structure within range, storage, inputs and fuel together, each inventory once.
+
+```lua title="init.lua"
+local furnace = game.Containers:Nearby(30, { kind = "station" })[1]
+local around = game.Containers:Around(furnace.Actor.Position, 30)       -- what stands within 30 m of the furnace
+local ore = game.Containers:Held("Metal_Ore", 30, { around = furnace.Actor.Position })
+print(#around, "structures near the furnace hold", ore, "iron ore")
+print(game.Containers:Totals(furnace.Inputs).metal_ore or 0, "of it in the furnace itself")
+```
+
+A hook that the game calls hundreds of times a frame (a crafting check for every recipe tile) can ask `Totals` on
+every call: after the first, each call is the stamp's two reads and a table lookup.
+
 Signals for items that come and go are on [Events of the game](/docs/events#items).
 
 Every field and function is listed in the [Items and inventories reference](/docs/reference/items).

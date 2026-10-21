@@ -36,6 +36,7 @@ ui.Tag({ X = here.X, Y = here.Y, Z = here.Z }, { text = "Camp", within = 500 })
 | `within` | The tag only shows when the thing is this many metres away or nearer. 100 when left out. |
 | `outline` | `true` shows the tag exactly as far as outlines show (`game.Highlight:GetRange()`), in place of `within`. |
 | `fade` | The tag gets smaller with distance and fades out over the last fifth of its range, as the game's own markers do. `true` when left out. |
+| `over_menus` | `true` keeps the tag showing while one of the game's screens or the Wax menu is open. Left out, tags are hidden then and come back when the screen closes, so they never sit on the game's buttons. |
 | `lift` | How far above the thing's middle the tag sits, in centimetres. Wax works it out when left out. |
 
 ## Tags and outlines

@@ -138,6 +138,59 @@ game.Containers:Nearby(range?: number, options?: WaxNearbyOptions): WaxNearbyCon
 
 <InExplorer id="game.Containers.Nearby" />
 
+### `game.Containers:Around(place, range?, options?)` [#game-containers-around]
+
+The same list measured from a place in the game's own units (a station, a build site, a spot on a server that has no player to measure from), nearest first.
+
+```lua
+game.Containers:Around(place: { X: number, Y: number, Z: number }, range?: number, options?: WaxNearbyOptions): WaxContainer[]
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `place` | `{ X: number, Y: number, Z: number }` |  |
+| `range` (optional) | `number` | Metres. 30 when omitted. |
+| `options` (optional) | [`WaxNearbyOptions`](/docs/reference/items#waxnearbyoptions) |  |
+
+**Returns** [`WaxContainer[]`](/docs/reference/controls#waxcontainer)
+
+<InExplorer id="game.Containers.Around" />
+
+### `game.Containers:Totals(inventory, options?)` [#game-containers-totals]
+
+What an inventory holds, by item row in lower case: `{ wood = 140, fiber = 12 }`. One pass over its stacks, kept until the inventory's slots used or items held change, so asking every frame costs two cheap reads at most.
+
+```lua
+game.Containers:Totals(inventory: WaxInventory|any, options?: { stale?: boolean }): table<string, integer>
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `inventory` | [`WaxInventory`](/docs/reference/items#waxinventory) \| `any` | A Wax inventory or the engine's own object. |
+| `options` (optional) | `{ stale?: boolean }` | `stale = true` answers the last pass with no read at all once one exists, for a path that runs many times a frame while something else keeps it fresh. |
+
+**Returns** `table<string, integer>`
+
+<InExplorer id="game.Containers.Totals" />
+
+### `game.Containers:Held(item, range?, options?)` [#game-containers-held]
+
+How many of an item the structures within range hold, storage, inputs and fuel together.
+
+```lua
+game.Containers:Held(item: string|WaxItemStack, range?: number, options?: WaxHeldOptions): integer
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `item` | `string` \| [`WaxItemStack`](/docs/reference/items#waxitemstack) | The item row, such as "Wood". |
+| `range` (optional) | `number` | Metres. 30 when omitted. |
+| `options` (optional) | [`WaxHeldOptions`](/docs/reference/items#waxheldoptions) |  |
+
+**Returns** `integer`
+
+<InExplorer id="game.Containers.Held" />
+
 ### `game.Containers:Kinds(range?, options?)` [#game-containers-kinds]
 
 The kinds of structure in range and how many of each, by name.
@@ -666,7 +719,7 @@ Returned by [`game.Containers:Kinds`](/docs/reference/items#game-containers-kind
 
 ## WaxNearbyOptions [#waxnearbyoptions]
 
-Used by [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby), [`game.Containers:Kinds`](/docs/reference/items#game-containers-kinds).
+Used by [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby), [`game.Containers:Around`](/docs/reference/items#game-containers-around), [`game.Containers:Kinds`](/docs/reference/items#game-containers-kinds).
 
 <InExplorer id="WaxNearbyOptions" />
 
@@ -674,3 +727,13 @@ Used by [`game.Containers:Nearby`](/docs/reference/items#game-containers-nearby)
 | --- | --- | --- |
 | `kind` | `"storage"` \| `"station"` \| `"cargo"` | Only structures of that kind. |
 | `holding` | `boolean` | Only structures with something in them. |
+
+## WaxHeldOptions [#waxheldoptions]
+
+Extends [`WaxNearbyOptions`](/docs/reference/items#waxnearbyoptions). Used by [`game.Containers:Held`](/docs/reference/items#game-containers-held).
+
+<InExplorer id="WaxHeldOptions" />
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `around` | `{ X: number, Y: number, Z: number }` | Measure from this place instead of the player. |

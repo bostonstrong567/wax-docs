@@ -88,6 +88,14 @@ const PAGES = {
     description: 'game.Time, game.Weather, game.Prospect and the players of the session.',
     lead: ['WaxTime', 'WaxWeather', 'WaxProspect'],
   },
+  'memo.lua': {
+    slug: 'memo',
+    icon: 'Timer',
+    title: 'Memos',
+    description: 'Small caches for paths the game runs many times a frame: one per frame, one timed.',
+    lead: ['WaxMemoModule'],
+    note: '<Since version="0.3.18" />',
+  },
   'items.lua': {
     slug: 'items',
     icon: 'Backpack',
@@ -205,6 +213,7 @@ const GROUPS = [
   { id: 'character', title: 'Characters', file: 'character.lua', text: 'game.Me for your own character, its signals, and the fields of every character.' },
   { id: 'stats', title: 'Stats', file: 'stats.lua', text: 'The numbers the game keeps for a character, and the modifiers that are on it.' },
   { id: 'items', title: 'Items', file: 'items.lua', text: 'game.Items, inventories and what a character carries.' },
+  { id: 'memo', title: 'Memos', file: 'memo.lua', text: 'memo.frame and memo.timed: small caches for hot paths.' },
   { id: 'session', title: 'Session', file: 'session.lua', text: 'game.Time, game.Weather, game.Prospect and the players of the session.' },
   { id: 'mode', title: 'Mode', file: 'mode.lua', text: 'game.Mode: a dedicated server, a host, a client or alone, and whether there is a screen.' },
   { id: 'creature', title: 'Creatures', file: 'creature.lua', text: 'The fields of a creature, spawning one, and what the tables of the game say about a kind.' },

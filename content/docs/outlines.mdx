@@ -101,6 +101,23 @@ game.Highlight:Configure({ Range = false }) -- back to the game's own 14
 `Range` goes from 1 to 5000 metres. It is the same for every outline, because the game draws them all in one
 pass.
 
+## Through walls
+
+<Since version="0.3.18" />
+
+An outline shows through walls, and so does the tint of a filled mark. That is how Wax sets the game's outline
+up, so a mod needs nothing for it. The game's own setting keeps the tint behind walls for three of the four
+filled colours and drops it for the fourth; `ThroughWalls = false` goes back to that:
+
+```lua
+game.Highlight:Configure({ ThroughWalls = false })
+```
+
+An object whose whole bounding box is hidden is not rendered by this game's engine at all, so it gets no outline,
+whatever the settings. A bench against the far side of a wall is outlined; the same bench two rooms away shows
+only the parts whose box reaches past what hides it. The cheaper per-mesh settings and the engine's occlusion-query
+switch are untried.
+
 ## A tag with the outline
 
 <Since version="0.3.16" />
@@ -129,7 +146,7 @@ Wax uses the outline that the game itself draws. That gives it these limits:
 
 - There is room for four colours with a fill and three colours without one at the same time. A colour counts
   once, however many things use it. When there is no room left, the nearest colour in use is shown.
-- An outline always shows through walls.
+- An outline shows through walls, whole, unless `ThroughWalls` is set to false.
 - Outlines reach 14 metres unless `Range` says otherwise, and every outline has the same reach.
 - Trees, rocks and bushes cannot be outlined one at a time.
 - The outline needs your character. It is not drawn at the space station.

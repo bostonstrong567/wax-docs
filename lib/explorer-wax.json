@@ -64,7 +64,19 @@
     "WaxItemFacts",
     "WaxShareStation",
     "WaxContainerKind",
-    "WaxNearbyOptions"
+    "WaxNearbyOptions",
+    "WaxHeldOptions"
+   ],
+   "members": []
+  },
+  {
+   "id": "memo",
+   "title": "Memos",
+   "text": "memo.frame and memo.timed: small caches for hot paths.",
+   "types": [
+    "WaxMemoModule",
+    "WaxMemo",
+    "WaxTimedMemo"
    ],
    "members": []
   },
@@ -754,6 +766,14 @@
   "Stats:AddModifier": "WaxCharacterStats.AddModifier",
   "Stats:RemoveModifier": "WaxCharacterStats.RemoveModifier",
   "game.Time:Set": "game.Time.Set",
+  "memo.frame": "WaxMemoModule.frame",
+  "memo.timed": "WaxMemoModule.timed",
+  "Memo:get": "WaxMemo.get",
+  "Memo:has": "WaxMemo.has",
+  "Memo:set": "WaxMemo.set",
+  "Memo:take": "WaxMemo.take",
+  "Memo:clear": "WaxMemo.clear",
+  "TimedMemo:sweep": "WaxTimedMemo.sweep",
   "Stack:Equip": "WaxItemStack.Equip",
   "Stack:Activate": "WaxItemStack.Activate",
   "game.Items:Get": "game.Items.Get",
@@ -763,6 +783,9 @@
   "game.Items:Find": "game.Items.Find",
   "game.Items:Load": "game.Items.Load",
   "game.Containers:Nearby": "game.Containers.Nearby",
+  "game.Containers:Around": "game.Containers.Around",
+  "game.Containers:Totals": "game.Containers.Totals",
+  "game.Containers:Held": "game.Containers.Held",
   "game.Containers:Kinds": "game.Containers.Kinds",
   "game.Containers:Accepted": "game.Containers.Accepted",
   "game.Containers:Count": "game.Containers.Count",
@@ -4197,6 +4220,14 @@
      "use": "local tag = ui.Tag(target, { fade = true })"
     },
     {
+     "id": "WaxTagOptions.over_menus",
+     "name": "over_menus",
+     "type": "boolean",
+     "optional": true,
+     "text": "True keeps the tag showing while one of the game's screens or the Wax menu is open. Otherwise it is hidden then and comes back after.",
+     "use": "local tag = ui.Tag(target, { over_menus = true })"
+    },
+    {
      "id": "WaxTagOptions.lift",
      "name": "lift",
      "type": "number",
@@ -7560,6 +7591,9 @@
     "href": "/docs/gui/controls",
     "title": "Controls"
    },
+   "makers": [
+    "game.Containers.Around"
+   ],
    "use": "local window = ui.Window({ title = \"Example\" })",
    "funcs": [
     {
@@ -11174,15 +11208,15 @@
      "params": [
       {
        "name": "options",
-       "type": "{ Fill?: number, Width?: number, Range?: number|false }"
+       "type": "{ Fill?: number, Width?: number, Range?: number|false, ThroughWalls?: boolean }"
       }
      ],
      "returns": [
       {
-       "type": "{ Fill: number, Width: number, Range: number }"
+       "type": "{ Fill: number, Width: number, Range: number, ThroughWalls: boolean }"
       }
      ],
-     "text": "Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4), Range how far away an outlined thing can be and still show, in metres (1 to 5000; the game's own 14 until set, and false goes back to it). Tags made with a mark show exactly as far.",
+     "text": "Settings every outline shares: Fill is how strongly a filled model is tinted (0 to 1), Width the line width (1 to 4), Range how far away an outlined thing can be and still show, in metres (1 to 5000; the game's own 14 until set, and false goes back to it). Tags made with a mark show exactly as far. ThroughWalls (true when never set) keeps a filled mark's tint as well as its outline behind walls in every colour slot; false leaves the game's own setting, which drops the tint for one of the four.",
      "ref": "/docs/reference/game#game-highlight-configure",
      "use": "local result = game.Highlight:Configure(options)"
     },
@@ -14083,6 +14117,205 @@
    ]
   },
   {
+   "id": "WaxMemoModule",
+   "name": "WaxMemoModule",
+   "title": "WaxMemoModule",
+   "kind": "object",
+   "group": "memo",
+   "text": "Small caches for hot paths: a frame memo forgets everything when the frame changes, a timed one forgets an entry after its seconds. A hook the game calls hundreds of times a frame answers the same question from one of these after the first time.",
+   "ref": "/docs/reference/memo#waxmemomodule",
+   "funcs": [
+    {
+     "id": "WaxMemoModule.frame",
+     "name": "frame",
+     "call": "memo.frame",
+     "returns": [
+      {
+       "type": "WaxMemo"
+      }
+     ],
+     "text": "A cache that holds its entries for the rest of the current frame.",
+     "ref": "/docs/reference/memo#memo-frame",
+     "use": "local result = memo.frame()"
+    },
+    {
+     "id": "WaxMemoModule.timed",
+     "name": "timed",
+     "call": "memo.timed",
+     "params": [
+      {
+       "name": "seconds",
+       "type": "number"
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxTimedMemo"
+      }
+     ],
+     "text": "A cache whose entries last this many seconds from when they were set.",
+     "ref": "/docs/reference/memo#memo-timed",
+     "use": "local timedMemo = memo.timed(seconds)"
+    }
+   ]
+  },
+  {
+   "id": "WaxMemo",
+   "name": "WaxMemo",
+   "title": "WaxMemo",
+   "kind": "object",
+   "group": "memo",
+   "text": "What memo.frame gives back.",
+   "ref": "/docs/reference/memo#waxmemo",
+   "makers": [
+    "WaxMemoModule.frame"
+   ],
+   "props": [
+    {
+     "id": "WaxMemo.count",
+     "name": "count",
+     "type": "integer",
+     "text": "How many entries it holds.",
+     "use": "print(memo.count)"
+    },
+    {
+     "id": "WaxMemo.hits",
+     "name": "hits",
+     "type": "integer",
+     "text": "How many times get or take answered from an entry.",
+     "use": "print(memo.hits)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxMemo.get",
+     "name": "get",
+     "call": "memo:get",
+     "params": [
+      {
+       "name": "key",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "The value kept under the key, or nil. Keys are any Lua value; false is kept as a value.",
+     "ref": "/docs/reference/memo#memo-get",
+     "use": "local result = memo:get(key)"
+    },
+    {
+     "id": "WaxMemo.has",
+     "name": "has",
+     "call": "memo:has",
+     "params": [
+      {
+       "name": "key",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True when an entry is there.",
+     "ref": "/docs/reference/memo#memo-has",
+     "use": "local result = memo:has(key)"
+    },
+    {
+     "id": "WaxMemo.set",
+     "name": "set",
+     "call": "memo:set",
+     "params": [
+      {
+       "name": "key",
+       "type": "any"
+      },
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "Keeps a value under the key and answers it.",
+     "ref": "/docs/reference/memo#memo-set",
+     "use": "local result = memo:set(key, value)"
+    },
+    {
+     "id": "WaxMemo.take",
+     "name": "take",
+     "call": "memo:take",
+     "params": [
+      {
+       "name": "key",
+       "type": "any"
+      },
+      {
+       "name": "fn",
+       "type": "fun(...): any"
+      },
+      {
+       "name": "...",
+       "type": "any"
+      }
+     ],
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "The value kept under the key, or fn(...) kept under it now. A nil answer is not kept.",
+     "ref": "/docs/reference/memo#memo-take",
+     "use": "local result = memo:take(key, function(...) end, ...)"
+    },
+    {
+     "id": "WaxMemo.clear",
+     "name": "clear",
+     "call": "memo:clear",
+     "text": "Forgets every entry.",
+     "ref": "/docs/reference/memo#memo-clear",
+     "use": "memo:clear()"
+    }
+   ]
+  },
+  {
+   "id": "WaxTimedMemo",
+   "name": "WaxTimedMemo",
+   "title": "WaxTimedMemo",
+   "kind": "object",
+   "group": "memo",
+   "text": "What memo.timed gives back.",
+   "parents": [
+    "WaxMemo"
+   ],
+   "ref": "/docs/reference/memo#waxtimedmemo",
+   "guide": {
+    "href": "/docs/time-and-weather",
+    "title": "Time, weather and the prospect"
+   },
+   "makers": [
+    "WaxMemoModule.timed"
+   ],
+   "use": "local timedMemo = memo.timed(seconds)",
+   "funcs": [
+    {
+     "id": "WaxTimedMemo.sweep",
+     "name": "sweep",
+     "call": "timedMemo:sweep",
+     "text": "Drops every entry whose seconds are over.",
+     "ref": "/docs/reference/memo#timedmemo-sweep",
+     "use": "local timedMemo = memo.timed(seconds)\ntimedMemo:sweep()"
+    }
+   ]
+  },
+  {
    "id": "WaxItemFacts",
    "name": "WaxItemFacts",
    "title": "WaxItemFacts",
@@ -14591,6 +14824,7 @@
    "ref": "/docs/reference/items#waxnearbyoptions",
    "users": [
     "game.Containers.Nearby",
+    "game.Containers.Around",
     "game.Containers.Kinds"
    ],
    "props": [
@@ -14657,6 +14891,93 @@
      "use": "local nearbyContainers = game.Containers:Nearby(range, options)"
     },
     {
+     "id": "game.Containers.Around",
+     "name": "Around",
+     "call": "game.Containers:Around",
+     "params": [
+      {
+       "name": "place",
+       "type": "{ X: number, Y: number, Z: number }"
+      },
+      {
+       "name": "range",
+       "type": "number",
+       "optional": true,
+       "text": "Metres. 30 when omitted."
+      },
+      {
+       "name": "options",
+       "type": "WaxNearbyOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "WaxContainer[]"
+      }
+     ],
+     "text": "The same list measured from a place in the game's own units (a station, a build site, a spot on a server that has no player to measure from), nearest first.",
+     "ref": "/docs/reference/items#game-containers-around",
+     "use": "local containers = game.Containers:Around(place, range, options)"
+    },
+    {
+     "id": "game.Containers.Totals",
+     "name": "Totals",
+     "call": "game.Containers:Totals",
+     "params": [
+      {
+       "name": "inventory",
+       "type": "WaxInventory|any",
+       "text": "A Wax inventory or the engine's own object."
+      },
+      {
+       "name": "options",
+       "type": "{ stale?: boolean }",
+       "optional": true,
+       "text": "`stale = true` answers the last pass with no read at all once one exists, for a path that runs many times a frame while something else keeps it fresh."
+      }
+     ],
+     "returns": [
+      {
+       "type": "table<string, integer>"
+      }
+     ],
+     "text": "What an inventory holds, by item row in lower case: `{ wood = 140, fiber = 12 }`. One pass over its stacks, kept until the inventory's slots used or items held change, so asking every frame costs two cheap reads at most.",
+     "ref": "/docs/reference/items#game-containers-totals",
+     "use": "local result = game.Containers:Totals(inventory, options)"
+    },
+    {
+     "id": "game.Containers.Held",
+     "name": "Held",
+     "call": "game.Containers:Held",
+     "params": [
+      {
+       "name": "item",
+       "type": "string|WaxItemStack",
+       "text": "The item row, such as \"Wood\"."
+      },
+      {
+       "name": "range",
+       "type": "number",
+       "optional": true,
+       "text": "Metres. 30 when omitted."
+      },
+      {
+       "name": "options",
+       "type": "WaxHeldOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "How many of an item the structures within range hold, storage, inputs and fuel together.",
+     "ref": "/docs/reference/items#game-containers-held",
+     "use": "local result = game.Containers:Held(item, range, options)"
+    },
+    {
      "id": "game.Containers.Kinds",
      "name": "Kinds",
      "call": "game.Containers:Kinds",
@@ -14720,6 +15041,31 @@
      "text": "How many structures that hold items the list knows of, in the whole world.",
      "ref": "/docs/reference/items#game-containers-count",
      "use": "local result = game.Containers:Count()"
+    }
+   ]
+  },
+  {
+   "id": "WaxHeldOptions",
+   "name": "WaxHeldOptions",
+   "title": "WaxHeldOptions",
+   "kind": "data",
+   "group": "items",
+   "text": "The options that game.Containers:Held takes.",
+   "parents": [
+    "WaxNearbyOptions"
+   ],
+   "ref": "/docs/reference/items#waxheldoptions",
+   "users": [
+    "game.Containers.Held"
+   ],
+   "props": [
+    {
+     "id": "WaxHeldOptions.around",
+     "name": "around",
+     "type": "{ X: number, Y: number, Z: number }",
+     "optional": true,
+     "text": "Measure from this place instead of the player.",
+     "use": "local result = game.Containers:Held(item, range, { around = value })"
     }
    ]
   },

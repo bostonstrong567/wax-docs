@@ -173,6 +173,55 @@ The right ways:
 between, the log says so once per file when the mod loads, and the catalogue warns on it. `RegisterHook`
 by itself is not available in a mod, and the catalogue refuses a mod that calls it.
 
+### Answering a crafting check from the containers around
+
+<Since version="0.3.18" />
+
+The game decides whether a recipe can be made with `ProcessingComponent:CanSatisfyRecipeInput(Input, Multiplier,
+AdditionalInventories, CurrentAmount)` for each input and `CanQueueItem(RecipeToQueue, AdditionalInventories)` for
+the CRAFT button, and it hands each an array of extra inventories that nothing may be added to. The way to count
+the chests around a station is to answer those checks after the game has: read the game's own answer first and leave
+a yes alone, read only the fields you need, and take the counts from `game.Containers` rather than from the game on
+every call. The checks run for every recipe tile when a crafting screen opens, hundreds in one frame, so the memo
+below answers a repeated ask from the frame's first one.
+
+```lua title="init.lua"
+local memo = raw.Wax.import("core.memo")
+local answered = memo.frame()                     -- forgets everything when the frame moves on
+
+local function station_of(component)             -- the actor the check was made on, and its place
+    local owner = component:GetOwner()
+    local at = owner:K2_GetActorLocation()
+    return { addr = owner:GetAddress(), at = { X = at.X, Y = at.Y, Z = at.Z } }
+end
+
+hooks.listen("/Script/Icarus.ProcessingComponent:CanSatisfyRecipeInput", function(component, ret, input, multiplier, _, current)
+    if ret:get() == true then return end          -- the game says yes: nothing to add
+    local item, count = input.Element.RowName, input.Count
+    local station = station_of(component.Raw)
+    local key = station.addr .. "|" .. item .. "|" .. count .. "|" .. multiplier .. "|" .. current
+    return answered:take(key, function()
+        local nearby = game.Containers:Held(item, 30, { around = station.at })
+        if current + nearby >= count * multiplier then return true end
+        return nil                                -- nil is not kept, and leaves the game's no
+    end)
+end, { when = "post", reach = "net" })
+```
+
+For the craft itself, move what the backpack lacks into it before the game counts: a `when = "pre"` listener on
+`OnServer_AddProcessingRecipe` that uses `OnServer_ShiftItem` through the player's controller, where the craft is
+decided (a server, a host, a single player). Quick Stash in the catalogue is the whole of it, with the station's
+sources kept half a second and a per-frame memo for the CRAFT button's check too.
+
+### Memos for hot hooks
+
+<Since version="0.3.18" />
+
+`core.memo` has two small caches for paths the game runs many times a frame: `memo.frame()` keeps its entries for the
+rest of the current frame, `memo.timed(seconds)` for that long. Both have `get`, `has`, `set`, `take(key, fn, ...)`
+(the value kept, or `fn` run and kept) and `clear`; keys are any Lua value, `false` is kept as a value, `nil` is not.
+The [memo reference](/docs/reference/memo) lists them.
+
 ## What they cost
 
 - Nothing until the first handler connects. Wax starts listening to the game's function then.
