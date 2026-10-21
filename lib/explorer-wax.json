@@ -425,6 +425,18 @@
    ]
   },
   {
+   "id": "hooks",
+   "title": "hooks",
+   "text": "",
+   "types": [
+    "hooks",
+    "WaxHanded",
+    "WaxHookReturn",
+    "WaxHookOptions"
+   ],
+   "members": []
+  },
+  {
    "id": "content",
    "title": "content",
    "text": "",
@@ -927,6 +939,14 @@
   "game.Frame:Connect": "game.Frame.Connect",
   "game.Frame:Once": "game.Frame.Once",
   "game.Frame:Wait": "game.Frame.Wait",
+  "Handed:get": "WaxHanded.get",
+  "Handed:GetArrayNum": "WaxHanded.GetArrayNum",
+  "Handed:Num": "WaxHanded.Num",
+  "Handed:IsEmpty": "WaxHanded.IsEmpty",
+  "Handed:ForEach": "WaxHanded.ForEach",
+  "Return:get": "WaxHookReturn.get",
+  "Return:set": "WaxHookReturn.set",
+  "hooks.listen": "hooks.listen",
   "Content:Path": "WaxContent.Path",
   "Content:ClassPath": "WaxContent.ClassPath",
   "Content:Load": "WaxContent.Load",
@@ -22356,6 +22376,231 @@
    ]
   },
   {
+   "id": "WaxHanded",
+   "name": "WaxHanded",
+   "title": "WaxHanded",
+   "kind": "object",
+   "group": "hooks",
+   "text": "A value the game handed a hook, as a listener may have it: read inside the listener, never written. An array answers `#view`, `view[i]` (nil past the end), `view:get()` (a Lua table of its entries) and `view:ForEach`; a struct answers its fields. An object comes as an Instance and text as a string, not as a view. A write raises an error: the value is the game's own memory, and growing or emptying an array there crashes the game. Once the listener has returned, every view it was handed answers with an error, so copy what you keep with `get`.",
+   "ref": "/docs/reference/hooks#waxhanded",
+   "funcs": [
+    {
+     "id": "WaxHanded.get",
+     "name": "get",
+     "call": "handed:get",
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "A copy a listener may keep. An array becomes a Lua table of its entries, with objects as Instances, text as strings and structs as views. A struct view gives itself.",
+     "ref": "/docs/reference/hooks#handed-get",
+     "use": "local result = handed:get()"
+    },
+    {
+     "id": "WaxHanded.GetArrayNum",
+     "name": "GetArrayNum",
+     "call": "handed:GetArrayNum",
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "How many entries an array has. An error on a struct.",
+     "ref": "/docs/reference/hooks#handed-getarraynum",
+     "use": "local result = handed:GetArrayNum()"
+    },
+    {
+     "id": "WaxHanded.Num",
+     "name": "Num",
+     "call": "handed:Num",
+     "returns": [
+      {
+       "type": "integer"
+      }
+     ],
+     "text": "The same as GetArrayNum.",
+     "ref": "/docs/reference/hooks#handed-num",
+     "use": "local result = handed:Num()"
+    },
+    {
+     "id": "WaxHanded.IsEmpty",
+     "name": "IsEmpty",
+     "call": "handed:IsEmpty",
+     "returns": [
+      {
+       "type": "boolean"
+      }
+     ],
+     "text": "True for an array with no entries.",
+     "ref": "/docs/reference/hooks#handed-isempty",
+     "use": "local result = handed:IsEmpty()"
+    },
+    {
+     "id": "WaxHanded.ForEach",
+     "name": "ForEach",
+     "call": "handed:ForEach",
+     "params": [
+      {
+       "name": "fn",
+       "type": "fun(index: integer, entry: any): boolean?"
+      }
+     ],
+     "text": "Runs fn for every entry of an array, with its index from 1 and the entry converted as `view[i]` gives it. Return true from fn to stop.",
+     "ref": "/docs/reference/hooks#handed-foreach",
+     "use": "handed:ForEach(function(index, entry) end)"
+    }
+   ]
+  },
+  {
+   "id": "WaxHookReturn",
+   "name": "WaxHookReturn",
+   "title": "WaxHookReturn",
+   "kind": "object",
+   "group": "hooks",
+   "text": "The return value of the function a post listener runs after. Good only inside the listener.",
+   "ref": "/docs/reference/hooks#waxhookreturn",
+   "props": [
+    {
+     "id": "WaxHookReturn.changed",
+     "name": "changed",
+     "type": "boolean",
+     "text": "True once set was called.",
+     "use": "print(return.changed)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "WaxHookReturn.get",
+     "name": "get",
+     "call": "return:get",
+     "returns": [
+      {
+       "type": "any"
+      }
+     ],
+     "text": "What the function answered, converted like a parameter. An error on a function that returns nothing.",
+     "ref": "/docs/reference/hooks#return-get",
+     "use": "local result = return:get()"
+    },
+    {
+     "id": "WaxHookReturn.set",
+     "name": "set",
+     "call": "return:set",
+     "params": [
+      {
+       "name": "value",
+       "type": "any"
+      }
+     ],
+     "text": "Replaces what the caller will see. An Instance is passed as its object. Returning a value from the listener does the same. An error from a \"pre\" listener (the function has not run yet) and on a function that returns nothing.",
+     "ref": "/docs/reference/hooks#return-set",
+     "use": "return:set(value)"
+    }
+   ]
+  },
+  {
+   "id": "WaxHookOptions",
+   "name": "WaxHookOptions",
+   "title": "WaxHookOptions",
+   "kind": "data",
+   "group": "hooks",
+   "text": "The options that hooks.listen takes.",
+   "ref": "/docs/reference/hooks#waxhookoptions",
+   "users": [
+    "hooks.listen"
+   ],
+   "props": [
+    {
+     "id": "WaxHookOptions.when",
+     "name": "when",
+     "type": "\"pre\"|\"post\"",
+     "optional": true,
+     "text": "\"pre\" (the default) runs the listener before the function, as fn(object, params...). \"post\" runs it after, as fn(object, ret, params...), where ret is the return value to read and set.",
+     "use": "local undo = hooks.listen(path, function(object, ...) end, { when = \"pre\" })"
+    },
+    {
+     "id": "WaxHookOptions.reach",
+     "name": "reach",
+     "type": "\"net\"|\"delegate\"|\"called\"",
+     "optional": true,
+     "text": "How the game reaches the function. With \"called\" (blueprint code calls it) the values are the caller's own variables, not the call's, so only the object is handed over. Left out: what listens to the function already, else \"delegate\".",
+     "use": "local undo = hooks.listen(path, function(object, ...) end, { reach = \"net\" })"
+    },
+    {
+     "id": "WaxHookOptions.label",
+     "name": "label",
+     "type": "string",
+     "optional": true,
+     "text": "A name for the listener in error reports. The function's name when left out.",
+     "use": "local undo = hooks.listen(path, function(object, ...) end, { label = \"text\" })"
+    }
+   ]
+  },
+  {
+   "id": "hooks",
+   "name": "WaxHooks",
+   "title": "hooks",
+   "kind": "namespace",
+   "group": "hooks",
+   "text": "Listening to the game's own functions. `hooks.listen` is the way; UE4SS's RegisterHook is not available to a mod.",
+   "ref": "/docs/reference/hooks#hooks",
+   "props": [
+    {
+     "id": "hooks.NET",
+     "name": "NET",
+     "type": "\"net\"",
+     "text": "The game's own code raises the function as a network call: its values are right.",
+     "use": "print(hooks.NET)"
+    },
+    {
+     "id": "hooks.DELEGATE",
+     "name": "DELEGATE",
+     "type": "\"delegate\"",
+     "text": "The game bound the function to one of its events: its values are right.",
+     "use": "print(hooks.DELEGATE)"
+    },
+    {
+     "id": "hooks.CALLED",
+     "name": "CALLED",
+     "type": "\"called\"",
+     "text": "Blueprint code calls the function: only the object is right.",
+     "use": "print(hooks.CALLED)"
+    }
+   ],
+   "funcs": [
+    {
+     "id": "hooks.listen",
+     "name": "listen",
+     "call": "hooks.listen",
+     "params": [
+      {
+       "name": "path",
+       "type": "string"
+      },
+      {
+       "name": "fn",
+       "type": "fun(object: WaxInstance, ...: any): any"
+      },
+      {
+       "name": "options",
+       "type": "WaxHookOptions",
+       "optional": true
+      }
+     ],
+     "returns": [
+      {
+       "type": "fun()",
+       "name": "undo"
+      }
+     ],
+     "text": "Runs fn each time the game calls the function at `path`, such as \"/Script/Icarus.ProcessingComponent:CanSatisfyRecipeInput\". Only a function of the game's own code can be listened to, never a blueprint's. fn gets the object the function was called on as an Instance and its parameters as values it can read and not write: numbers, strings and booleans as they are, objects as Instances, arrays and structs as views (WaxHanded). With `when = \"post\"` the second argument is the return value (WaxHookReturn): `ret:get()` reads what the game answered, `ret:set(value)` or a value returned from fn replaces it. fn runs inside the game's own call: keep it short and never wait in it. An error in fn is logged, and after five in a row the listener is switched off. Returns the function that takes the listener off; a reload of the mod takes it off by itself.",
+     "ref": "/docs/reference/hooks#hooks-listen",
+     "use": "local undo = hooks.listen(path, function(object, ...) end, options)"
+    }
+   ]
+  },
+  {
    "id": "WaxContent",
    "name": "WaxContent",
    "title": "WaxContent",
@@ -22649,6 +22894,34 @@
       }
      ],
      "text": "Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use task.spawn or task.delay.",
+     "ref": "/docs/reference/mods#blocked-functions",
+     "blocked": true
+    },
+    {
+     "id": "RegisterHook",
+     "name": "RegisterHook",
+     "call": "RegisterHook",
+     "params": [
+      {
+       "name": "...",
+       "type": "any"
+      }
+     ],
+     "text": "Blocked in Wax mods: it hands your code the game's own arrays, and a write into one of them crashes the game. Use hooks.listen(path, fn, { when = \"post\" }), which hands you parameters you can read and a return value you can set.",
+     "ref": "/docs/reference/mods#blocked-functions",
+     "blocked": true
+    },
+    {
+     "id": "UnregisterHook",
+     "name": "UnregisterHook",
+     "call": "UnregisterHook",
+     "params": [
+      {
+       "name": "...",
+       "type": "any"
+      }
+     ],
+     "text": "Blocked in Wax mods: hooks.listen returns the function that takes the listener off, and a reload takes it off by itself.",
      "ref": "/docs/reference/mods#blocked-functions",
      "blocked": true
     },

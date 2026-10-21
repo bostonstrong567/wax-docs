@@ -277,8 +277,15 @@ one raises an error that says why.
 | `LoopAsync`, `ExecuteAsync`, `ExecuteWithDelay` | [`task.spawn`](/docs/tasks), `task.delay` and `task.wait` |
 | `RegisterKeyBind`, `RegisterKeyBindAsync` | [`ui.Hotkey`](/docs/gui/hotkeys) |
 | `RestartMod`, `RestartCurrentMod`, `UninstallMod`, `UninstallCurrentMod`, `ClearAllDelayedActions` | Nothing. Wax reloads mods by itself. |
+| `RegisterHook`, `UnregisterHook` | [`hooks.listen`](/docs/events#listening-to-any-function-of-the-game) |
 
 The originals are still reachable through `raw`, for example `raw.LoopAsync`. They can crash the game.
+
+<Since version="0.3.17" />
+
+`RegisterHook` is blocked for another reason: it hands your code the game's own arrays, and a write into one
+of them crashed a dedicated server. `hooks.listen` hands you views you can read and a return value you can
+set. A mod that reaches `raw.RegisterHook` all the same is told so in the log, once per file, when it loads.
 
 The full list with reasons is in the [reference](/docs/reference/mods#blocked-functions).
 

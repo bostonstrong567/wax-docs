@@ -116,9 +116,62 @@ How to put a stack in the hand, and what `Activate("Consume")` runs, is on
 
 ## When your function runs
 
-Your function never runs inside the game's own call. Wax notes what it heard and tells you from its frame
-loop, in the same frame or the next. So your function can wait, show a window or call the game, like any
-other task.
+A handler on one of the signals above never runs inside the game's own call. Wax notes what it heard and
+tells you from its frame loop, in the same frame or the next. So your function can wait, show a window or
+call the game, like any other task. A listener made with `hooks.listen`, below, is the other kind: it runs
+inside the call.
+
+## Listening to any function of the game
+
+<Since version="0.3.17" />
+
+The signals cover what most mods need. For anything else, `hooks.listen` runs your function each time the
+game calls one of its own: a function of the game's C++ code, named by its path. The
+[Explorer](/explorer) lists them with their parameters.
+
+```lua title="init.lua"
+-- The bench asks whether an input of a recipe can be met. Say yes when a chest nearby has it.
+hooks.listen("/Script/Icarus.ProcessingComponent:CanSatisfyRecipeInput", function(bench, ret, input, multiplier, extra, have)
+    if ret:get() == false and chests.have(bench, input.Element.RowName, input.Count * multiplier) then
+        ret:set(true)
+    end
+end, { when = "post" })
+```
+
+- `when = "pre"`, the default, runs your function before the game's: `fn(object, params...)`.
+- `when = "post"` runs it after: `fn(object, ret, params...)`. `ret:get()` is what the game answered, and
+  `ret:set(value)` replaces what the caller will see. Returning a value from your function does the same.
+- The object the function was called on comes as an [Instance](/docs/instances). Numbers, strings and
+  booleans come as they are, an object parameter as an Instance, an array or a struct as a view: `#list`,
+  `list[i]`, `shape.Field`, and `list:get()` for a Lua table you can keep. A view is good inside your function
+  only, so copy what you want to keep.
+- Your function runs inside the game's call. Keep it short, never wait in it, and do not show windows from it.
+  An error is logged, and after five in a row the listener is switched off.
+- It returns a function that takes the listener off. A reload of your mod takes it off by itself.
+- `reach = "called"` is for a function that blueprint code calls: the values UE4SS sees then are the caller's
+  own variables, so only the object is handed over.
+
+### Arrays the game hands you are read-only
+
+<Since version="0.3.17" />
+
+What a hook is handed lives in the game's own memory for the length of the call. An array there belongs to
+the function that made it: if Lua made it longer or emptied it, UE4SS would give it new memory of its own,
+and the game would then write into or free memory it does not own. That is a crash, and on a dedicated
+server it took the whole session down. So every write into a parameter raises an error:
+
+> Wax refuses to write into an array the game handed a hook: it belongs to the game. Use the return value,
+> or move items with the game's own calls.
+
+The right ways:
+
+- **The return value.** Change what the function answers with `ret:set` or by returning a value, as above.
+- **The game's own calls.** To have the game count an item, give it the item: `inventory:Move`, `Push` and
+  `Pull` on [Items and inventories](/docs/items) hand it over the way the game does, before the game looks.
+
+`raw.RegisterHook` is still there for whoever accepts the risk: it hands you UE4SS's values with no view in
+between, the log says so once per file when the mod loads, and the catalogue warns on it. `RegisterHook`
+by itself is not available in a mod, and the catalogue refuses a mod that calls it.
 
 ## What they cost
 

@@ -283,6 +283,8 @@ These UE4SS functions raise an error when a mod calls them. The reason is given 
 | `LoopAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
 | `ExecuteAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
 | `ExecuteWithDelay` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`task.spawn`](/docs/reference/tasks#task-spawn) or [`task.delay`](/docs/reference/tasks#task-delay). |
+| `RegisterHook` | Blocked in Wax mods: it hands your code the game's own arrays, and a write into one of them crashes the game. Use hooks.listen(path, fn, \{ when = "post" \}), which hands you parameters you can read and a return value you can set. |
+| `UnregisterHook` | Blocked in Wax mods: [`hooks.listen`](/docs/reference/hooks#hooks-listen) returns the function that takes the listener off, and a reload takes it off by itself. |
 | `RegisterKeyBind` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`ui.Hotkey`](/docs/reference/ui#ui-hotkey). |
 | `RegisterKeyBindAsync` | Blocked in Wax mods: it runs Lua on another thread, which corrupts the game's Lua state. Use [`ui.Hotkey`](/docs/reference/ui#ui-hotkey). |
 | `RestartMod` | Blocked in Wax mods: restarting a UE4SS mod destroys the Lua state Wax runs in. Reload the mod through Wax instead. |

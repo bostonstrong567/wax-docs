@@ -173,6 +173,14 @@ const PAGES = {
     description: 'game.Frame, and signals that fire when a value of the game changes.',
     lead: ['WaxFrameSignal'],
   },
+  'hooks.lua': {
+    slug: 'hooks',
+    icon: 'Webhook',
+    title: 'Hooks',
+    description: 'hooks.listen: run your code when the game calls one of its own functions, read what it was handed, set what it returns.',
+    lead: ['WaxHooks'],
+    note: '<Since version="0.3.17" />',
+  },
 };
 // Lua's own standard library, written by the language server. Not part of Wax.
 const SKIP = new Set(['lua_basic.lua']);

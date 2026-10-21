@@ -340,9 +340,17 @@ not taken.
 | `LoopInGameThreadAfterFrames` | A loop inside `task.spawn` with a `task.wait` in it. `task.wait()` with no number waits one frame. |
 | `RegisterBeginPlayPostHook`, `RegisterEndPlayPreHook` | For creatures and players, the signals of [`game.Creatures`](/docs/creatures#when-creatures-come-and-go) and `game.Players`. |
 | `RestartMod`, `RestartCurrentMod`, `UninstallMod`, `UninstallCurrentMod`, `ClearAllDelayedActions` | Nothing. Wax reloads mods by itself. |
+| `RegisterHook`, `UnregisterHook` | [`hooks.listen`](/docs/events#listening-to-any-function-of-the-game), which hands you parameters you can read and a return value you can set. |
 
 Wax blocks most of these in the game as well.
 [Functions that are blocked](/docs/mods#functions-that-are-blocked) says why.
+
+<Since version="0.3.17" />
+
+`raw.RegisterHook` is a warning, not a refusal: the author chose UE4SS's own hooks and their risk, and the
+reviewer looks at what the mod does with them. A write into an array the game handed a hook crashes the game,
+so `list:Empty()` or `list[n + 1] = x` on a parameter of a function is pointed out as well
+([why](/docs/events#arrays-the-game-hands-you-are-read-only)).
 
 ### Calls the reviewer looks at
 
