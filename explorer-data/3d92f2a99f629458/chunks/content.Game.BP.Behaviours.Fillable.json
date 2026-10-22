@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Behaviours.Fillable","types":[
+{"name":"BP_FillableComponent_C","kind":"class","from":"/Game/BP/Behaviours/Fillable/BP_FillableComponent.BP_FillableComponent_C","parent":"FillableComponent","origin":"blueprint","props":[],"funcs":[["ReceiveBeginPlay",[],"","obj:ReceiveBeginPlay()"]]}
+]}
