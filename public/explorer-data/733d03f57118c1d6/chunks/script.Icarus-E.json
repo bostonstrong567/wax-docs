@@ -75,6 +75,8 @@
 {"name":"EFLODActorState","kind":"enum","from":"/Script/Icarus.EFLODActorState","values":[["Undefined",0],["Revealing",2],["Revealed",4],["Concealing",8],["Concealed",16]]},
 {"name":"EFLODLevelInfluenceType","kind":"enum","from":"/Script/Icarus.EFLODLevelInfluenceType","values":[["None",0],["ViewTrace",1],["Distance",2]]},
 {"name":"EFSRModeSetting","kind":"enum","from":"/Script/Icarus.EFSRModeSetting","values":[["Off",0],["Performance",1],["Balanced",2],["Quality",3],["Ultra_Quality",4],["NumSettings",5],["Custom",255]]},
+{"name":"EFaceDirection","kind":"enum","from":"/Script/Icarus.EFaceDirection","values":[["Top",0],["Bottom",1],["Left",2],["Right",3]]},
+{"name":"EFaceTypes","kind":"enum","from":"/Script/Icarus.EFaceTypes","values":[["FaceShape_Round",0],["FaceShape_Heart",1],["FaceShape_Square",2],["FaceShape_Narrow",3],["FaceShape_Pear",4],["FaceShape_Triangle",5],["None",6]]},
 {"name":"EFeatureLevelCheckResult","kind":"enum","from":"/Script/Icarus.EFeatureLevelCheckResult","values":[["Unchecked",0],["Fail_FeatureLevel",1],["Fail_Flag",2],["Unknown_CouldNotCheckFlag",3],["Pass",4]]},
 {"name":"EFieldGuideItemHotToObtain","kind":"enum","from":"/Script/Icarus.EFieldGuideItemHotToObtain","values":[["Unobtainium",0],["Harvest",1],["Craft",2],["Kill",4],["Fishing",8],["PickAxe",16],["SledgeHammer",32],["DrillOrExtract",64],["Buy_At_Workshop",128]]},
 {"name":"EFireExtinguishResult","kind":"enum","from":"/Script/Icarus.EFireExtinguishResult","values":[["Failed",0],["ExtinguishedCombustion",1],["ExtinguishedPyrolysis",2]]},
