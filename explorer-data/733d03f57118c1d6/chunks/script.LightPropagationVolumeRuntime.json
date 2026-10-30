@@ -1,0 +1,3 @@
+{"chunk":"script.LightPropagationVolumeRuntime","types":[
+{"name":"LightPropagationVolumeBlendable","kind":"class","from":"/Script/LightPropagationVolumeRuntime.LightPropagationVolumeBlendable","parent":"Object","origin":"native","props":[["BlendWeight","number","print(obj.BlendWeight)"],["Settings","LightPropagationVolumeSettings","print(obj.Settings)"]],"funcs":[]}
+]}

@@ -1,0 +1,3 @@
+{"chunk":"script.AvfMediaFactory","types":[
+{"name":"AvfMediaSettings","kind":"class","from":"/Script/AvfMediaFactory.AvfMediaSettings","parent":"Object","origin":"native","props":[["NativeAudioOut","boolean","print(obj.NativeAudioOut)"]],"funcs":[]}
+]}

@@ -1,0 +1,5 @@
+{"chunk":"script.NiagaraCore","types":[
+{"name":"NiagaraCompileHash","kind":"struct","from":"/Script/NiagaraCore.NiagaraCompileHash","props":[["DataHash","integer[]","print(value.DataHash)"]]},
+{"name":"NiagaraDataInterfaceBase","kind":"class","from":"/Script/NiagaraCore.NiagaraDataInterfaceBase","parent":"NiagaraMergeable","origin":"native","props":[],"funcs":[]},
+{"name":"NiagaraMergeable","kind":"class","from":"/Script/NiagaraCore.NiagaraMergeable","parent":"Object","origin":"native","props":[],"funcs":[]}
+]}

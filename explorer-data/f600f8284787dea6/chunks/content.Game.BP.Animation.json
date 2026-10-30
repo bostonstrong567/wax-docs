@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Animation","types":[
+{"name":"BP_AnimNotify_CameraShake_C","kind":"class","from":"/Game/BP/Animation/Notifies/BP_AnimNotify_CameraShake.BP_AnimNotify_CameraShake_C","parent":"AnimNotify","origin":"blueprint","props":[["Radius","number","print(obj.Radius)"],["Scale","number","print(obj.Scale)"],["Shake","Class","print(obj.Shake)"],["SourceBone","string","print(obj.SourceBone)"]],"funcs":[["GetNotifyName",[],"string","local result = obj:GetNotifyName()"],["Received_Notify",[["MeshComp","SkeletalMeshComponent"],["Animation","AnimSequenceBase"]],"boolean","local result = obj:Received_Notify(meshComp, animation)"]]}
+]}

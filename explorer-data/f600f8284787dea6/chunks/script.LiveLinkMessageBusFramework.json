@@ -1,0 +1,9 @@
+{"chunk":"script.LiveLinkMessageBusFramework","types":[
+{"name":"LiveLinkClearSubject","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkClearSubject","props":[["SubjectName","string","print(value.SubjectName)"]]},
+{"name":"LiveLinkConnectMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkConnectMessage","props":[["LiveLinkVersion","integer","print(value.LiveLinkVersion)"]]},
+{"name":"LiveLinkHeartbeatMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkHeartbeatMessage","props":[]},
+{"name":"LiveLinkPingMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkPingMessage","props":[["LiveLinkVersion","integer","print(value.LiveLinkVersion)"],["PollRequest","Guid","print(value.PollRequest)"]]},
+{"name":"LiveLinkPongMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkPongMessage","props":[["CreationPlatformTime","number","print(value.CreationPlatformTime)"],["LiveLinkVersion","integer","print(value.LiveLinkVersion)"],["MachineName","string","print(value.MachineName)"],["PollRequest","Guid","print(value.PollRequest)"],["ProviderName","string","print(value.ProviderName)"]]},
+{"name":"LiveLinkSubjectDataMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkSubjectDataMessage","props":[["RefSkeleton","LiveLinkRefSkeleton","print(value.RefSkeleton)"],["SubjectName","string","print(value.SubjectName)"]]},
+{"name":"LiveLinkSubjectFrameMessage","kind":"struct","from":"/Script/LiveLinkMessageBusFramework.LiveLinkSubjectFrameMessage","props":[["Curves","LiveLinkCurveElement[]","print(value.Curves)"],["MetaData","LiveLinkMetaData","print(value.MetaData)"],["SubjectName","string","print(value.SubjectName)"],["Time","number","print(value.Time)"],["Transforms","Transform[]","print(value.Transforms)"]]}
+]}

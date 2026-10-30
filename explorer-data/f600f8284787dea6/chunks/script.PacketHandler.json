@@ -1,0 +1,4 @@
+{"chunk":"script.PacketHandler","types":[
+{"name":"HandlerComponentFactory","kind":"class","from":"/Script/PacketHandler.HandlerComponentFactory","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"PacketHandlerProfileConfig","kind":"class","from":"/Script/PacketHandler.PacketHandlerProfileConfig","parent":"Object","origin":"native","props":[["Components","string[]","print(obj.Components)"]],"funcs":[]}
+]}
