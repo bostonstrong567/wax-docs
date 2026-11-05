@@ -1,0 +1,3 @@
+{"chunk":"script.AutomationUtils","types":[
+{"name":"AutomationUtilsBlueprintLibrary","kind":"class","from":"/Script/AutomationUtils.AutomationUtilsBlueprintLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["TakeGameplayAutomationScreenshot",[["ScreenshotName","string"],["MaxGlobalError","number"],["MaxLocalError","number"],["MapNameOverride","string"]],"","obj:TakeGameplayAutomationScreenshot(\"text\", 1.0, 1.0, \"text\")",["static"]]]}
+]}

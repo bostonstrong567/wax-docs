@@ -1,0 +1,8 @@
+{"chunk":"content.Game.BP.Objects.World.Items.Deployables.Alien","types":[
+{"name":"BP_AlienFossil_Conch_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Conch.BP_AlienFossil_Conch_C","parent":"BP_DeployableBase_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_AlienFossil_Conch_Small_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Conch_Small.BP_AlienFossil_Conch_Small_C","parent":"BP_DeployableBase_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_AlienFossil_Pottery01_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Pottery01.BP_AlienFossil_Pottery01_C","parent":"BP_DeployableContainerBase_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_AlienFossil_Pottery02_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Pottery02.BP_AlienFossil_Pottery02_C","parent":"BP_DeployableContainerBase_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_AlienFossil_Pottery03_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Pottery03.BP_AlienFossil_Pottery03_C","parent":"BP_DeployableContainerBase_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_AlienFossil_Pottery04_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Alien/BP_AlienFossil_Pottery04.BP_AlienFossil_Pottery04_C","parent":"BP_DeployableContainerBase_C","origin":"blueprint","props":[],"funcs":[]}
+]}

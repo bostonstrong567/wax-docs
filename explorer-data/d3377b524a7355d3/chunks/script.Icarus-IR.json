@@ -1,0 +1,4 @@
+{"chunk":"script.Icarus-IR","types":[
+{"name":"IRGN_AlwaysRelevant_ForConnection","kind":"class","from":"/Script/Icarus.IRGN_AlwaysRelevant_ForConnection","parent":"ReplicationGraphNode","origin":"native","props":[["LastPawn","Actor","print(obj.LastPawn)"],["PastRelevantActors","AlwaysRelevantActorInfo[]","print(obj.PastRelevantActors)"]],"funcs":[]},
+{"name":"IRGN_PlayerState_FrequencyLimited","kind":"class","from":"/Script/Icarus.IRGN_PlayerState_FrequencyLimited","parent":"ReplicationGraphNode","origin":"native","props":[],"funcs":[]}
+]}

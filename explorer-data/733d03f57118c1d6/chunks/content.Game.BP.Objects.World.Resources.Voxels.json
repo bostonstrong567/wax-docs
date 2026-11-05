@@ -1,0 +1,7 @@
+{"chunk":"content.Game.BP.Objects.World.Resources.Voxels","types":[
+{"name":"BP_Voxel_GEN_01_C","kind":"class","from":"/Game/BP/Objects/World/Resources/Voxels/Shapes/BP_Voxel_GEN_01.BP_Voxel_GEN_01_C","parent":"BP_VoxelRock_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Voxel_GEN_02_C","kind":"class","from":"/Game/BP/Objects/World/Resources/Voxels/Shapes/BP_Voxel_GEN_02.BP_Voxel_GEN_02_C","parent":"BP_VoxelRock_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Voxel_GEN_03_C","kind":"class","from":"/Game/BP/Objects/World/Resources/Voxels/Shapes/BP_Voxel_GEN_03.BP_Voxel_GEN_03_C","parent":"BP_VoxelRock_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Voxel_GEN_04_C","kind":"class","from":"/Game/BP/Objects/World/Resources/Voxels/Shapes/BP_Voxel_GEN_04.BP_Voxel_GEN_04_C","parent":"BP_VoxelRock_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Voxel_GEN_05_C","kind":"class","from":"/Game/BP/Objects/World/Resources/Voxels/Shapes/BP_Voxel_GEN_05.BP_Voxel_GEN_05_C","parent":"BP_VoxelRock_C","origin":"blueprint","props":[],"funcs":[]}
+]}

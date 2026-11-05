@@ -1,0 +1,3 @@
+{"chunk":"content.Game.UI.Components.SquareProgress","types":[
+{"name":"UMG_CraftingProgressbar_C","kind":"class","from":"/Game/UI/Components/SquareProgress/UMG_CraftingProgressbar.UMG_CraftingProgressbar_C","parent":"UserWidget","origin":"blueprint","props":[["CurrentProgress","number","print(obj.CurrentProgress)"],["Progress","Image","print(obj.Progress)"]],"funcs":[["SetProgress",[["Percent","number"]],"","obj:SetProgress(1.0)"]]}
+]}

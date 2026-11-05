@@ -1,0 +1,4 @@
+{"chunk":"script.UObjectPlugin","types":[
+{"name":"MyPluginObject","kind":"class","from":"/Script/UObjectPlugin.MyPluginObject","parent":"Object","origin":"native","props":[["MyStruct","MyPluginStruct","print(obj.MyStruct)"]],"funcs":[]},
+{"name":"MyPluginStruct","kind":"struct","from":"/Script/UObjectPlugin.MyPluginStruct","props":[["TestString","string","print(value.TestString)"]]}
+]}

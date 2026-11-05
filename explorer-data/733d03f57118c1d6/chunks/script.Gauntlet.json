@@ -1,0 +1,5 @@
+{"chunk":"script.Gauntlet","types":[
+{"name":"GauntletTestController","kind":"class","from":"/Script/Gauntlet.GauntletTestController","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"GauntletTestControllerBootTest","kind":"class","from":"/Script/Gauntlet.GauntletTestControllerBootTest","parent":"GauntletTestController","origin":"native","props":[],"funcs":[]},
+{"name":"GauntletTestControllerErrorTest","kind":"class","from":"/Script/Gauntlet.GauntletTestControllerErrorTest","parent":"GauntletTestController","origin":"native","props":[],"funcs":[]}
+]}

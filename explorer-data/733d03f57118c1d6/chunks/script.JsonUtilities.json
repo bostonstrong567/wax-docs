@@ -1,0 +1,4 @@
+{"chunk":"script.JsonUtilities","types":[
+{"name":"JsonObjectWrapper","kind":"struct","from":"/Script/JsonUtilities.JsonObjectWrapper","props":[["JsonString","string","print(value.JsonString)"]]},
+{"name":"JsonUtilitiesDummyObject","kind":"class","from":"/Script/JsonUtilities.JsonUtilitiesDummyObject","parent":"Object","origin":"native","props":[],"funcs":[]}
+]}

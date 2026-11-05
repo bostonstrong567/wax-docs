@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Singletons","types":[
+{"name":"BP_TemperatureSingleton_C","kind":"class","from":"/Game/BP/Singletons/BP_TemperatureSingleton.BP_TemperatureSingleton_C","parent":"TemperatureSingleton","origin":"blueprint","props":[],"funcs":[]}
+]}

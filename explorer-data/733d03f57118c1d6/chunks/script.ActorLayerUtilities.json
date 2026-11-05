@@ -1,0 +1,4 @@
+{"chunk":"script.ActorLayerUtilities","types":[
+{"name":"ActorLayer","kind":"struct","from":"/Script/ActorLayerUtilities.ActorLayer","props":[["Name","string","print(value.Name)"]]},
+{"name":"LayersBlueprintLibrary","kind":"class","from":"/Script/ActorLayerUtilities.LayersBlueprintLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["AddActorToLayer",[["InActor","Actor"],["Layer","ActorLayer"]],"","obj:AddActorToLayer(inActor, {})",["static"]],["GetActors",[["WorldContextObject","Object"],["ActorLayer","ActorLayer"]],"Actor[]","local result = obj:GetActors(worldContextObject, {})",["static"]],["RemoveActorFromLayer",[["InActor","Actor"],["Layer","ActorLayer"]],"","obj:RemoveActorFromLayer(inActor, {})",["static"]]]}
+]}

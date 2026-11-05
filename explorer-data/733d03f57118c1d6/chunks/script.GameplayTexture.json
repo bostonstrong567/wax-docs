@@ -1,0 +1,4 @@
+{"chunk":"script.GameplayTexture","types":[
+{"name":"GameplayTexture","kind":"class","from":"/Script/GameplayTexture.GameplayTexture","parent":"Object","origin":"native","props":[["BeginUV","Vector2D","print(obj.BeginUV)"],["CachedResolution","IntPoint","print(obj.CachedResolution)"],["EndUV","Vector2D","print(obj.EndUV)"],["Resolution","IntPoint","print(obj.Resolution)"],["SourceTexture","Texture2D","print(obj.SourceTexture)"],["TextureData","Color[]","print(obj.TextureData)"]],"funcs":[["GetSourceTexture",[],"Texture2D","local result = obj:GetSourceTexture()"]]},
+{"name":"GameplayTextureFunctionLibrary","kind":"class","from":"/Script/GameplayTexture.GameplayTextureFunctionLibrary","parent":"BlueprintFunctionLibrary","origin":"native","props":[],"funcs":[["GetUniqueColours",[["Texture","GameplayTexture"]],"Color[]","local result = obj:GetUniqueColours(texture)",["static"]]]}
+]}

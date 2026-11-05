@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Objects.World.Items.Deployables.MortarAndPestle","types":[
+{"name":"BP_MortarAndPestle_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/MortarAndPestle/BP_MortarAndPestle.BP_MortarAndPestle_C","parent":"BP_ProcessorBase_C","origin":"blueprint","props":[["SM_DEP_Mortar_Pestle_02","StaticMeshComponent","print(obj.SM_DEP_Mortar_Pestle_02)"]],"funcs":[["ReceiveBeginPlay",[],"","obj:ReceiveBeginPlay()"]]}
+]}
