@@ -1,0 +1,3 @@
+{"chunk":"content.VisualDebugger","types":[
+{"name":"ScaleRef_Human_C","kind":"class","from":"/VisualDebugger/Assets/ScaleRef_Human.ScaleRef_Human_C","parent":"Actor","origin":"blueprint","props":[["HumanScale","StaticMeshComponent","print(obj.HumanScale)"]],"funcs":[]}
+]}

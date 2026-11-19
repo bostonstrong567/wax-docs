@@ -1,0 +1,3 @@
+{"chunk":"script.ImgMediaEngine","types":[
+{"name":"ImgMediaPlaybackComponent","kind":"class","from":"/Script/ImgMediaEngine.ImgMediaPlaybackComponent","parent":"ActorComponent","origin":"native","props":[["LODBias","number","print(obj.LODBias)"],["Width","number","print(obj.Width)"]],"funcs":[]}
+]}

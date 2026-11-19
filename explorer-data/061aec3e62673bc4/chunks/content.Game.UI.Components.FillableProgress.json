@@ -1,0 +1,3 @@
+{"chunk":"content.Game.UI.Components.FillableProgress","types":[
+{"name":"UMG_FillableProgressBar_C","kind":"class","from":"/Game/UI/Components/FillableProgress/UMG_FillableProgressBar.UMG_FillableProgressBar_C","parent":"UserWidget","origin":"blueprint","props":[["Base","Image","print(obj.Base)"],["CurrentProgress","number","print(obj.CurrentProgress)"],["Progress","Image","print(obj.Progress)"],["Type","IcarusResourcesEnum","print(obj.Type)"]],"funcs":[["Construct",[],"","obj:Construct()"],["SetContainerType",[["ResourceType","IcarusResourcesEnum"]],"","obj:SetContainerType({})"],["SetProgress",[["Percent","number"]],"","obj:SetProgress(1.0)"]]}
+]}

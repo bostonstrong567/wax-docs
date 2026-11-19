@@ -1,0 +1,5 @@
+{"chunk":"script.AudioAnalyzer","types":[
+{"name":"AudioAnalyzerAsset","kind":"class","from":"/Script/AudioAnalyzer.AudioAnalyzerAsset","parent":"Object","origin":"native","props":[],"funcs":[]},
+{"name":"AudioAnalyzerNRT","kind":"class","from":"/Script/AudioAnalyzer.AudioAnalyzerNRT","parent":"AudioAnalyzerAsset","origin":"native","props":[["DurationInSeconds","number","print(obj.DurationInSeconds)"],["Sound","SoundWave","print(obj.Sound)"]],"funcs":[]},
+{"name":"AudioAnalyzerNRTSettings","kind":"class","from":"/Script/AudioAnalyzer.AudioAnalyzerNRTSettings","parent":"AudioAnalyzerAsset","origin":"native","props":[],"funcs":[]}
+]}

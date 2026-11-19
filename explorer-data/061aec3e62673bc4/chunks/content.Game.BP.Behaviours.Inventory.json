@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Behaviours.Inventory","types":[
+{"name":"BPI_LinkedActorInventoryRedirector_C","kind":"class","from":"/Game/BP/Behaviours/Inventory/BPI_LinkedActorInventoryRedirector.BPI_LinkedActorInventoryRedirector_C","parent":"Interface","origin":"blueprint","props":[],"funcs":[["GetRedirectedInventoryComponent",[["InventoryComponent","InventoryComponent"]],"","obj:GetRedirectedInventoryComponent(inventoryComponent)"]]}
+]}

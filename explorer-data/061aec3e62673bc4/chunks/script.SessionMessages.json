@@ -1,0 +1,7 @@
+{"chunk":"script.SessionMessages","types":[
+{"name":"SessionServiceLog","kind":"struct","from":"/Script/SessionMessages.SessionServiceLog","props":[["Category","string","print(value.Category)"],["Data","string","print(value.Data)"],["InstanceId","Guid","print(value.InstanceId)"],["TimeSeconds","number","print(value.TimeSeconds)"],["Verbosity","integer","print(value.Verbosity)"]]},
+{"name":"SessionServiceLogSubscribe","kind":"struct","from":"/Script/SessionMessages.SessionServiceLogSubscribe","props":[]},
+{"name":"SessionServiceLogUnsubscribe","kind":"struct","from":"/Script/SessionMessages.SessionServiceLogUnsubscribe","props":[]},
+{"name":"SessionServicePing","kind":"struct","from":"/Script/SessionMessages.SessionServicePing","props":[["UserName","string","print(value.UserName)"]]},
+{"name":"SessionServicePong","kind":"struct","from":"/Script/SessionMessages.SessionServicePong","props":[["Authorized","boolean","print(value.Authorized)"],["BuildDate","string","print(value.BuildDate)"],["DeviceName","string","print(value.DeviceName)"],["InstanceId","Guid","print(value.InstanceId)"],["InstanceName","string","print(value.InstanceName)"],["PlatformName","string","print(value.PlatformName)"],["SessionId","Guid","print(value.SessionId)"],["SessionName","string","print(value.SessionName)"],["SessionOwner","string","print(value.SessionOwner)"],["Standalone","boolean","print(value.Standalone)"]]}
+]}

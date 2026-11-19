@@ -1,0 +1,7 @@
+{"chunk":"content.Game.BP.Objects.World.Items.Deployables.Notes","types":[
+{"name":"BP_AudioLog_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Notes/BP_AudioLog.BP_AudioLog_C","parent":"BP_Note_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Clipboard_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Notes/BP_Clipboard.BP_Clipboard_C","parent":"BP_Note_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Logbook_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Notes/BP_Logbook.BP_Logbook_C","parent":"BP_Note_C","origin":"blueprint","props":[],"funcs":[]},
+{"name":"BP_Note_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Notes/BP_Note.BP_Note_C","parent":"BP_DeployableBase_C","origin":"blueprint","props":[["NS_Sprites","NiagaraComponent","print(obj.NS_Sprites)"],["Note Close Audio","FMODEvent","print(obj:Get(\"Note Close Audio\"))"],["Note Open Audio","FMODEvent","print(obj:Get(\"Note Open Audio\"))"]],"funcs":[["Deployable_Interact",[["Interactor","Actor"]],"","obj:Deployable_Interact(interactor)"],["Deployable_StopInteract",[["Interactor","Actor"]],"","obj:Deployable_StopInteract(interactor)"]]},
+{"name":"BP_Terminal_C","kind":"class","from":"/Game/BP/Objects/World/Items/Deployables/Notes/BP_Terminal.BP_Terminal_C","parent":"BP_Note_C","origin":"blueprint","props":[["LaptopAudio","FMODAudioComponent","print(obj.LaptopAudio)"]],"funcs":[]}
+]}

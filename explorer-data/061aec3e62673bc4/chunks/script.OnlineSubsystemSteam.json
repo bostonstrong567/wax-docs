@@ -1,0 +1,5 @@
+{"chunk":"script.OnlineSubsystemSteam","types":[
+{"name":"SteamAuthComponentModuleInterface","kind":"class","from":"/Script/OnlineSubsystemSteam.SteamAuthComponentModuleInterface","parent":"HandlerComponentFactory","origin":"native","props":[],"funcs":[]},
+{"name":"SteamNetConnection","kind":"class","from":"/Script/OnlineSubsystemSteam.SteamNetConnection","parent":"IpConnection","origin":"native","props":[["bIsPassthrough","boolean","print(obj.bIsPassthrough)"]],"funcs":[]},
+{"name":"SteamNetDriver","kind":"class","from":"/Script/OnlineSubsystemSteam.SteamNetDriver","parent":"IpNetDriver","origin":"native","props":[],"funcs":[]}
+]}

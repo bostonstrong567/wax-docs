@@ -1,0 +1,9 @@
+{"chunk":"script.ActorSequence","types":[
+{"name":"ActorSequence","kind":"class","from":"/Script/ActorSequence.ActorSequence","parent":"MovieSceneSequence","origin":"native","props":[["MovieScene","MovieScene","print(obj.MovieScene)"],["ObjectReferences","ActorSequenceObjectReferenceMap","print(obj.ObjectReferences)"]],"funcs":[]},
+{"name":"ActorSequenceComponent","kind":"class","from":"/Script/ActorSequence.ActorSequenceComponent","parent":"ActorComponent","origin":"native","props":[["PlaybackSettings","MovieSceneSequencePlaybackSettings","print(obj.PlaybackSettings)"],["Sequence","ActorSequence","print(obj.Sequence)"],["SequencePlayer","ActorSequencePlayer","print(obj.SequencePlayer)"]],"funcs":[]},
+{"name":"ActorSequenceObjectReference","kind":"struct","from":"/Script/ActorSequence.ActorSequenceObjectReference","props":[["ActorId","Guid","print(value.ActorId)"],["PathToComponent","string","print(value.PathToComponent)"],["Type","EActorSequenceObjectReferenceType","print(value.Type)"]]},
+{"name":"ActorSequenceObjectReferenceMap","kind":"struct","from":"/Script/ActorSequence.ActorSequenceObjectReferenceMap","props":[["BindingIds","Guid[]","print(value.BindingIds)"],["References","ActorSequenceObjectReferences[]","print(value.References)"]]},
+{"name":"ActorSequenceObjectReferences","kind":"struct","from":"/Script/ActorSequence.ActorSequenceObjectReferences","props":[["Array","ActorSequenceObjectReference[]","print(value.Array)"]]},
+{"name":"ActorSequencePlayer","kind":"class","from":"/Script/ActorSequence.ActorSequencePlayer","parent":"MovieSceneSequencePlayer","origin":"native","props":[],"funcs":[]},
+{"name":"EActorSequenceObjectReferenceType","kind":"enum","from":"/Script/ActorSequence.EActorSequenceObjectReferenceType","values":[["ContextActor",0],["ExternalActor",1],["Component",2]]}
+]}

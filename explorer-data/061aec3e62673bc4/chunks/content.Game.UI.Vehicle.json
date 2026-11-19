@@ -1,0 +1,5 @@
+{"chunk":"content.Game.UI.Vehicle","types":[
+{"name":"UMG_VehicleControls_C","kind":"class","from":"/Game/UI/Vehicle/UMG_VehicleControls.UMG_VehicleControls_C","parent":"UserWidget","origin":"blueprint","props":[["UMG_Titlebar","UMG_Titlebar_C","print(obj.UMG_Titlebar)"]],"funcs":[]},
+{"name":"UMG_VehicleGear_C","kind":"class","from":"/Game/UI/Vehicle/UMG_VehicleGear.UMG_VehicleGear_C","parent":"UserWidget","origin":"blueprint","props":[["Gear","integer","print(obj.Gear)"],["GearText","TextBlock","print(obj.GearText)"],["Selected","boolean","print(obj.Selected)"],["SelectedImage","Image","print(obj.SelectedImage)"]],"funcs":[["PreConstruct",[["IsDesignTime","boolean"]],"","obj:PreConstruct(true)"],["SetSelected",[["Selected","boolean"]],"","obj:SetSelected(true)"]]},
+{"name":"UMG_VehiclePaperDoll_Wheel_C","kind":"class","from":"/Game/UI/Vehicle/UMG_VehiclePaperDoll_Wheel.UMG_VehiclePaperDoll_Wheel_C","parent":"UserWidget","origin":"blueprint","props":[["Suspension","Image","print(obj.Suspension)"],["Tire","Image","print(obj.Tire)"],["Wheel","Image","print(obj.Wheel)"]],"funcs":[]}
+]}

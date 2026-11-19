@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.Navigation","types":[
+{"name":"BP_IcarusJumpLink_C","kind":"class","from":"/Game/BP/Navigation/BP_IcarusJumpLink.BP_IcarusJumpLink_C","parent":"IcarusNavLink","origin":"blueprint","props":[],"funcs":[["JumpFinished",[],"","obj:JumpFinished()"],["LaunchAgent",[["Agent","Character"],["Destination","Vector"]],"","obj:LaunchAgent(agent, { X = 0, Y = 0, Z = 0 })"],["ReceiveSmartLinkReached",[["Agent","Actor"],["Destination","Vector"]],"","obj:ReceiveSmartLinkReached(agent, { X = 0, Y = 0, Z = 0 })"]]}
+]}

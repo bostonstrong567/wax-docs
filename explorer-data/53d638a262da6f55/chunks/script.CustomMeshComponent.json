@@ -1,0 +1,4 @@
+{"chunk":"script.CustomMeshComponent","types":[
+{"name":"CustomMeshComponent","kind":"class","from":"/Script/CustomMeshComponent.CustomMeshComponent","parent":"MeshComponent","origin":"native","props":[],"funcs":[["AddCustomMeshTriangles",[["Triangles","CustomMeshTriangle[]"]],"","obj:AddCustomMeshTriangles({})"],["ClearCustomMeshTriangles",[],"","obj:ClearCustomMeshTriangles()"],["SetCustomMeshTriangles",[["Triangles","CustomMeshTriangle[]"]],"boolean","local result = obj:SetCustomMeshTriangles({})"]]},
+{"name":"CustomMeshTriangle","kind":"struct","from":"/Script/CustomMeshComponent.CustomMeshTriangle","props":[["Vertex0","Vector","print(value.Vertex0)"],["Vertex1","Vector","print(value.Vertex1)"],["Vertex2","Vector","print(value.Vertex2)"]]}
+]}

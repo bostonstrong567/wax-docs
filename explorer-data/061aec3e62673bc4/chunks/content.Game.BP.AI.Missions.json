@@ -1,0 +1,3 @@
+{"chunk":"content.Game.BP.AI.Missions","types":[
+{"name":"BTTask_SetVector_C","kind":"class","from":"/Game/BP/AI/Missions/BTTask_SetVector.BTTask_SetVector_C","parent":"BTTask_BlueprintBase","origin":"blueprint","props":[["ShouldAdd","boolean","print(obj.ShouldAdd)"],["Value","Vector","print(obj.Value)"],["VectorKey","BlackboardKeySelector","print(obj.VectorKey)"]],"funcs":[["ReceiveExecute",[["OwnerActor","Actor"]],"","obj:ReceiveExecute(ownerActor)"]]}
+]}
